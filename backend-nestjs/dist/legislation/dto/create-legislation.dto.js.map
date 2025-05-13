@@ -1,0 +1,1 @@
+{"version":3,"file":"create-legislation.dto.js","sourceRoot":"","sources":["../../../src/legislation/dto/create-legislation.dto.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,6CAA8C;AAC9C,qDAAuD;AAEvD,MAAa,oBAAoB;IAO7B,IAAI,CAAS;CAEhB;AATD,oDASC;AAFG;IANC,IAAA,qBAAW,EAAC;QACT,IAAI,EAAE,MAAM;QACZ,WAAW,EAAE,UAAU;KAC1B,CAAC;IACD,IAAA,0BAAQ,GAAE;IACV,IAAA,4BAAU,GAAE;;kDACA"}

@@ -1,0 +1,38 @@
+import { Accessory } from "src/accessory/entities/accessory.entity";
+import { ApproveStock } from "src/approve-stock/entities/approve-stock.entity";
+import { CustomerRequest } from "src/customer-request/entities/customer-request.entity";
+import { Device } from "src/devices/entities/device.entity";
+import { ExpertiseReason } from "src/expertise-reasons/entities/expertise-reason.entity";
+import { HistoryRepair } from "src/history-repair/entities/history-repair.entity";
+import { Invoice } from "src/invoice/entities/invoice.entity";
+import { ListFault } from "src/list-fault/entities/list-fault.entity";
+import { NotesCustomer } from "src/notes-customer/entities/notes-customer.entity";
+import { OutputList } from "src/output-list/entities/output-list.entity";
+import { RepairAction } from "src/repair-action/entities/repair-action.entity";
+import { Transfert } from "src/transfert/entities/transfert.entity";
+import { User } from "src/users/entities/user.entity";
+export declare class Repair {
+    id: number;
+    warrenty?: boolean;
+    approveRepair?: boolean;
+    newSerialNumber?: string;
+    advancePayment?: number;
+    actuellyBranch: number;
+    files?: string[];
+    partsNeed?: number[];
+    remark?: string;
+    deviceStateReceive: string;
+    accessory?: Accessory[];
+    listFault: ListFault[];
+    customerRequest?: CustomerRequest[];
+    notesCustomer?: NotesCustomer[];
+    expertiseReason?: ExpertiseReason[];
+    repairAction?: RepairAction[];
+    device: Device;
+    user: User;
+    approveStock?: ApproveStock[];
+    historyRepair: HistoryRepair[];
+    outputList: OutputList;
+    transfert: Transfert[];
+    invoice: Invoice;
+}

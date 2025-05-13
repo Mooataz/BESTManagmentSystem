@@ -1,0 +1,1 @@
+{"version":3,"file":"create-notes-customer.dto.js","sourceRoot":"","sources":["../../../src/notes-customer/dto/create-notes-customer.dto.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,6CAA8C;AAC9C,qDAAuD;AAEvD,MAAa,sBAAsB;IAO/B,IAAI,CAAS;CAChB;AARD,wDAQC;AADG;IANC,IAAA,qBAAW,EAAC;QACT,IAAI,EAAE,MAAM;QACZ,WAAW,EAAE,UAAU;KAC1B,CAAC;IACD,IAAA,0BAAQ,GAAE;IACV,IAAA,4BAAU,GAAE;;oDACA"}
