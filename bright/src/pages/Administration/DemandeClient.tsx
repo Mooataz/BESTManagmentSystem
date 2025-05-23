@@ -5,7 +5,7 @@ import Table from '@mui/joy/Table';
 import Box from '@mui/joy/Box';
 import Button from '@mui/joy/Button';
 import Typography from '@mui/joy/Typography';
-import { addDemandeClient,    deletedemandeClient,  fetchListdemandeClient,   updateDemandeClient,   } from '../../api/Administration';
+import { addDemandeClient,    deletedemandeClient,  fetchListdemandeClient,   updateDemandeClient,   } from '../../api/administration/Administration';
 import Divider from '@mui/joy/Divider';
 import DialogTitle from '@mui/joy/DialogTitle';
 import DialogContent from '@mui/joy/DialogContent';
@@ -16,6 +16,9 @@ import DeleteForever from '@mui/icons-material/DeleteForever';
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
 import Tooltip from '@mui/joy/Tooltip';
 import AdjustIcon from '@mui/icons-material/Adjust';
+import Add from '@mui/icons-material/Add';
+import { useNotification } from '../Componants/NotificationContext';
+
 interface DemandeClient {
     id: number; name: string;
 }
@@ -26,6 +29,7 @@ interface ResponsiveModalProps {
 
   export default function DemandeClient() {
     const [message, setMessage] = React.useState<DemandeClient[]>([]);
+
     React.useEffect(() => {
         fetchListdemandeClient()
             .then((data) => { setMessage(data) })
@@ -70,6 +74,8 @@ interface ResponsiveModalProps {
 }
 
 function DeleteDemandeClient ({ demandeClient }:ResponsiveModalProps) {
+    const { notify } = useNotification();
+
     const [open, setOpen] = React.useState<boolean>(false);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
@@ -85,8 +91,12 @@ function DeleteDemandeClient ({ demandeClient }:ResponsiveModalProps) {
         try {
           await deletedemandeClient(formData.id);
           setOpen(false);
+              notify("Mise à jour avec succès !", "success");
+
         } catch (err) {
-          setError('Échec de la mise à jour. Veuillez réessayer.');
+                 const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
+            notify(errorMessage, "danger");
+
         } finally {
           setIsLoading(false);
         }
@@ -161,14 +171,23 @@ function DeleteDemandeClient ({ demandeClient }:ResponsiveModalProps) {
     )
 }
 function UpdateDemandeClient({ demandeClient }: ResponsiveModalProps) {
+    const { notify } = useNotification();
+
     const [open, setOpen] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
 const [formData, setFormData] = React.useState({
-    id:demandeClient.id,
-    name:demandeClient.name,
+    id:0,
+    name:'',
     
 })
+        const handleOpen = () => {
+        setFormData({
+             id:demandeClient.id,
+            name:demandeClient.name,
+        });
+        setOpen(true);
+    };
 const handleSubmit = async () => {
     setIsLoading(true);
     setError(null);
@@ -176,8 +195,11 @@ const handleSubmit = async () => {
     try {
       await updateDemandeClient(formData);
       setOpen(false);
+          notify("Mise à jour avec succès !", "success");
+
     } catch (err) {
-      setError('Échec de la mise à jour. Veuillez réessayer.');
+             const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
+            notify(errorMessage, "danger");
     } finally {
       setIsLoading(false);
     }
@@ -185,7 +207,7 @@ const handleSubmit = async () => {
 
     return (
         <React.Fragment>
-            <Button variant="outlined" color="neutral" onClick={() => setOpen(true)}>
+            <Button variant="outlined" color="neutral" onClick={() => {setOpen(true); handleOpen()}}>
                 Editer
             </Button>
             <Modal open={open} onClose={() => setOpen(false)} >
@@ -241,6 +263,8 @@ const handleSubmit = async () => {
     );
 }
 function AjouteDemandeClient( ) {
+    const { notify } = useNotification();
+
     const [open, setOpen] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
@@ -254,8 +278,13 @@ const handleSubmit = async () => {
     try {
       await addDemandeClient(formData);
       setOpen(false);
+          notify("Ajouter avec succès !", "success");
+
     } catch (err) {
-      setError('Échec de la mise à jour. Veuillez réessayer.');
+       
+           const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
+            notify(errorMessage, "danger");
+
     } finally {
       setIsLoading(false);
     }
@@ -264,7 +293,16 @@ const handleSubmit = async () => {
     return (
         <React.Fragment>
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', width:'60%', marginLeft:'20%'}}>
-            <Button variant="outlined" fullWidth  onClick={() => setOpen(true)}>Ajouter un nouvelle demande</Button>
+                          <div style={{ marginLeft: '65%', marginBottom: '1%' }}>
+                    <Button
+                    variant="outlined"
+                    color="neutral"
+                    startDecorator={<Add />}
+                     fullWidth  onClick={() => setOpen(true)}
+                    >
+                    Ajouter un nouvelle demande
+                    </Button>
+                </div>
             </Box>
             <Modal open={open} onClose={() => setOpen(false)} >
                 <ModalDialog

@@ -7,17 +7,14 @@ export class Device {
     @PrimaryGeneratedColumn()
         id: number;
     @Column()
-        serialeNumber? : string;
+        serialenumber : string;
     
     @Column({ type: 'timestamptz' })
-        purchaseDate? : Date ;
+        purchaseDate : Date ;
     
     @Column()
-        warrentyProof? : string;
+        warrentyProof : string;
 
-    @ManyToMany( () => Customer, customer => customer.device)
-    @JoinTable() 
-    customer : Customer[];
 
     @OneToMany( () => Repair, repair => repair.device)
     repair: Repair[];

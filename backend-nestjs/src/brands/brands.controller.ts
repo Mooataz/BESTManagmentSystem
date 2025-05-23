@@ -35,7 +35,7 @@ export class BrandsController {
   async create( @Body() createBrandDto: CreateBrandDto, 
                 @Res() res , 
                 @UploadedFile() logo:Express.Multer.File) {
-    
+    console.log('REÇU', createBrandDto, logo);
     try {
       createBrandDto.logo=logo.filename
       const newBrand= await this.brandsService.create(createBrandDto)

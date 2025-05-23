@@ -14,6 +14,7 @@ const swagger_1 = require("@nestjs/swagger");
 class CreateOtherCostDto {
     name;
     price;
+    status;
 }
 exports.CreateOtherCostDto = CreateOtherCostDto;
 __decorate([
@@ -31,4 +32,11 @@ __decorate([
     }),
     __metadata("design:type", Number)
 ], CreateOtherCostDto.prototype, "price", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        type: String,
+        description: "Required"
+    }),
+    __metadata("design:type", String)
+], CreateOtherCostDto.prototype, "status", void 0);
 //# sourceMappingURL=create-other-cost.dto.js.map

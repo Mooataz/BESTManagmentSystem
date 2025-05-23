@@ -16,6 +16,8 @@ class CreateModelDto {
     name;
     picture;
     allpartIds;
+    brand;
+    typeModel;
 }
 exports.CreateModelDto = CreateModelDto;
 __decorate([
@@ -37,9 +39,29 @@ __decorate([
 ], CreateModelDto.prototype, "picture", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        type: Array,
+        type: [Number],
         description: "Required"
     }),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsNumber)({}, { each: true }),
     __metadata("design:type", Array)
 ], CreateModelDto.prototype, "allpartIds", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        type: Number,
+        description: "Required"
+    }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Number)
+], CreateModelDto.prototype, "brand", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        type: Number,
+        description: "Required"
+    }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Number)
+], CreateModelDto.prototype, "typeModel", void 0);
 //# sourceMappingURL=create-model.dto.js.map

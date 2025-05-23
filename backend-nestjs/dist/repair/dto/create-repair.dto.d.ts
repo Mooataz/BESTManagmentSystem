@@ -8,12 +8,13 @@ export declare class CreateRepairDto {
     partsNeed?: number[];
     remark?: string;
     deviceStateReceive?: string;
-    accessoryIds: number[];
-    listFaultIds: number[];
-    customerRequestIds: number[];
-    notesCustomerIds: number[];
-    expertiseReasonsIds: number[];
-    repairActionIds: number[];
+    accessoryIds?: number[];
+    listFaultIds?: number[];
+    customerRequestIds?: number[];
+    notesCustomerIds?: number[];
+    expertiseReasonsIds?: number[];
+    repairActionIds?: number[];
     device: number;
-    user: number;
+    user?: number;
+    customer: number;
 }

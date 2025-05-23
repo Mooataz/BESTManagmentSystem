@@ -22,12 +22,7 @@ export class CreateUserDto {
     @IsNotEmpty()
     phone : number;
 
-    /* @ApiProperty({
-        type:String,
-        description: "Required"
-    })
-    @IsEmail()
-    email : string; */
+   
 
     @ApiProperty({
         type:String,
@@ -68,11 +63,7 @@ export class CreateUserDto {
     @IsString({ each: true })
     role : string;
 
-    @ApiProperty({
-        type:Array,
-        description: "Required"
-    })
-    permissionsIds: number[];
+ 
 
     @ApiProperty({
         type:Number,

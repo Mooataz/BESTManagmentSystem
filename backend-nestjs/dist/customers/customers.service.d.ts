@@ -14,5 +14,5 @@ export declare class CustomersService {
     remove(id: number): Promise<Customer>;
     findByDistributer(distributerId: number): Promise<Customer[]>;
     findByPhone(phone: number): Promise<Customer[]>;
-    findByName(name: string): Promise<Customer[]>;
+    findByName(name: string, phone: number, distributer: any): Promise<Customer>;
 }

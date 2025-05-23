@@ -178,28 +178,56 @@ export class DevicesController {
     }
   }
 
-  @Get('filter-by-customer/:customerId')
-async getDevicesByCustomer(@Param('customerId') customerId: string, @Res() res) {
-  try {
-    const id = parseInt(customerId, 10);
-    if (isNaN(id)) {
-      throw new Error('Invalid customerId');
+@ApiBody({
+    schema:{
+      type:'object',
+      properties: {
+        serialenumber:{type:"string"},
+        warrentyProof : {type:"string" , format:"binary"},
+        purchaseDate: {type :"Date"},
+        model: {type: "number"},
+         
+      },
+      }
+    })
+    @ApiConsumes("multipart/form-data")
+  // configuration Multer
+  @UseInterceptors(
+    FileInterceptor('warrentyProof', {
+      storage : diskStorage({
+        destination:"./upload/devices",
+        filename:(_request, warrentyProof, callback) =>
+          callback(null,`${new Date().getTime()}-${warrentyProof.originalname}`)
+      })
+    })
+  )
+   @Post('Device')
+   async checkDevice (@Body() body:{
+    serialenumber:string,
+    purchaseDate:string,
+     
+    model:number
+   }, @Res() res, @UploadedFile() file:Express.Multer.File){
+
+    
+    try {
+      const {serialenumber, purchaseDate,  model } = body;
+      const warrentyProof=file?.filename
+      const find = await this.devicesService.chekDevice(serialenumber, purchaseDate, warrentyProof, model)
+      return res.status(HttpStatus.OK).json({
+        message:"Founded Successfuly !",
+        status:HttpStatus.OK,
+        data:find })
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message:error.message,
+        status:HttpStatus.BAD_REQUEST,
+        data:null })
     }
 
-    const devices = await this.devicesService.filterDevicesByCustomer(id);
-    return res.status(HttpStatus.OK).json({
-      message: 'Devices found successfully!',
-      status: HttpStatus.OK,
-      data: devices,
-    });
-  } catch (error) {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      message: error.message,
-      status: HttpStatus.BAD_REQUEST,
-      data: null,
-    });
+   }
+
+   
+  
   }
-}
-
-
-}
+ 

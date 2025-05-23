@@ -19,10 +19,10 @@ export class Model {
     @Column({ nullable: true })
             picture: string;
 
-    @ManyToOne( () => Brand, Brand => Brand.Model)
+    @ManyToOne( () => Brand, Brand => Brand.Model,  { cascade: true })
     brand : Brand 
 
-    @ManyToOne( () => TypeModel, typeModel => typeModel.model)
+    @ManyToOne( () => TypeModel, typeModel => typeModel.model,  { cascade: true })
     typeModel : TypeModel ;
 
     @OneToMany( () => Device, device => device.model)

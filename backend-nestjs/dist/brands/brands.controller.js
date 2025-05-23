@@ -26,6 +26,7 @@ let BrandsController = class BrandsController {
         this.brandsService = brandsService;
     }
     async create(createBrandDto, res, logo) {
+        console.log('REÇU', createBrandDto, logo);
         try {
             createBrandDto.logo = logo.filename;
             const newBrand = await this.brandsService.create(createBrandDto);

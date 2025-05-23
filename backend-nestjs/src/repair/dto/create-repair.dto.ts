@@ -37,26 +37,29 @@ export class CreateRepairDto {
     deviceStateReceive?: string;
 
     @ApiProperty({ type: Array, description: "Required"  })
-    accessoryIds: number[];
+    accessoryIds?: number[];
 
     @ApiProperty({ type: Array, description: "Required" })
-    listFaultIds: number[];
+    listFaultIds?: number[];
 
     @ApiProperty({ type: Array, description: "Required" })
-    customerRequestIds: number[];
+    customerRequestIds?: number[];
 
     @ApiProperty({ type: Array, description: "Required" })
-    notesCustomerIds: number[];
+    notesCustomerIds?: number[];
 
     @ApiProperty({ type: Array, description: "Required" })
-    expertiseReasonsIds: number[];
+    expertiseReasonsIds?: number[];
 
     @ApiProperty({ type: Array, description: "Required" })
-    repairActionIds: number[];
+    repairActionIds?: number[];
 
     @ApiProperty({ type: Number,})   
     device: number;
 
     @ApiProperty({type: Number,})
-    user: number;
+    user?: number;
+
+    @ApiProperty({type: Number,})
+    customer: number;
 }

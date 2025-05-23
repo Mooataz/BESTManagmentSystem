@@ -79,7 +79,9 @@ let CompanyController = class CompanyController {
     }
     async update(id, updateCompanyDto, res, logo) {
         try {
-            updateCompanyDto.logo = logo.filename;
+            if (logo) {
+                updateCompanyDto.logo = logo.filename;
+            }
             const updatedata = await this.companyService.update(id, updateCompanyDto);
             return res.status(common_1.HttpStatus.OK).json({
                 message: "Company updated successfuly !",

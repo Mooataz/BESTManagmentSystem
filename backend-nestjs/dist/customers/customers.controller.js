@@ -56,26 +56,10 @@ let CustomersController = class CustomersController {
             });
         }
     }
-    async getByPhone(phone, res) {
+    async getByName(body, res) {
         try {
-            const allfind = await this.customersService.findByPhone(phone);
-            return res.status(common_1.HttpStatus.OK).json({
-                message: "Founded Successfuly !",
-                status: common_1.HttpStatus.OK,
-                data: allfind
-            });
-        }
-        catch (error) {
-            return res.status(common_1.HttpStatus.BAD_REQUEST).json({
-                message: error.message,
-                status: common_1.HttpStatus.BAD_REQUEST,
-                data: null
-            });
-        }
-    }
-    async getByName(name, res) {
-        try {
-            const allfind = await this.customersService.findByName(name);
+            const { name, phone, distributer } = body;
+            const allfind = await this.customersService.findByName(name, phone, distributer);
             return res.status(common_1.HttpStatus.OK).json({
                 message: "Founded Successfuly !",
                 status: common_1.HttpStatus.OK,
@@ -177,19 +161,11 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], CustomersController.prototype, "getByDistributerId", null);
 __decorate([
-    (0, common_1.Get)('/findByPhone/:phone'),
-    __param(0, (0, common_1.Param)('phone')),
+    (0, common_1.Post)('/findByName'),
+    __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
-    __metadata("design:returntype", Promise)
-], CustomersController.prototype, "getByPhone", null);
-__decorate([
-    (0, common_1.Get)('/findByName/:name'),
-    __param(0, (0, common_1.Param)('name')),
-    __param(1, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], CustomersController.prototype, "getByName", null);
 __decorate([

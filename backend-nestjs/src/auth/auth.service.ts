@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { CreateLoginDTO } from './dto/create-login.dto';
 import * as argon2  from 'argon2';
@@ -23,12 +23,15 @@ export class AuthService {
         const user = await this.userService.findUserByLogin(createLoginDTO.login);
         if(!user){ throw new BadRequestException('User not found by this login')};
 
+        if (user.status !== 'Autoriser') {
+            throw new UnauthorizedException("Compte a été désactivé");
+        }
+
         //Check password
         const passwordMatches = await argon2.verify(user.password, createLoginDTO.password);
         if(!passwordMatches){ throw new BadRequestException('Incorrect password')};
 
-        //if(user.refreshToken !== null) { throw new BadRequestException('User already connected')} // verifier si user deja connecter
-
+ 
         // Generate Token
         const token = await this.generateTokens(user.id, user.login)
 
@@ -40,6 +43,7 @@ export class AuthService {
     async findUserById(id: number) {
         const user = await this.userRepositry.findOne({
           where: { id },
+          relations: ['branch'],
           select: ['id', 'name', 'role', 'login', 'status'], // ce que tu veux retourner
         });
         return user;

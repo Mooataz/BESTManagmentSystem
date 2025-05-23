@@ -17,26 +17,40 @@ const common_1 = require("@nestjs/common");
 const model_entity_1 = require("./entities/model.entity");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
+const type_model_entity_1 = require("../type-model/entities/type-model.entity");
+const brand_entity_1 = require("../brands/entities/brand.entity");
 const all_part_entity_1 = require("../all-parts/entities/all-part.entity");
 const app_service_1 = require("../app.service");
 let ModelsService = class ModelsService {
     modelRepositry;
     allPartRepositry;
+    brandRepositry;
+    typeModelRepositry;
     appService;
-    constructor(modelRepositry, allPartRepositry, appService) {
+    constructor(modelRepositry, allPartRepositry, brandRepositry, typeModelRepositry, appService) {
         this.modelRepositry = modelRepositry;
         this.allPartRepositry = allPartRepositry;
+        this.brandRepositry = brandRepositry;
+        this.typeModelRepositry = typeModelRepositry;
         this.appService = appService;
     }
     async create(createModelDto) {
         createModelDto.name = this.appService.cleanSpaces(createModelDto.name);
+        const brand = createModelDto.brand ? await this.brandRepositry.findOne({ where: { id: createModelDto.brand } }) : undefined;
+        if (!brand) {
+            throw new common_1.NotFoundException("No valid brand found.");
+        }
+        const typeModel = createModelDto.brand ? await this.typeModelRepositry.findOne({ where: { id: createModelDto.typeModel } }) : undefined;
+        if (!typeModel) {
+            throw new common_1.NotFoundException("No Type model found.");
+        }
         const allpart = await this.allPartRepositry.find({ where: { id: (0, typeorm_2.In)(createModelDto.allpartIds) } });
-        const createNew = this.modelRepositry.create({ ...createModelDto, allpart });
+        const createNew = this.modelRepositry.create({ ...createModelDto, brand, allpart, typeModel });
         return await this.modelRepositry.save(createNew);
     }
     async findAll() {
         const findAll = await this.modelRepositry.find({
-            relations: ['allpart'],
+            relations: ['allpart', 'brand', 'typeModel'],
         });
         if (!findAll || findAll.length === 0) {
             throw new common_1.NotFoundException('No models found');
@@ -51,12 +65,46 @@ let ModelsService = class ModelsService {
         return findOne;
     }
     async update(id, updateModelDto) {
-        await this.modelRepositry.update(id, updateModelDto);
-        const updatedata = await this.modelRepositry.findOne({ where: { id } });
-        if (!updatedata) {
-            throw new common_1.NotFoundException('Model not found for update');
+        const existingModel = await this.modelRepositry.findOne({
+            where: { id },
+            relations: ['brand', 'typeModel', 'allpart']
+        });
+        if (!existingModel) {
+            throw new common_1.NotFoundException('Model not found');
         }
-        return updatedata;
+        const updateData = {};
+        if (updateModelDto.name) {
+            updateData.name = this.appService.cleanSpaces(updateModelDto.name);
+        }
+        if (updateModelDto.picture) {
+            updateData.picture = updateModelDto.picture;
+        }
+        if (updateModelDto.brand) {
+            const brand = await this.brandRepositry.findOne({
+                where: { id: updateModelDto.brand }
+            });
+            if (!brand) {
+                throw new common_1.NotFoundException("No valid brand found.");
+            }
+            updateData.brand = brand;
+        }
+        if (updateModelDto.typeModel) {
+            const typeModel = await this.typeModelRepositry.findOne({
+                where: { id: updateModelDto.typeModel }
+            });
+            if (!typeModel) {
+                throw new common_1.NotFoundException("No Type model found.");
+            }
+            updateData.typeModel = typeModel;
+        }
+        if (updateModelDto.allpartIds) {
+            const allpart = await this.allPartRepositry.find({
+                where: { id: (0, typeorm_2.In)(updateModelDto.allpartIds) }
+            });
+            existingModel.allpart = allpart;
+        }
+        Object.assign(existingModel, updateData);
+        return await this.modelRepositry.save(existingModel);
     }
     async remove(id) {
         const deletedata = await this.modelRepositry.findOne({ where: { id } });
@@ -94,7 +142,11 @@ exports.ModelsService = ModelsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(model_entity_1.Model)),
     __param(1, (0, typeorm_1.InjectRepository)(all_part_entity_1.AllPart)),
+    __param(2, (0, typeorm_1.InjectRepository)(brand_entity_1.Brand)),
+    __param(3, (0, typeorm_1.InjectRepository)(type_model_entity_1.TypeModel)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.Repository,
         app_service_1.AppService])
 ], ModelsService);

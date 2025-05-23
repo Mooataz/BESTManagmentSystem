@@ -30,6 +30,7 @@ class CreateRepairDto {
     repairActionIds;
     device;
     user;
+    customer;
 }
 exports.CreateRepairDto = CreateRepairDto;
 __decorate([
@@ -106,4 +107,8 @@ __decorate([
     (0, swagger_1.ApiProperty)({ type: Number, }),
     __metadata("design:type", Number)
 ], CreateRepairDto.prototype, "user", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Number, }),
+    __metadata("design:type", Number)
+], CreateRepairDto.prototype, "customer", void 0);
 //# sourceMappingURL=create-repair.dto.js.map

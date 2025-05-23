@@ -8,44 +8,37 @@ import FolderRoundedIcon from '@mui/icons-material/FolderRounded';
 import Layout from './componantes/Layout';
 import Navigation from './componantes/Navigation';
 import Header from './componantes/Header';
- import Distributeurs from '../../pages/Administration/Distributeurs';
-import Accessoires from '../../pages/Administration/Accessoires';
+import Distributeurs from '../../pages/Administration/Distributeurs';
+import Accessoires from '../ModelAccessory/Accessoires';
 import ListProblemes from '../../pages/Administration/ListProblemes';
 import DemandeClient from '../../pages/Administration/DemandeClient';
 import NoteToCustomers from '../../pages/Administration/NotesPourClient';
 import RaisonsExpertise from '../../pages/Administration/RaisonsExpertise';
 import { Agencies } from '../../pages/Administration/Agencies';
-import  Employees  from '../../pages/Administration/Employees';
+import  Employees  from '../Administration/Users/Employees';
 import { Marques } from '../../pages/Administration/Marques';
 import { Entreprise } from '../../pages/Administration/Entreprise';
-
-export default function TeamExample() {
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import Updatepassword from '../Componants/Updatepassword';
+import { ListAllParts } from '../Administration/ListAllParts';
+import { LevelRepair } from '../Administration/LevelRepair';
+import { OthersCoast } from '../Administration/OthersCoast';
+import { TypeModel } from '../ModelAccessory/TypeModel';
+import { Model } from '../ModelAccessory/Model';
+ import imgAcceuille from '../../assets/imgAcceuille.jpg'
+ import Card from '@mui/joy/Card';
+import { AddProduct } from '../Reception/AddProduct';
+ ;
+ export default function Dashboard() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const [selectedPage, setSelectedPage] = React.useState('home');
-
-  const componentsMap: { [key: string]: React.ReactNode } = {
-    Distributeurs: <Distributeurs />,
-    Accessoires: <Accessoires />,
-    ListProblemes: <ListProblemes />,
-    DemandeClient: <DemandeClient />,
-    NoteToCustomers: <NoteToCustomers />,
-    RaisonsExpertise: <RaisonsExpertise />,
-    Agencies: <Agencies />,
-    Employees: <Employees />,
-    Marques: <Marques/>,
-    Entreprise: <Entreprise />
-  };
-
+   
+  
   return (
     <CssVarsProvider disableTransitionOnChange>
       <CssBaseline />
-      {drawerOpen && (
-        <Layout.SideDrawer onClose={() => setDrawerOpen(false)}>
-          {/* Contenu du tiroir latéral si nécessaire */}
-        </Layout.SideDrawer>
-      )}
+       
       
-      {/* Barre d'onglets mobile */}
+       
       <Stack
         id="tab-bar"
         direction="row"
@@ -70,7 +63,7 @@ export default function TeamExample() {
           startDecorator={<FolderRoundedIcon />}
           sx={{ flexDirection: 'column', '--Button-gap': 0 }}
         >
-          Bright Electronic Solutions Technology
+          Bright Electronic Solutions Technology.
         </Button>
       </Stack>
 
@@ -89,9 +82,12 @@ export default function TeamExample() {
           <Header />
         </Layout.Header>
         
-        <Box sx={{ display: 'flex', flexGrow: 1 }}>
+        <Box sx={{ display: 'flex' }}>
           <Layout.SideNav>
-            <Navigation onSelectPage={setSelectedPage} selectedPage={selectedPage} />
+            <Box    >
+                <Navigation  />
+            </Box>
+           
           </Layout.SideNav>
           
           {/* Contenu principal */}
@@ -101,31 +97,39 @@ export default function TeamExample() {
               p: 2,
               display: 'flex',
               flexDirection: 'column',
-              minWidth: 0, // Important pour éviter les débordements
+              minWidth: 1510, // Important pour éviter les débordements
             }}
           >
-            {selectedPage === 'home' ? (
-              <Box
-                sx={{
-                  flexGrow: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                {/* Contenu de la page d'accueil */}
-              </Box>
-            ) : (
-              <Box
-                sx={{
-                  flexGrow: 1,
-                  width: '1600px',
-                  overflow: 'auto', // Ajout du défilement si nécessaire
-                }}
-              >
-                {componentsMap[selectedPage] || null}
-              </Box>
-            )}
+           <Card component="main"  sx={{ flexGrow: 1, p: 2 ,width:'1555px', height:'800px'}}>
+   
+            
+            <Routes>
+              <Route path="/" element={<img src={imgAcceuille}/>}/>
+              <Route path="distributeurs" element={<Distributeurs />} />
+              <Route path="accessoires" element={<Accessoires />} />
+              <Route path="Entreprise" element={ <Entreprise />} />
+              <Route path="Agencies" element={ <Agencies  />} />
+              <Route path="Employees" element={ <Employees  />} />
+              <Route path="Marques" element={ <Marques  />} />
+              <Route path="RaisonsExpertise" element={ <RaisonsExpertise  />} />
+              <Route path="ListProblemes" element={ <ListProblemes  />} />
+              <Route path="DemandeClient" element={ <DemandeClient  />} />
+              <Route path="NoteToCustomers" element={ <NoteToCustomers  />} />
+              <Route path="Updatepassword/:userId" element={ <Updatepassword />} />
+              <Route path="listePiécesTotal" element={ <ListAllParts />} />
+              <Route path='NiveauRéparation' element={ <LevelRepair />} />
+              <Route path="AutresFrais" element={<OthersCoast />} />
+              <Route path='TypeModéle' element={<TypeModel />} />
+              <Route path='Modéles' element={<Model />} />
+              <Route path="Reçoiproduit" element={<AddProduct />}/>
+            </Routes>
+                
+              
+
+
+
+          </Card>
+
           </Layout.Main>
         </Box>
       </Layout.Root>

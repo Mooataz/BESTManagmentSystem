@@ -53,12 +53,18 @@ const auth_module_1 = require("./auth/auth.module");
 const config_1 = require("@nestjs/config");
 const notification_module_1 = require("./notification/notification.module");
 const schedule_1 = require("@nestjs/schedule");
+const serve_static_1 = require("@nestjs/serve-static");
+const path_1 = require("path");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            serve_static_1.ServeStaticModule.forRoot({
+                rootPath: (0, path_1.join)(__dirname, '..', 'upload'),
+                serveRoot: '/upload',
+            }),
             schedule_1.ScheduleModule.forRoot(),
             typeorm_1.TypeOrmModule.forRoot({
                 type: 'postgres',

@@ -44,27 +44,14 @@ export class CustomersController {
         data:null }) }
   }
   
-  @Get('/findByPhone/:phone')
-  async getByPhone(@Param('phone') phone: number,
+ 
+ 
+  @Post('/findByName')
+  async getByName(@Body() body:{name:string , phone:number, distributer} ,
                       @Res() res) {
     try {
-      const allfind = await this.customersService.findByPhone(phone)
-      return res.status(HttpStatus.OK).json({
-        message:"Founded Successfuly !",
-        status:HttpStatus.OK,
-        data:allfind })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
-  }
-
-  @Get('/findByName/:name')
-  async getByName(@Param('name') name: string,
-                      @Res() res) {
-    try {
-      const allfind = await this.customersService.findByName(name)
+      const {name, phone, distributer} = body;
+      const allfind = await this.customersService.findByName(name, phone, distributer)
       return res.status(HttpStatus.OK).json({
         message:"Founded Successfuly !",
         status:HttpStatus.OK,

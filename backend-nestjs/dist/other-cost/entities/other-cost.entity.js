@@ -16,6 +16,7 @@ let OtherCost = class OtherCost {
     id;
     price;
     name;
+    status;
     invoice;
 };
 exports.OtherCost = OtherCost;
@@ -31,6 +32,10 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], OtherCost.prototype, "name", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], OtherCost.prototype, "status", void 0);
 __decorate([
     (0, typeorm_1.ManyToMany)(() => invoice_entity_1.Invoice, (invoice) => invoice.otherCost),
     __metadata("design:type", invoice_entity_1.Invoice)

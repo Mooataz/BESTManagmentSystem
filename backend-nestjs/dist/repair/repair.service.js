@@ -28,6 +28,7 @@ const device_entity_1 = require("../devices/entities/device.entity");
 const user_entity_1 = require("../users/entities/user.entity");
 const stock_part_entity_1 = require("../stock-parts/entities/stock-part.entity");
 const approve_stock_entity_1 = require("../approve-stock/entities/approve-stock.entity");
+const customer_entity_1 = require("../customers/entities/customer.entity");
 let RepairService = class RepairService {
     repairRepositry;
     accessoryRepositry;
@@ -40,8 +41,9 @@ let RepairService = class RepairService {
     userRepositry;
     stockPartRepositry;
     approveStockRepositry;
+    CustomerStockRepositry;
     appService;
-    constructor(repairRepositry, accessoryRepositry, listFaultRepositry, customerRequestRepositry, notesCustomerRepositry, expertiseReasonRepositry, repairActionRepositry, deviceRepositry, userRepositry, stockPartRepositry, approveStockRepositry, appService) {
+    constructor(repairRepositry, accessoryRepositry, listFaultRepositry, customerRequestRepositry, notesCustomerRepositry, expertiseReasonRepositry, repairActionRepositry, deviceRepositry, userRepositry, stockPartRepositry, approveStockRepositry, CustomerStockRepositry, appService) {
         this.repairRepositry = repairRepositry;
         this.accessoryRepositry = accessoryRepositry;
         this.listFaultRepositry = listFaultRepositry;
@@ -53,26 +55,27 @@ let RepairService = class RepairService {
         this.userRepositry = userRepositry;
         this.stockPartRepositry = stockPartRepositry;
         this.approveStockRepositry = approveStockRepositry;
+        this.CustomerStockRepositry = CustomerStockRepositry;
         this.appService = appService;
     }
     async create(createRepairDto) {
         const accessory = await this.accessoryRepositry.find({
-            where: { id: (0, typeorm_1.In)(createRepairDto.accessoryIds) }
+            where: { id: (0, typeorm_1.In)(createRepairDto.accessoryIds ?? []) }
         });
         const listFault = await this.listFaultRepositry.find({
-            where: { id: (0, typeorm_1.In)(createRepairDto.listFaultIds) }
+            where: { id: (0, typeorm_1.In)(createRepairDto.listFaultIds ?? []) }
         });
         const customerRequest = await this.customerRequestRepositry.find({
-            where: { id: (0, typeorm_1.In)(createRepairDto.customerRequestIds) }
+            where: { id: (0, typeorm_1.In)(createRepairDto.customerRequestIds ?? []) }
         });
         const notesCustomer = await this.notesCustomerRepositry.find({
-            where: { id: (0, typeorm_1.In)(createRepairDto.notesCustomerIds) }
+            where: { id: (0, typeorm_1.In)(createRepairDto.notesCustomerIds ?? []) }
         });
         const expertiseReason = await this.expertiseReasonRepositry.find({
-            where: { id: (0, typeorm_1.In)(createRepairDto.expertiseReasonsIds) }
+            where: { id: (0, typeorm_1.In)(createRepairDto.expertiseReasonsIds ?? []) }
         });
         const repairAction = await this.repairActionRepositry.find({
-            where: { id: (0, typeorm_1.In)(createRepairDto.repairActionIds) }
+            where: { id: (0, typeorm_1.In)(createRepairDto.repairActionIds ?? []) }
         });
         const device = await this.deviceRepositry.findOne({
             where: { id: createRepairDto.device }
@@ -143,13 +146,23 @@ let RepairService = class RepairService {
             }
             user = foundUser;
         }
+        let customer = undefined;
+        if (updateRepairDto.customer !== undefined) {
+            const foundCustomer = await this.CustomerStockRepositry.findOne({ where: { id: updateRepairDto.customer } });
+            if (!foundCustomer) {
+                throw new common_1.NotFoundException('Customer not found');
+            }
+            customer = foundCustomer;
+        }
         const updateData = {
             ...updateRepairDto,
             device: device ?? existingRepair.device,
-            user: user ?? existingRepair.user
+            user: user ?? existingRepair.user,
+            customer: customer ?? existingRepair.customer
         };
         delete updateData.device;
         delete updateData.user;
+        delete updateData.customer;
         await this.repairRepositry.update(id, updateData);
         return this.repairRepositry.findOneOrFail({
             where: { id },
@@ -253,7 +266,9 @@ exports.RepairService = RepairService = __decorate([
     __param(8, (0, typeorm_2.InjectRepository)(user_entity_1.User)),
     __param(9, (0, typeorm_2.InjectRepository)(stock_part_entity_1.StockPart)),
     __param(10, (0, typeorm_2.InjectRepository)(approve_stock_entity_1.ApproveStock)),
+    __param(11, (0, typeorm_2.InjectRepository)(customer_entity_1.Customer)),
     __metadata("design:paramtypes", [typeorm_1.Repository,
+        typeorm_1.Repository,
         typeorm_1.Repository,
         typeorm_1.Repository,
         typeorm_1.Repository,

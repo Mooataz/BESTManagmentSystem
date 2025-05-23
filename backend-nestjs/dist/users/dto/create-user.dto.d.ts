@@ -6,6 +6,5 @@ export declare class CreateUserDto {
     createdDate: Date;
     status: string;
     role: string;
-    permissionsIds: number[];
     branch?: number;
 }

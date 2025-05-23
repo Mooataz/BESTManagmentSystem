@@ -28,6 +28,9 @@ let ModelsController = class ModelsController {
     async create(createModelDto, res, picture) {
         try {
             createModelDto.picture = picture.filename;
+            if (typeof createModelDto.allpartIds === 'string') {
+                createModelDto.allpartIds = JSON.parse(createModelDto.allpartIds);
+            }
             const newUser = await this.modelsService.create(createModelDto);
             return res.status(common_1.HttpStatus.CREATED).json({
                 message: "Model created Successfuly !",
@@ -111,9 +114,25 @@ let ModelsController = class ModelsController {
             });
         }
     }
-    async update(id, updateModelDto, res, picture) {
+    async update(id, body, res, picture) {
         try {
-            updateModelDto.picture = picture?.filename;
+            const updateModelDto = new update_model_dto_1.UpdateModelDto();
+            updateModelDto.name = body.name;
+            if (picture) {
+                updateModelDto.picture = picture.filename;
+            }
+            else if (body.picture) {
+                updateModelDto.picture = body.picture;
+            }
+            if (body.allpartIds) {
+                updateModelDto.allpartIds = Array.isArray(body.allpartIds)
+                    ? body.allpartIds
+                    : JSON.parse(body.allpartIds);
+            }
+            if (body.brand)
+                updateModelDto.brand = parseInt(body.brand);
+            if (body.typeModel)
+                updateModelDto.typeModel = parseInt(body.typeModel);
             const updatedata = await this.modelsService.update(id, updateModelDto);
             return res.status(common_1.HttpStatus.OK).json({
                 message: "Model updated successfuly !",
@@ -235,7 +254,7 @@ __decorate([
     __param(2, (0, common_1.Res)()),
     __param(3, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_model_dto_1.UpdateModelDto, Object, Object]),
+    __metadata("design:paramtypes", [Number, Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], ModelsController.prototype, "update", null);
 __decorate([

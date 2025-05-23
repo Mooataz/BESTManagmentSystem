@@ -10,16 +10,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Customer = void 0;
-const device_entity_1 = require("../../devices/entities/device.entity");
 const distributeur_entity_1 = require("../../distributeur/entities/distributeur.entity");
 const output_list_entity_1 = require("../../output-list/entities/output-list.entity");
+const repair_entity_1 = require("../../repair/entities/repair.entity");
 const typeorm_1 = require("typeorm");
 let Customer = class Customer {
     id;
     name;
     phone;
     distributer;
-    device;
+    repair;
     outputList;
 };
 exports.Customer = Customer;
@@ -40,9 +40,9 @@ __decorate([
     __metadata("design:type", distributeur_entity_1.Distributeur)
 ], Customer.prototype, "distributer", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => device_entity_1.Device, device => device.customer),
-    __metadata("design:type", Array)
-], Customer.prototype, "device", void 0);
+    (0, typeorm_1.OneToMany)(() => repair_entity_1.Repair, repair => repair.customer),
+    __metadata("design:type", repair_entity_1.Repair)
+], Customer.prototype, "repair", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => output_list_entity_1.OutputList, (outputList) => outputList.customer),
     __metadata("design:type", Array)

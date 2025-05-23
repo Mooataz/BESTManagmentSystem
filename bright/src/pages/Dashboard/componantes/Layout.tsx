@@ -63,10 +63,12 @@ function SideNav(props: BoxProps) {
       {...props}
       sx={[
         {
+          
           p: 2,
           bgcolor: 'background.surface',
-          borderRight: '1px solid',
+          borderRight: '1px solid ',
           borderColor: 'divider',
+           minWidth:'300px',
           display: {
             xs: 'none',
             sm: 'initial',

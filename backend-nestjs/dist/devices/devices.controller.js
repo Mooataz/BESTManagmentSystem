@@ -112,24 +112,22 @@ let DevicesController = class DevicesController {
             });
         }
     }
-    async getDevicesByCustomer(customerId, res) {
+    async checkDevice(body, res, file) {
         try {
-            const id = parseInt(customerId, 10);
-            if (isNaN(id)) {
-                throw new Error('Invalid customerId');
-            }
-            const devices = await this.devicesService.filterDevicesByCustomer(id);
+            const { serialenumber, purchaseDate, model } = body;
+            const warrentyProof = file?.filename;
+            const find = await this.devicesService.chekDevice(serialenumber, purchaseDate, warrentyProof, model);
             return res.status(common_1.HttpStatus.OK).json({
-                message: 'Devices found successfully!',
+                message: "Founded Successfuly !",
                 status: common_1.HttpStatus.OK,
-                data: devices,
+                data: find
             });
         }
         catch (error) {
             return res.status(common_1.HttpStatus.BAD_REQUEST).json({
                 message: error.message,
                 status: common_1.HttpStatus.BAD_REQUEST,
-                data: null,
+                data: null
             });
         }
     }
@@ -233,13 +231,32 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DevicesController.prototype, "remove", null);
 __decorate([
-    (0, common_1.Get)('filter-by-customer/:customerId'),
-    __param(0, (0, common_1.Param)('customerId')),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            properties: {
+                serialenumber: { type: "string" },
+                warrentyProof: { type: "string", format: "binary" },
+                purchaseDate: { type: "Date" },
+                model: { type: "number" },
+            },
+        }
+    }),
+    (0, swagger_1.ApiConsumes)("multipart/form-data"),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('warrentyProof', {
+        storage: (0, multer_1.diskStorage)({
+            destination: "./upload/devices",
+            filename: (_request, warrentyProof, callback) => callback(null, `${new Date().getTime()}-${warrentyProof.originalname}`)
+        })
+    })),
+    (0, common_1.Post)('Device'),
+    __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
+    __param(2, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
-], DevicesController.prototype, "getDevicesByCustomer", null);
+], DevicesController.prototype, "checkDevice", null);
 exports.DevicesController = DevicesController = __decorate([
     (0, common_1.Controller)('devices'),
     __metadata("design:paramtypes", [devices_service_1.DevicesService])

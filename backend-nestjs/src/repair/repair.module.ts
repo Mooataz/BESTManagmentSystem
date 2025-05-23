@@ -14,9 +14,10 @@ import { User } from 'src/users/entities/user.entity';
 import { Device } from 'src/devices/entities/device.entity';
 import { StockPart } from 'src/stock-parts/entities/stock-part.entity';
 import { ApproveStock } from 'src/approve-stock/entities/approve-stock.entity';
+import { Customer } from 'src/customers/entities/customer.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Repair,Accessory,ListFault,CustomerRequest,NotesCustomer, ExpertiseReason, RepairAction, Device, User, StockPart, ApproveStock])],
+  imports: [TypeOrmModule.forFeature([Repair,Accessory,ListFault,CustomerRequest,NotesCustomer, ExpertiseReason, RepairAction, Device, User, StockPart, ApproveStock,Customer])],
   controllers: [RepairController],
   providers: [RepairService,AppService],
 })

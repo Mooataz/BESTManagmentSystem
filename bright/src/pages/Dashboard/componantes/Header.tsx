@@ -18,12 +18,41 @@ import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import BEST from '../../../assets/BEST.png'
 import { useNavigate } from 'react-router-dom';
-import { getCurrentUser, handleLogout } from '../../../api/login';
+import { getCurrentUser, handleLogout } from '../../../api/administration/login';
 import { TbPassword } from "react-icons/tb";
-
-
-
-
+import { getCompany } from '../../../api/administration/Company';
+import { getAgencies } from '../../../api/administration/Agencies';
+import { AgencieList } from '../../Administration/Users/Employees';
+import { useTranslation } from 'react-i18next';
+import Switch from '@mui/joy/Switch';
+ interface Company {
+  id: number;
+  name: string;
+  headquarterslocation: string;
+  taxRegisterNumber: string;
+  rib: number;
+  logo: string;
+  bank: string;
+  quantityAlertStock: number;
+}
+interface Agency {
+  id: number;
+  name: string;
+  phone: number;
+  email: string;
+  location: string;
+}
+type User = {
+  id: number;
+  name: string;
+  phone: number;
+  password: string;
+  createdDate: string;
+  status: string;
+  login: string;
+  role: string[];
+  branch: Agency
+};
 
 function ColorSchemeToggle() {
   const { mode, setMode } = useColorScheme();
@@ -58,14 +87,18 @@ function ColorSchemeToggle() {
 
 export default function Header() {
   const roleColors: Record<string, string> = {
-    Administarteur: 'gold',
+    Administrateur: 'gold',
     Reception: 'pink',
     Coordinateur: 'green',
     Technicien: 'blue',
     Gestionnaire_de_stocks: 'purple',
   };
   const navigate = useNavigate();
-  const [currentUser, setCurrentUser] = React.useState<{ name: string; role: string[] }>({ name: '', role: [] });
+  const [currentUser, setCurrentUser] = React.useState<User | null>(null);
+  const [branch, setBranch] = React.useState<{ branch: Agency | undefined }>();
+  const [company, setCompany] = React.useState<Company>();
+  const [agencies, setAgencies] = React.useState<Agency[]>([]);
+
   React.useEffect(() => {
     const fetchUser = async () => {
       const user = await getCurrentUser();
@@ -84,7 +117,37 @@ export default function Header() {
     }
   };
 
-  const [open, setOpen] = React.useState(false);
+
+  const fetchUsers = async () => {
+    try {
+      const usersData = await getCompany();
+      setCompany(usersData);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des utilisateurs', error);
+    }
+  };
+
+  React.useEffect(() => {
+    getAgencies().then((data) => setAgencies(data));
+    fetchUsers();
+  }, []);
+const handleNavigation = () => {
+  if (currentUser) {
+    navigate(`/dashboard/Updatepassword/${currentUser.id}`);
+  }
+};
+
+  const { i18n } = useTranslation();
+  const { t } = useTranslation();
+
+  // Détecte la langue actuelle
+  const isEnglish = i18n.language === 'en';
+
+  // Change la langue quand on toggle
+  const handleToggle = () => {
+    const newLang = isEnglish ? 'fr' : 'en';
+    i18n.changeLanguage(newLang);
+  };
   return (
     <Box sx={{ display: 'flex', flexGrow: 1, justifyContent: 'space-between' }}>
       <Stack
@@ -100,9 +163,9 @@ export default function Header() {
           size="md"
           variant="outlined"
           color="neutral"
-          sx={{ display: { xs: 'none', sm: 'inline-flex' }, borderRadius: '50%' }}
+          sx={{ display: { xs: 'none', sm: 'inline-flex' }, borderRadius: '30%' }}
         >
-          <img src={BEST} style={{ width: '40px' }} />
+          <img src={company?.logo ? `http://localhost:3000/upload/company/${company.logo}` : "https://via.placeholder.com/150"} style={{ width: '110px' }} />
         </IconButton>
         <Button
           variant="plain"
@@ -112,7 +175,7 @@ export default function Header() {
           size="sm"
           sx={{ alignSelf: 'center' }}
         >
-          Bright Electronic Solutions Technology
+          {company?.name}
         </Button>
 
 
@@ -125,9 +188,35 @@ export default function Header() {
           gap: 1.5,
           alignItems: 'center',
         }}
-      >
+      >    
+        {currentUser?.role.includes('Administrateur') ? (
+          <AgencieList
+            agencies={agencies}
+            onSelect={(agency) => {
+              setBranch((prev) => ({
+                ...prev,
+                branch: agency ?? prev?.branch,
+              }));
+            }}
+          />
 
+        ) : (
+          <Typography level="body-sm">
+            {t('Agence')} : {currentUser?.branch?.name || '-'}
+          </Typography>
+        )}
 
+<Stack direction="row" spacing={2} alignItems="center">
+      <Typography level="body-sm">Fr</Typography>
+
+      <Switch
+        checked={isEnglish}
+        onChange={handleToggle}
+        
+      />
+
+      <Typography level="body-sm">En</Typography>
+    </Stack>
 
         <ColorSchemeToggle />
         <Dropdown>
@@ -137,7 +226,7 @@ export default function Header() {
             sx={{ maxWidth: '32px', maxHeight: '32px', borderRadius: '9999999px' }}
           >
             <Avatar alt="Remy Sharp" src="/broken-image.jpg">
-              {currentUser.name[0]}
+              {currentUser?.name[0]}
             </Avatar>
           </MenuButton>
           <Menu
@@ -153,14 +242,14 @@ export default function Header() {
             <MenuItem>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Avatar alt="Remy Sharp" src="/broken-image.jpg">
-                  {currentUser.name[0]}
+                  {currentUser?.name[0]}
                 </Avatar>
                 <Box sx={{ ml: 1.5 }}>
                   <Typography level="title-sm" textColor="text.primary">
-                    {currentUser.name}
+                    {currentUser?.name}
                   </Typography>
                   <Typography level="body-xs" textColor="text.tertiary">
-                    {currentUser.role.map((role: string) => (
+                    {currentUser?.role.map((role: string) => (
                       <div className='flex flex-item'><VscStarEmpty color={roleColors[role]} /> {role}</div>
                     ))}
                   </Typography>
@@ -168,11 +257,11 @@ export default function Header() {
               </Box>
             </MenuItem>
             <ListDivider />
-            <MenuItem >
+            <MenuItem  onClick={handleNavigation}>
 
 
               <TbPassword />
-              Modifier mots de passe
+              {t('Upassword')}
 
 
 
@@ -187,7 +276,7 @@ export default function Header() {
                 <LogoutRoundedIcon />
               </div>
 
-              Se dèconnecter
+              {t('Logout')}
             </MenuItem>
           </Menu>
         </Dropdown>

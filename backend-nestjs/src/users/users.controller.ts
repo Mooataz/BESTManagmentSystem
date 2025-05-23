@@ -35,7 +35,22 @@ export class UsersController {
       })
     }
   }
-
+/* @Get('/findUser/:branchId')
+  async findUser(@Param('branchId') branchId: number,
+                      @Res() res) {
+    try {
+      const allfind = await this.usersService.findUser(branchId)
+      return res.status(HttpStatus.OK).json({
+        message:"Founded Successfuly !",
+        status:HttpStatus.OK,
+        data:allfind })
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message:error.message,
+        status:HttpStatus.BAD_REQUEST,
+        data:null }) }
+  }
+ */
   @Get('/findByBranch/:branchId')
   async getByBranchId(@Param('branchId') branchId: number,
                       @Res() res) {
@@ -125,9 +140,9 @@ export class UsersController {
   async update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto, @Res() res) {
     //return this.usersService.update(+id, updateUserDto);
     try {
-      //if (updateUserDto.password){
-         //updateUserDto.password = await argon2.hash(updateUserDto.password); 
-      //}
+      if (updateUserDto.password){
+         updateUserDto.password = await argon2.hash(updateUserDto.password); 
+      }
   
       const updatedata = await this.usersService.update(id,updateUserDto)
       return res.status(HttpStatus.OK).json({

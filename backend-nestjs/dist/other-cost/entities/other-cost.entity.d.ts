@@ -3,5 +3,6 @@ export declare class OtherCost {
     id: number;
     price: number;
     name: string;
+    status: string;
     invoice: Invoice;
 }

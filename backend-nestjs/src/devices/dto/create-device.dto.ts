@@ -18,15 +18,8 @@ export class CreateDeviceDto {
         type:String,
         description: "Required"
     })
-    warrentyProof? : string;
-    @ApiProperty({
-        type: [Number],
-        description: "Array of part IDs (Required, send as '1,2,3')",
-        example: [1, 2, 3],
-    })
-    @IsArray()
-    @ArrayNotEmpty()
-    @IsNumber({}, { each: true })
-    customer: number[];
+    warrentyProof : string;
+   
+ 
    
 }

@@ -1,4 +1,7 @@
-{
+{ 
+  "scripts": {
+    "start:all": "concurrently \"npm --prefix backend-nestjs run start:dev\" \"npm --prefix bright run dev\""
+  },
   "dependencies": {
     "@nestjs/typeorm": "^11.0.0",
     "best": "^14.0.0",
@@ -7,5 +10,8 @@
     "pg": "^8.13.3",
     "typeorm": "^0.3.21",
     "vite": "^6.3.5"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
   }
 }

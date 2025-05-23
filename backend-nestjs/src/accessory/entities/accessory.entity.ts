@@ -8,6 +8,7 @@ export class Accessory {
     @Column()
         name : string;
 
+        
     @ManyToMany ( () => Repair, (repair) => repair.accessory)
     repair : Repair[];
 }

@@ -10,16 +10,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Device = void 0;
-const customer_entity_1 = require("../../customers/entities/customer.entity");
 const model_entity_1 = require("../../models/entities/model.entity");
 const repair_entity_1 = require("../../repair/entities/repair.entity");
 const typeorm_1 = require("typeorm");
 let Device = class Device {
     id;
-    serialeNumber;
+    serialenumber;
     purchaseDate;
     warrentyProof;
-    customer;
     repair;
     model;
 };
@@ -31,7 +29,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], Device.prototype, "serialeNumber", void 0);
+], Device.prototype, "serialenumber", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: 'timestamptz' }),
     __metadata("design:type", Date)
@@ -40,11 +38,6 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Device.prototype, "warrentyProof", void 0);
-__decorate([
-    (0, typeorm_1.ManyToMany)(() => customer_entity_1.Customer, customer => customer.device),
-    (0, typeorm_1.JoinTable)(),
-    __metadata("design:type", Array)
-], Device.prototype, "customer", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => repair_entity_1.Repair, repair => repair.device),
     __metadata("design:type", Array)

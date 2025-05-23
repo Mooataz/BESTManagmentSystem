@@ -1,5 +1,6 @@
 //RaisonsExpertise
 
+import Add from '@mui/icons-material/Add';
 
 import { FormLabel, Input, Stack } from '@mui/joy';
 import * as React from "react";
@@ -17,7 +18,8 @@ import DeleteForever from '@mui/icons-material/DeleteForever';
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
 import Tooltip from '@mui/joy/Tooltip';
 import AdjustIcon from '@mui/icons-material/Adjust';
-import { addRaisonsExpertise, deleteraisonsExpertise, fetchRaisonsExpertise, updateRaisonsExpertise } from '../../api/Administration';
+import { addRaisonsExpertise, deleteraisonsExpertise, fetchRaisonsExpertise, updateRaisonsExpertise } from '../../api/administration/Administration';
+import { useNotification } from '../Componants/NotificationContext';
 interface RaisonsExpertises {
     id: number; name: string;
 }
@@ -72,6 +74,8 @@ interface ResponsiveModalProps {
 }
 
 function DeleteRaisonsExpertise ({ raisonsExpertise }:ResponsiveModalProps) {
+    const { notify } = useNotification();
+    
     const [open, setOpen] = React.useState<boolean>(false);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
@@ -87,8 +91,11 @@ function DeleteRaisonsExpertise ({ raisonsExpertise }:ResponsiveModalProps) {
         try {
           await deleteraisonsExpertise(formData.id);
           setOpen(false);
+          notify("Supprimer avec succès !", "success");
+
         } catch (err) {
-          setError('Échec de la mise à jour. Veuillez réessayer.');
+          const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
+            notify(errorMessage, "danger");
         } finally {
           setIsLoading(false);
         }
@@ -163,14 +170,23 @@ function DeleteRaisonsExpertise ({ raisonsExpertise }:ResponsiveModalProps) {
     )
 }
 function UpdateRaisonsExpertise({ raisonsExpertise }: ResponsiveModalProps) {
+    const { notify } = useNotification();
+    
     const [open, setOpen] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
 const [formData, setFormData] = React.useState({
-    id:raisonsExpertise.id,
-    name:raisonsExpertise.name,
+    id:0,
+    name:'',
     
 })
+        const handleOpen = () => {
+        setFormData({
+             id:raisonsExpertise.id,
+            name:raisonsExpertise.name,
+        });
+        
+    };
 const handleSubmit = async () => {
     setIsLoading(true);
     setError(null);
@@ -178,8 +194,11 @@ const handleSubmit = async () => {
     try {
       await updateRaisonsExpertise(formData);
       setOpen(false);
+      notify("Modification passer", "success");
     } catch (err) {
-      setError('Échec de la mise à jour. Veuillez réessayer.');
+        const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
+            notify(errorMessage, "danger");
+
     } finally {
       setIsLoading(false);
     }
@@ -187,7 +206,7 @@ const handleSubmit = async () => {
 
     return (
         <React.Fragment>
-            <Button variant="outlined" color="neutral" onClick={() => setOpen(true)}>
+            <Button variant="outlined" color="neutral" onClick={() => {setOpen(true); handleOpen()}}>
                 Editer
             </Button>
             <Modal open={open} onClose={() => setOpen(false)} >
@@ -243,6 +262,8 @@ const handleSubmit = async () => {
     );
 }
 function AjouteRaisonsExpertise( ) {
+    const { notify } = useNotification();
+    
     const [open, setOpen] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
@@ -256,8 +277,13 @@ const handleSubmit = async () => {
     try {
       await addRaisonsExpertise(formData);
       setOpen(false);
+        notify("Ajouter avec succès !", "success");
+
     } catch (err) {
-      setError('Échec de la mise à jour. Veuillez réessayer.');
+        const errorMessage =
+        err instanceof Error ? err.message : 'Une erreur inconnue est survenue.';
+        notify(errorMessage, 'danger');
+
     } finally {
       setIsLoading(false);
     }
@@ -266,7 +292,16 @@ const handleSubmit = async () => {
     return (
         <React.Fragment>
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', width:'60%', marginLeft:'20%'}}>
-            <Button variant="outlined" fullWidth  onClick={() => setOpen(true)}>Ajouter un nouvelle raison</Button>
+             <div style={{ marginLeft: '65%', marginBottom: '1%' }}>
+                    <Button
+                    variant="outlined"
+                    color="neutral"
+                    startDecorator={<Add />}
+                     fullWidth  onClick={() => setOpen(true)}
+                    >
+                    Ajouter un nouvelle raison
+                    </Button>
+                </div>
             </Box>
             <Modal open={open} onClose={() => setOpen(false)} >
                 <ModalDialog

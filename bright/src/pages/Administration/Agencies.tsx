@@ -1,7 +1,25 @@
- import { getAgencies, updateAgencie } from '../../api/Agencies';
+import { getAgencies, updateAgencie } from '../../api/administration/Agencies';
 import React, { useEffect } from "react";
- import { Box } from "@mui/joy";
-
+import { Box } from "@mui/joy";
+import Button from '@mui/joy/Button';
+import FormControl from '@mui/joy/FormControl';
+import FormLabel from '@mui/joy/FormLabel';
+import Input from '@mui/joy/Input';
+import Modal from '@mui/joy/Modal';
+import ModalDialog from '@mui/joy/ModalDialog';
+import DialogTitle from '@mui/joy/DialogTitle';
+import DialogContent from '@mui/joy/DialogContent';
+import Stack from '@mui/joy/Stack';
+import Add from '@mui/icons-material/Add';
+import { addAgencie } from '../../api/administration/Agencies'; 
+import Card from '@mui/joy/Card';
+import CardContent from '@mui/joy/CardContent';
+import CardOverflow from '@mui/joy/CardOverflow';
+import CardActions from '@mui/joy/CardActions';
+import Typography from '@mui/joy/Typography';
+import { FcPhone } from "react-icons/fc";
+import { MdAlternateEmail } from "react-icons/md";
+import { TfiLocationPin } from "react-icons/tfi";
 interface Agency {
     id: number;
     name: string;
@@ -72,16 +90,7 @@ export function Agencies() {
 
 
 
-  
-import Card from '@mui/joy/Card';
-import CardContent from '@mui/joy/CardContent';
-import CardOverflow from '@mui/joy/CardOverflow';
-import CardActions from '@mui/joy/CardActions';
-import Typography from '@mui/joy/Typography';
 
-import { FcPhone } from "react-icons/fc";
-import { MdAlternateEmail } from "react-icons/md";
-import { TfiLocationPin } from "react-icons/tfi";
  interface BioCardProps {
     item: {
         id: number;
@@ -124,23 +133,15 @@ export   function BioCard({item}: BioCardProps) {
 
 
 
-import Button from '@mui/joy/Button';
-import FormControl from '@mui/joy/FormControl';
-import FormLabel from '@mui/joy/FormLabel';
-import Input from '@mui/joy/Input';
-import Modal from '@mui/joy/Modal';
-import ModalDialog from '@mui/joy/ModalDialog';
-import DialogTitle from '@mui/joy/DialogTitle';
-import DialogContent from '@mui/joy/DialogContent';
-import Stack from '@mui/joy/Stack';
-import Add from '@mui/icons-material/Add';
-import { addAgencie } from '../../api/Agencies';
+
  
+
  
 export   function AddAgence() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [open, setOpen] = React.useState<boolean>(false);
+   const { notify } = useNotification();
   const [formData, setFormData] = React.useState ({  
       
     name:'',
@@ -165,12 +166,16 @@ export   function AddAgence() {
   const handleSubmit = async () => {
       setIsLoading(true);
       setError(null);
-      
+          notify("Agence Ajouter avec succès !", "success");
+
       try {
         await addAgencie(formData);
         setOpen(false);
       } catch (err) {
-        setError('Échec de la mise à jour. Veuillez réessayer.');
+             const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
+            notify(errorMessage, "danger");
+
+       
       } finally {
         setIsLoading(false);
       }
@@ -225,9 +230,11 @@ export   function AddAgence() {
   );
 }
 import { MdOutlineModeEdit } from "react-icons/md";
-import { getCompany } from '../../api/Company';
+import { getCompany } from '../../api/administration/Company';
+import { useNotification } from '../Componants/NotificationContext';
 
 export   function UpdateAgence({agencie}:Agencies) {
+   const { notify } = useNotification();
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
     
@@ -247,8 +254,11 @@ export   function UpdateAgence({agencie}:Agencies) {
         try {
           await updateAgencie(formData);
           setOpen(false);
+              notify("Mise à jour avec succès !", "success");
+
         } catch (err) {
-          setError('Échec de la mise à jour. Veuillez réessayer.');
+               const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
+            notify(errorMessage, "danger");
         } finally {
           setIsLoading(false);
         }

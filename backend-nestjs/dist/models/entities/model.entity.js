@@ -42,11 +42,11 @@ __decorate([
     __metadata("design:type", String)
 ], Model.prototype, "picture", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => brand_entity_1.Brand, Brand => Brand.Model),
+    (0, typeorm_1.ManyToOne)(() => brand_entity_1.Brand, Brand => Brand.Model, { cascade: true }),
     __metadata("design:type", brand_entity_1.Brand)
 ], Model.prototype, "brand", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => type_model_entity_1.TypeModel, typeModel => typeModel.model),
+    (0, typeorm_1.ManyToOne)(() => type_model_entity_1.TypeModel, typeModel => typeModel.model, { cascade: true }),
     __metadata("design:type", type_model_entity_1.TypeModel)
 ], Model.prototype, "typeModel", void 0);
 __decorate([

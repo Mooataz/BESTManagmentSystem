@@ -132,6 +132,9 @@ let UsersController = class UsersController {
     }
     async update(id, updateUserDto, res) {
         try {
+            if (updateUserDto.password) {
+                updateUserDto.password = await argon2.hash(updateUserDto.password);
+            }
             const updatedata = await this.usersService.update(id, updateUserDto);
             return res.status(common_1.HttpStatus.OK).json({
                 message: "User updates successfuly !",

@@ -43,6 +43,9 @@ export class ModelsController {
     try {
      
         createModelDto.picture = picture.filename 
+        if (typeof createModelDto.allpartIds === 'string') {
+  createModelDto.allpartIds = JSON.parse(createModelDto.allpartIds);
+}
       const newUser = await this.modelsService.create(createModelDto)
       return res.status(HttpStatus.CREATED).json({
         message: "Model created Successfuly !",
@@ -156,13 +159,30 @@ export class ModelsController {
   )
   @Patch(':id')
   async update(@Param('id') id: number,
-    @Body() updateModelDto: UpdateModelDto,
+    @Body() body:any,
     @Res() res,
     @UploadedFile() picture: Express.Multer.File) {
 
     // return this.modelsService.update(+id, updateModelDto);
     try {
-      updateModelDto.picture = picture?.filename
+      const updateModelDto = new UpdateModelDto();
+      updateModelDto.name = body.name;
+    // Handle picture update
+    if (picture) {
+      updateModelDto.picture = picture.filename;
+    } else if (body.picture) {
+      updateModelDto.picture = body.picture;
+    }
+     // Handle allparts
+    if (body.allpartIds) {
+      updateModelDto.allpartIds = Array.isArray(body.allpartIds) 
+        ? body.allpartIds 
+        : JSON.parse(body.allpartIds);
+    }
+
+    if (body.brand) updateModelDto.brand = parseInt(body.brand);
+    if (body.typeModel) updateModelDto.typeModel = parseInt(body.typeModel);
+
       const updatedata = await this.modelsService.update(id, updateModelDto)
       return res.status(HttpStatus.OK).json({
         message: "Model updated successfuly !",

@@ -8,6 +8,6 @@ export class Permission {
     @Column()
         description : string;
 
-    @ManyToMany( () => User,user =>user.permissions)
-    user : User[] 
+   /*  @ManyToMany( () => User,user =>user.permissions)
+    user : User[]  */
 }

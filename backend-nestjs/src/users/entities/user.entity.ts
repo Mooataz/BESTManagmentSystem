@@ -37,10 +37,7 @@ export class User {
 
     @ManyToOne (() => Branch,(branch) => branch.user)
     branch:Branch;
-
-    @ManyToMany(() => Permission, (permission) => permission.user, { cascade: true })
-    @JoinTable()
-    permissions: Permission[];
+ 
 
     @OneToMany( () => Repair,(repair) => repair.user)
     repair : Repair[]; 

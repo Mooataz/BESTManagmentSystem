@@ -16,6 +16,7 @@ import { Device } from 'src/devices/entities/device.entity';
 import { User } from 'src/users/entities/user.entity';
 import { StockPart } from 'src/stock-parts/entities/stock-part.entity';
 import { ApproveStock } from 'src/approve-stock/entities/approve-stock.entity';
+import { Customer } from 'src/customers/entities/customer.entity';
 
 @Injectable()
 export class RepairService {
@@ -31,28 +32,29 @@ export class RepairService {
     @InjectRepository(User) private readonly userRepositry: Repository<User>,
     @InjectRepository(StockPart) private readonly stockPartRepositry: Repository<StockPart>,
     @InjectRepository(ApproveStock) private readonly approveStockRepositry: Repository<ApproveStock>,
+    @InjectRepository(Customer) private readonly CustomerStockRepositry: Repository<Customer>,
     private appService: AppService
 
   ) { }
   async create(createRepairDto: CreateRepairDto): Promise<Repair> {
     // Fetch related entities (arrays)
     const accessory = await this.accessoryRepositry.find({
-      where: { id: In(createRepairDto.accessoryIds) }
+      where: { id: In(createRepairDto.accessoryIds?? []) }
     });
     const listFault = await this.listFaultRepositry.find({
-      where: { id: In(createRepairDto.listFaultIds) }
+      where: { id: In(createRepairDto.listFaultIds?? []) }
     });
     const customerRequest = await this.customerRequestRepositry.find({
-      where: { id: In(createRepairDto.customerRequestIds) }
+      where: { id: In(createRepairDto.customerRequestIds?? []) }
     });
     const notesCustomer = await this.notesCustomerRepositry.find({
-      where: { id: In(createRepairDto.notesCustomerIds) }
+      where: { id: In(createRepairDto.notesCustomerIds?? []) }
     });
     const expertiseReason = await this.expertiseReasonRepositry.find({
-      where: { id: In(createRepairDto.expertiseReasonsIds) }
+      where: { id: In(createRepairDto.expertiseReasonsIds?? []) }
     });
     const repairAction = await this.repairActionRepositry.find({
-      where: { id: In(createRepairDto.repairActionIds) }
+      where: { id: In(createRepairDto.repairActionIds?? []) }
     });
 
     // Fetch single entities (not arrays)
@@ -129,18 +131,24 @@ export class RepairService {
       if (!foundUser) { throw new NotFoundException('User not found'); }
       user = foundUser;
     }
-
+let customer: Customer | undefined = undefined;
+if (updateRepairDto.customer !== undefined) {
+  const foundCustomer = await this.CustomerStockRepositry.findOne({ where: { id: updateRepairDto.customer } });
+  if (!foundCustomer) { throw new NotFoundException('Customer not found'); }
+  customer = foundCustomer;
+}
     // Prepare the update data
     const updateData: Partial<Repair> = {
       ...updateRepairDto,
       device: device ?? existingRepair.device,
-      user: user ?? existingRepair.user
+      user: user ?? existingRepair.user,
+      customer: customer ?? existingRepair.customer
     };
 
     // Remove the ID fields if they exist in the DTO
     delete updateData.device; // Remove the number ID
     delete updateData.user;   // Remove the number ID
-
+  delete updateData.customer;
     await this.repairRepositry.update(id, updateData);
 
     return this.repairRepositry.findOneOrFail({
@@ -186,6 +194,7 @@ export class RepairService {
     }
     return findAll
   }
+
   async filterByActuellyBranch(actuellyBranch: number): Promise<Repair[]> {
     const findAll = await this.repairRepositry
       .createQueryBuilder('repair')
@@ -197,42 +206,8 @@ export class RepairService {
     return findAll
   }
 
-/*   async updateRepairWithParts(
-    repairId: number,
-    updateData: Partial<Repair>
-  ): Promise<Repair> {
-    const repair = await this.repairRepositry.findOne({
-      where: { id: repairId },
-      relations: ['approveStock'], // make sure to load related approveStock
-    });
-    if (!repair) {
-      throw new NotFoundException('Repair not found');
-    }
-    const previousParts = repair.partsNeed || [];
-    const newParts = updateData.partsNeed || [];
-    // Find parts that are newly added
-    const addedParts = newParts.filter(p => !previousParts.includes(p));
-    // Update the repair entity with new data
-    Object.assign(repair, updateData);
-    const updatedRepair = await this.repairRepositry.save(repair);
-    // Create ApproveStock entries for newly added parts
-    for (const partId of addedParts) {
-      const stockPart = await this.stockPartRepositry.findOneBy({ id: partId });
-      if (!stockPart) continue;
-      const approveStock = this.approveStockRepositry.create({
-        type: 'Repair', // or whatever type logic you want
-        date: new Date(),
-        state: 'pending', // or another default
-        idPartRepair: partId,
-        stockPart,
-        repair: updatedRepair,
-      });
-      await this.approveStockRepositry.save(approveStock);
-    }
-    return updatedRepair;
-  } */
 
-    async updateRepairWithParts(
+  async updateRepairWithParts(
       repairId: number,
       updateData: UpdateRepairDto, // <-- Garde bien ici le type UpdateRepairDto
     ): Promise<Repair> {

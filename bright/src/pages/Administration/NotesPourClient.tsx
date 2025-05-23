@@ -15,8 +15,10 @@ import DeleteForever from '@mui/icons-material/DeleteForever';
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
 import Tooltip from '@mui/joy/Tooltip';
 import AdjustIcon from '@mui/icons-material/Adjust';
+import Add from '@mui/icons-material/Add';
 
-import { addNoteToCustomer, deleteNoteToCustomer, fetchNoteToCustomer, updatenoteToCustomer } from '../../api/Administration';
+import { addNoteToCustomer, deleteNoteToCustomer, fetchNoteToCustomer, updatenoteToCustomer } from '../../api/administration/Administration';
+import { useNotification } from '../Componants/NotificationContext';
 interface NoteToCustomer {
     id: number; name: string;
 }
@@ -69,6 +71,8 @@ interface ResponsiveModalProps {
     )
 } 
 function AjouteNoteToCustomer( ) {
+  const { notify } = useNotification();
+  
     const [open, setOpen] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
@@ -82,8 +86,11 @@ const handleSubmit = async () => {
     try {
       await addNoteToCustomer(formData);
       setOpen(false);
+      notify("Note ajouter avec succès !", "success");
+
     } catch (err) {
-      setError('Échec de la mise à jour. Veuillez réessayer.');
+      const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
+            notify(errorMessage, "danger");
     } finally {
       setIsLoading(false);
     }
@@ -92,7 +99,16 @@ const handleSubmit = async () => {
     return (
         <React.Fragment>
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', width:'60%', marginLeft:'20%'}}>
-            <Button variant="outlined" fullWidth  onClick={() => setOpen(true)}>Ajouter un nouvelle note</Button>
+             <div style={{ marginLeft: '65%', marginBottom: '1%' }}>
+                    <Button
+                    variant="outlined"
+                    color="neutral"
+                    startDecorator={<Add />}
+                     fullWidth  onClick={() => setOpen(true)}
+                    >
+                    Ajouter un nouvelle note
+                    </Button>
+                </div>
             </Box>
             <Modal open={open} onClose={() => setOpen(false)} >
                 <ModalDialog
@@ -149,14 +165,24 @@ const handleSubmit = async () => {
     );
 }
 function UpdatenoteToCustomer({ noteToCustomer }: ResponsiveModalProps) {
+  const { notify } = useNotification();
+  
     const [open, setOpen] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
 const [formData, setFormData] = React.useState({
-    id:noteToCustomer.id,
-    name:noteToCustomer.name,
+    id:0,
+    name:'',
     
 })
+        const handleOpen = () => {
+        setFormData({
+            id: noteToCustomer.id,
+            name: noteToCustomer.name,
+           
+        });
+        
+    }
 const handleSubmit = async () => {
     setIsLoading(true);
     setError(null);
@@ -164,8 +190,12 @@ const handleSubmit = async () => {
     try {
       await updatenoteToCustomer(formData);
       setOpen(false);
+      notify("Mise à jour avec succès !", "success");
+
     } catch (err) {
-      setError('Échec de la mise à jour. Veuillez réessayer.');
+      const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
+            notify(errorMessage, "danger");
+
     } finally {
       setIsLoading(false);
     }
@@ -173,7 +203,7 @@ const handleSubmit = async () => {
 
     return (
         <React.Fragment>
-            <Button variant="outlined" color="neutral" onClick={() => setOpen(true)}>
+            <Button variant="outlined" color="neutral" onClick={() => {setOpen(true); handleOpen()}}>
                 Editer
             </Button>
             <Modal open={open} onClose={() => setOpen(false)} >
@@ -231,6 +261,8 @@ const handleSubmit = async () => {
     );
 }
 function DeletenoteToCustomer ({ noteToCustomer }:ResponsiveModalProps) {
+  const { notify } = useNotification();
+  
     const [open, setOpen] = React.useState<boolean>(false);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
@@ -246,8 +278,13 @@ function DeletenoteToCustomer ({ noteToCustomer }:ResponsiveModalProps) {
         try {
           await deleteNoteToCustomer(formData.id);
           setOpen(false);
+          notify(" succès !", "success");
+
         } catch (err) {
-          setError('Échec de la mise à jour. Veuillez réessayer.');
+           
+          const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
+            notify(errorMessage, "danger");
+
         } finally {
           setIsLoading(false);
         }

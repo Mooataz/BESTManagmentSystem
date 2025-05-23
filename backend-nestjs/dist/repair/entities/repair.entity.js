@@ -13,6 +13,7 @@ exports.Repair = void 0;
 const accessory_entity_1 = require("../../accessory/entities/accessory.entity");
 const approve_stock_entity_1 = require("../../approve-stock/entities/approve-stock.entity");
 const customer_request_entity_1 = require("../../customer-request/entities/customer-request.entity");
+const customer_entity_1 = require("../../customers/entities/customer.entity");
 const device_entity_1 = require("../../devices/entities/device.entity");
 const expertise_reason_entity_1 = require("../../expertise-reasons/entities/expertise-reason.entity");
 const history_repair_entity_1 = require("../../history-repair/entities/history-repair.entity");
@@ -48,6 +49,7 @@ let Repair = class Repair {
     outputList;
     transfert;
     invoice;
+    customer;
 };
 exports.Repair = Repair;
 __decorate([
@@ -148,6 +150,10 @@ __decorate([
     (0, typeorm_1.OneToOne)(() => invoice_entity_1.Invoice, (invoice) => invoice.repair),
     __metadata("design:type", invoice_entity_1.Invoice)
 ], Repair.prototype, "invoice", void 0);
+__decorate([
+    (0, typeorm_1.ManyToOne)(() => customer_entity_1.Customer, customer => customer.repair),
+    __metadata("design:type", customer_entity_1.Customer)
+], Repair.prototype, "customer", void 0);
 exports.Repair = Repair = __decorate([
     (0, typeorm_1.Entity)()
 ], Repair);

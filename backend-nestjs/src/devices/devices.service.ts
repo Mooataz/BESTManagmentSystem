@@ -17,10 +17,8 @@ export class DevicesService {
   async create(createDeviceDto: CreateDeviceDto): Promise<Device> {
     if (createDeviceDto.serialeNumber?.length) { 
     createDeviceDto.serialeNumber = this.appService.cleanSpaces(createDeviceDto.serialeNumber) };
-    const customer = await this.customerRepositry.find({ where: { id: In(createDeviceDto.customer) }, })
-    if (!customer.length) { throw new NotFoundException('No model') };
-
-    const createNew = this.deviceRepositry.create({ ...createDeviceDto, customer })
+   
+    const createNew = this.deviceRepositry.create({ ...createDeviceDto    })
 
     return await this.deviceRepositry.save(createNew);
   }
@@ -41,32 +39,11 @@ export class DevicesService {
     return findOne
   }
 
-  /*  async update(id: number, updateDeviceDto: UpdateDeviceDto) :Promise<Device>  {
-       await this.deviceRepositry.update(id,updateDeviceDto);
-     const updatedata = await this.deviceRepositry.findOne({where :{ id }})
-     if (!updatedata) {
-       throw new NotFoundException('Device Not found for update = failed')
-     }
  
-     return updatedata    
-     
-     
-   
-    }  */
   async update(id: number, updateDeviceDto: UpdateDeviceDto): Promise<Device> {
-    const { customer, ...rest } = updateDeviceDto;
+    const {  ...rest } = updateDeviceDto;
     let updateData: Partial<Device> = { ...rest };
-
-    // Vérifier si des IDs de clients sont fournis
-    if (customer !== undefined) {
-      const customers = await this.customerRepositry.find({ where: { id: In(customer) } });
-
-      if (!customers.length) {
-        throw new NotFoundException('No customer found');
-      }
-
-      updateData.customer = customers; // Assigner les entités Customer[]
-    }
+ 
 
     await this.deviceRepositry.update(id, updateData);
 
@@ -117,5 +94,20 @@ export class DevicesService {
       if (!findAll || findAll.length === 0) {
         throw new NotFoundException("There is no data Available") }
   return findAll
+  }
+
+  async chekDevice (serialenumber:string, purchaseDate:string, warrentyProof:string, model:number):Promise<Device> {
+    console.log('Backend: ',serialenumber,' _ ',purchaseDate, ' _ ',model )
+    let device = await this.deviceRepositry
+      .createQueryBuilder('devices')
+      .where('serialenumber = :serialenumber', {serialenumber})
+      .getOne();
+
+      if(!device) { 
+        device = this.deviceRepositry.create({serialenumber, purchaseDate, warrentyProof, model: { id: model }});
+        await this;this.deviceRepositry.save(device)
+      }
+
+    return device
   }
 }

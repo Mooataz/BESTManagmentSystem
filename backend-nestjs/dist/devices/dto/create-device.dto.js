@@ -11,12 +11,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateDeviceDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
-const class_validator_1 = require("class-validator");
 class CreateDeviceDto {
     serialeNumber;
     purchaseDate;
     warrentyProof;
-    customer;
 }
 exports.CreateDeviceDto = CreateDeviceDto;
 __decorate([
@@ -40,15 +38,4 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], CreateDeviceDto.prototype, "warrentyProof", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        type: [Number],
-        description: "Array of part IDs (Required, send as '1,2,3')",
-        example: [1, 2, 3],
-    }),
-    (0, class_validator_1.IsArray)(),
-    (0, class_validator_1.ArrayNotEmpty)(),
-    (0, class_validator_1.IsNumber)({}, { each: true }),
-    __metadata("design:type", Array)
-], CreateDeviceDto.prototype, "customer", void 0);
 //# sourceMappingURL=create-device.dto.js.map

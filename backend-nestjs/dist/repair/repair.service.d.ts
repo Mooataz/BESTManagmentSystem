@@ -13,6 +13,7 @@ import { Device } from 'src/devices/entities/device.entity';
 import { User } from 'src/users/entities/user.entity';
 import { StockPart } from 'src/stock-parts/entities/stock-part.entity';
 import { ApproveStock } from 'src/approve-stock/entities/approve-stock.entity';
+import { Customer } from 'src/customers/entities/customer.entity';
 export declare class RepairService {
     private readonly repairRepositry;
     private readonly accessoryRepositry;
@@ -25,8 +26,9 @@ export declare class RepairService {
     private readonly userRepositry;
     private readonly stockPartRepositry;
     private readonly approveStockRepositry;
+    private readonly CustomerStockRepositry;
     private appService;
-    constructor(repairRepositry: Repository<Repair>, accessoryRepositry: Repository<Accessory>, listFaultRepositry: Repository<ListFault>, customerRequestRepositry: Repository<CustomerRequest>, notesCustomerRepositry: Repository<NotesCustomer>, expertiseReasonRepositry: Repository<ExpertiseReason>, repairActionRepositry: Repository<RepairAction>, deviceRepositry: Repository<Device>, userRepositry: Repository<User>, stockPartRepositry: Repository<StockPart>, approveStockRepositry: Repository<ApproveStock>, appService: AppService);
+    constructor(repairRepositry: Repository<Repair>, accessoryRepositry: Repository<Accessory>, listFaultRepositry: Repository<ListFault>, customerRequestRepositry: Repository<CustomerRequest>, notesCustomerRepositry: Repository<NotesCustomer>, expertiseReasonRepositry: Repository<ExpertiseReason>, repairActionRepositry: Repository<RepairAction>, deviceRepositry: Repository<Device>, userRepositry: Repository<User>, stockPartRepositry: Repository<StockPart>, approveStockRepositry: Repository<ApproveStock>, CustomerStockRepositry: Repository<Customer>, appService: AppService);
     create(createRepairDto: CreateRepairDto): Promise<Repair>;
     findAll(): Promise<Repair[]>;
     findOne(id: number): Promise<Repair>;

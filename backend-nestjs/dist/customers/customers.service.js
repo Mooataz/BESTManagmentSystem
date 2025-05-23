@@ -80,15 +80,17 @@ let CustomersService = class CustomersService {
         }
         return findAll;
     }
-    async findByName(name) {
-        const findAll = await this.customerRepositry
+    async findByName(name, phone, distributer) {
+        let customer = await this.customerRepositry
             .createQueryBuilder('customer')
             .where('name = :name', { name })
-            .getMany();
-        if (!findAll || findAll.length === 0) {
-            throw new common_1.NotFoundException("There is no data Available");
+            .andWhere('phone = :phone', { phone })
+            .getOne();
+        if (!customer) {
+            customer = this.customerRepositry.create({ name, phone, distributer });
+            await this.customerRepositry.save(customer);
         }
-        return findAll;
+        return customer;
     }
 };
 exports.CustomersService = CustomersService;

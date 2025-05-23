@@ -57,9 +57,15 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { NotificationModule } from './notification/notification.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+       ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'upload'), // Dossier où sont stockées les images
+      serveRoot: '/upload', // URL publique
+    }),
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -71,7 +77,9 @@ import { ScheduleModule } from '@nestjs/schedule';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
                  
       synchronize: true,
+ 
     }),
+   
     CompanyModule,
     BrandsModule,
     CustomersModule,

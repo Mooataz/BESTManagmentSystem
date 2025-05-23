@@ -1,6 +1,7 @@
 import { Accessory } from "src/accessory/entities/accessory.entity";
 import { ApproveStock } from "src/approve-stock/entities/approve-stock.entity";
 import { CustomerRequest } from "src/customer-request/entities/customer-request.entity";
+import { Customer } from "src/customers/entities/customer.entity";
 import { Device } from "src/devices/entities/device.entity";
 import { ExpertiseReason } from "src/expertise-reasons/entities/expertise-reason.entity";
 import { HistoryRepair } from "src/history-repair/entities/history-repair.entity";
@@ -90,4 +91,7 @@ export class Repair {
 
     @OneToOne( () => Invoice, (invoice) => invoice.repair)
     invoice: Invoice;
+
+    @ManyToOne( () => Customer, customer => customer.repair)
+    customer: Customer;
 }

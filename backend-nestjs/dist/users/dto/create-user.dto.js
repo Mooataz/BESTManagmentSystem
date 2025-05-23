@@ -20,7 +20,6 @@ class CreateUserDto {
     createdDate;
     status;
     role;
-    permissionsIds;
     branch;
 }
 exports.CreateUserDto = CreateUserDto;
@@ -86,13 +85,6 @@ __decorate([
     (0, class_validator_1.IsString)({ each: true }),
     __metadata("design:type", String)
 ], CreateUserDto.prototype, "role", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        type: Array,
-        description: "Required"
-    }),
-    __metadata("design:type", Array)
-], CreateUserDto.prototype, "permissionsIds", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         type: Number,

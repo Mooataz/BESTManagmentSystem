@@ -13,7 +13,6 @@ exports.User = void 0;
 const branch_entity_1 = require("../../branches/entities/branch.entity");
 const invoice_entity_1 = require("../../invoice/entities/invoice.entity");
 const output_list_entity_1 = require("../../output-list/entities/output-list.entity");
-const permission_entity_1 = require("../../permission/entities/permission.entity");
 const repair_entity_1 = require("../../repair/entities/repair.entity");
 const sale_entity_1 = require("../../sales/entities/sale.entity");
 const tracability_entity_1 = require("../../tracability/entities/tracability.entity");
@@ -28,7 +27,6 @@ let User = class User {
     login;
     role;
     branch;
-    permissions;
     repair;
     tracability;
     outputList;
@@ -73,11 +71,6 @@ __decorate([
     (0, typeorm_1.ManyToOne)(() => branch_entity_1.Branch, (branch) => branch.user),
     __metadata("design:type", branch_entity_1.Branch)
 ], User.prototype, "branch", void 0);
-__decorate([
-    (0, typeorm_1.ManyToMany)(() => permission_entity_1.Permission, (permission) => permission.user, { cascade: true }),
-    (0, typeorm_1.JoinTable)(),
-    __metadata("design:type", Array)
-], User.prototype, "permissions", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => repair_entity_1.Repair, (repair) => repair.user),
     __metadata("design:type", Array)

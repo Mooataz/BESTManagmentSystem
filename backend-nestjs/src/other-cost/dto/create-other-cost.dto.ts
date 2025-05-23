@@ -13,4 +13,10 @@ export class CreateOtherCostDto {
         description: "Required"
     })
     price : number;
+
+    @ApiProperty({
+        type: String,
+        description: "Required"
+    })
+    status: string;
 }

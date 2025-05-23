@@ -10,12 +10,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Permission = void 0;
-const user_entity_1 = require("../../users/entities/user.entity");
 const typeorm_1 = require("typeorm");
 let Permission = class Permission {
     id;
     description;
-    user;
 };
 exports.Permission = Permission;
 __decorate([
@@ -26,10 +24,6 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Permission.prototype, "description", void 0);
-__decorate([
-    (0, typeorm_1.ManyToMany)(() => user_entity_1.User, user => user.permissions),
-    __metadata("design:type", Array)
-], Permission.prototype, "user", void 0);
 exports.Permission = Permission = __decorate([
     (0, typeorm_1.Entity)()
 ], Permission);

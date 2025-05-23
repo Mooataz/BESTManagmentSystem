@@ -12,6 +12,9 @@ export class OtherCost {
     @Column()
     name : string;
 
+    @Column()
+    status: string;
+
     @ManyToMany( () => Invoice, (invoice) => invoice.otherCost)
     invoice: Invoice; 
 }

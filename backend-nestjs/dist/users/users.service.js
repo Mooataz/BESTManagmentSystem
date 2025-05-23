@@ -34,20 +34,16 @@ let UsersService = class UsersService {
     async create(createUserDto) {
         createUserDto.name = this.appService.cleanSpaces(createUserDto.name);
         createUserDto.login = this.appService.cleanSpaces(createUserDto.login);
-        const permissions = await this.permissionRepositry.find({ where: { id: (0, typeorm_2.In)(createUserDto.permissionsIds) } });
         const branch = createUserDto.branch ? await this.branchRepositry.findOne({ where: { id: createUserDto.branch } }) : undefined;
-        if (!permissions.length) {
-            throw new common_1.NotFoundException("No valid permissions found.");
-        }
         if (!branch) {
             throw new common_1.NotFoundException("No valid branch found.");
         }
-        const newCreate = this.userRepositry.create({ ...createUserDto, branch: branch || undefined, permissions, role: Array.isArray(createUserDto.role)
+        const newCreate = this.userRepositry.create({ ...createUserDto, branch: branch || undefined, role: Array.isArray(createUserDto.role)
                 ? createUserDto.role : [createUserDto.role], });
         return await this.userRepositry.save(newCreate);
     }
     async findAll() {
-        const allUsers = await this.userRepositry.find();
+        const allUsers = await this.userRepositry.find({ relations: ['branch'], });
         if (!allUsers || allUsers.length === 0) {
             throw new common_1.NotFoundException("There is no users data Available");
         }
@@ -61,7 +57,7 @@ let UsersService = class UsersService {
         return OneUser;
     }
     async update(id, updateUserDto) {
-        const { branch, permissionsIds, ...rest } = updateUserDto;
+        const { branch, ...rest } = updateUserDto;
         const updateData = { ...rest, role: rest.role ? (Array.isArray(rest.role) ? rest.role : [rest.role]) : undefined,
         };
         if (branch) {
@@ -71,12 +67,8 @@ let UsersService = class UsersService {
             }
             updateData.branch = branchEntity;
         }
-        if (permissionsIds) {
-            const permissions = await this.permissionRepositry.find({ where: { id: (0, typeorm_2.In)(permissionsIds) } });
-            updateData.permissions = permissions;
-        }
         await this.userRepositry.update(id, updateData);
-        const updatedUser = await this.userRepositry.findOne({ where: { id }, relations: ['branch', 'permissions'] });
+        const updatedUser = await this.userRepositry.findOne({ where: { id }, relations: ['branch'] });
         if (!updatedUser) {
             throw new common_1.NotFoundException('User not found after update');
         }

@@ -5,7 +5,7 @@ import Table from '@mui/joy/Table';
 import Box from '@mui/joy/Box';
 import Button from '@mui/joy/Button';
 import Typography from '@mui/joy/Typography';
-import { addListProbleme, deleteProblem, fetchListProbleme, updateListProbleme } from '../../api/Administration';
+import { addListProbleme, deleteProblem, fetchListProbleme, updateListProbleme } from '../../api/administration/Administration';
 import Divider from '@mui/joy/Divider';
 import DialogTitle from '@mui/joy/DialogTitle';
 import DialogContent from '@mui/joy/DialogContent';
@@ -16,6 +16,9 @@ import DeleteForever from '@mui/icons-material/DeleteForever';
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
 import Tooltip from '@mui/joy/Tooltip';
 import AdjustIcon from '@mui/icons-material/Adjust';
+import Add from '@mui/icons-material/Add';
+import { useNotification } from '../Componants/NotificationContext';
+
 interface ListProbleme {
     id: number; name: string;
 }
@@ -23,6 +26,7 @@ interface ResponsiveModalProps {
     listProbleme: ListProbleme;
     onUpdateSuccess?: () => void;
   }
+  
   export default function ListProblemes() {
     const [message, setMessage] = React.useState<ListProbleme[]>([]);
     React.useEffect(() => {
@@ -41,7 +45,7 @@ interface ResponsiveModalProps {
                     <tr>
                         <th style={{ width: '15%' }}>Panne</th>
                         
-                        <th></th>
+                         
                     </tr>
                 </thead>
                 <tbody>
@@ -68,6 +72,8 @@ interface ResponsiveModalProps {
     )
 } 
 function DeleteProblem ({ listProbleme }:ResponsiveModalProps) {
+    const { notify } = useNotification();
+
     const [open, setOpen] = React.useState<boolean>(false);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
@@ -83,8 +89,12 @@ function DeleteProblem ({ listProbleme }:ResponsiveModalProps) {
         try {
           await deleteProblem(formData.id);
           setOpen(false);
+              notify(" succès !", "success");
+
         } catch (err) {
-          setError('Échec de la mise à jour. Veuillez réessayer.');
+           
+          const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
+            notify(errorMessage, "danger");
         } finally {
           setIsLoading(false);
         }
@@ -158,6 +168,8 @@ function DeleteProblem ({ listProbleme }:ResponsiveModalProps) {
     )
 }
 function AjouteListProbleme( ) {
+    const { notify } = useNotification();
+
     const [open, setOpen] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
@@ -171,8 +183,12 @@ const handleSubmit = async () => {
     try {
       await addListProbleme(formData);
       setOpen(false);
+          notify("Ajoute avec succès !", "success");
+
     } catch (err) {
-      setError('Échec de la mise à jour. Veuillez réessayer.');
+       
+      const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
+            notify(errorMessage, "danger");
     } finally {
       setIsLoading(false);
     }
@@ -181,7 +197,16 @@ const handleSubmit = async () => {
     return (
         <React.Fragment>
             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', width:'60%', marginLeft:'20%'}}>
-            <Button variant="outlined" fullWidth  onClick={() => setOpen(true)}>Ajouter un nouvelle panne</Button>
+              <div style={{ marginLeft: '65%', marginBottom: '1%' }}>
+                    <Button
+                    variant="outlined"
+                    color="neutral"
+                    startDecorator={<Add />}
+                     fullWidth  onClick={() => setOpen(true)}
+                    >
+                    Ajouter un nouvelle panne
+                    </Button>
+                </div>
             </Box>
             <Modal open={open} onClose={() => setOpen(false)} >
                 <ModalDialog
@@ -238,14 +263,23 @@ const handleSubmit = async () => {
     );
 }
 function UpdateListProbleme({ listProbleme }: ResponsiveModalProps) {
+  const { notify } = useNotification();
+
     const [open, setOpen] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
 const [formData, setFormData] = React.useState({
-    id:listProbleme.id,
-    name:listProbleme.name,
+    id:0,
+    name:'',
     
 })
+       const handleOpen = () => {
+        setFormData({
+            id:listProbleme.id,
+            name:listProbleme.name,
+        });
+        
+    };
 const handleSubmit = async () => {
     setIsLoading(true);
     setError(null);
@@ -253,8 +287,11 @@ const handleSubmit = async () => {
     try {
       await updateListProbleme(formData);
       setOpen(false);
+       notify("Mise à jour avec succès !", "success");
     } catch (err) {
-      setError('Échec de la mise à jour. Veuillez réessayer.');
+       
+      const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
+            notify(errorMessage, "danger");
     } finally {
       setIsLoading(false);
     }
@@ -262,7 +299,7 @@ const handleSubmit = async () => {
 
     return (
         <React.Fragment>
-            <Button variant="outlined" color="neutral" onClick={() => setOpen(true)}>
+            <Button variant="outlined" color="neutral" onClick={() => {setOpen(true);handleOpen()}}>
                 Editer
             </Button>
             <Modal open={open} onClose={() => setOpen(false)} >

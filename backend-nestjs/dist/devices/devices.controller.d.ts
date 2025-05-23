@@ -9,5 +9,9 @@ export declare class DevicesController {
     findOne(id: number, res: any): Promise<any>;
     update(id: number, updateDeviceDto: UpdateDeviceDto, res: any, warrentyProof: Express.Multer.File): Promise<any>;
     remove(id: number, res: any): Promise<any>;
-    getDevicesByCustomer(customerId: string, res: any): Promise<any>;
+    checkDevice(body: {
+        serialenumber: string;
+        purchaseDate: string;
+        model: number;
+    }, res: any, file: Express.Multer.File): Promise<any>;
 }

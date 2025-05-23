@@ -20,9 +20,26 @@ export class CreateModelDto {
         picture: string;
 
         @ApiProperty({
-                type: Array ,
-                description: "Required" 
+        type: [Number], // Note the brackets for array of numbers
+        description: "Required" 
         })
-        allpartIds: number[] ;
-        
+        @IsArray()
+        @IsNumber({}, { each: true })
+        allpartIds: number[];
+
+            @ApiProperty({
+        type:Number,
+        description: "Required"
+    })
+    @IsNumber()
+    @IsNotEmpty()
+    brand?: number;
+     
+    @ApiProperty({
+        type:Number,
+        description: "Required"
+    })
+    @IsNumber()
+    @IsNotEmpty()
+        typeModel:number; 
 }

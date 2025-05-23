@@ -9,7 +9,7 @@ import {  AiOutlineUser, AiOutlineSetting,   } from "react-icons/ai";
 import Accordion from '@mui/joy/Accordion';
 import AccordionDetails from '@mui/joy/AccordionDetails';
 import AccordionSummary from '@mui/joy/AccordionSummary';
-import { getCurrentUser } from '../../../api/login';
+import { getCurrentUser } from '../../../api/administration/login';
 import { useNavigate } from 'react-router-dom';
 import { LuTabletSmartphone } from "react-icons/lu";
 import { BsEarbuds } from "react-icons/bs";
@@ -41,7 +41,8 @@ import HubOutlinedIcon from '@mui/icons-material/HubOutlined';
 import { BiShowAlt } from "react-icons/bi";
 import { BiSolidShow } from "react-icons/bi";
 import { PiChartLineThin } from "react-icons/pi";
-
+import {Box} from '@mui/joy'
+import { useTranslation } from 'react-i18next';
 interface NavigationProps {
   onSelectPage: (page: string) => void;
   selectedPage: string;
@@ -62,24 +63,31 @@ type MenuItem =
       page: string;
     }[];
   };
-
-export const menuItems: MenuItem[] = [
+ 
+ 
+export default function Navigation(/* { onSelectPage, selectedPage }: NavigationProps */) {
+ const navigate = useNavigate();
+ const { t } = useTranslation();
+  const handleNavigation = (page: string) => {
+    navigate(`/dashboard/${page}`);   
+  };
+const menuItems: MenuItem[] = [
   {
     label: 'Administration',
     icon: <AiOutlineSetting />,
     children: [
       { label: 'Entreprise', page: 'Entreprise', icon: <FaRegFontAwesome />},
-      { label: 'Agencies', page: 'Agencies', icon: <LiaCodeBranchSolid /> },
+      { label: 'Agence', page: 'Agencies', icon: <LiaCodeBranchSolid /> },
       { label: 'Employees', page: 'Employees', icon: <FaUserPlus /> },
       { label: 'Marques', page: 'Marques', icon: <TbBrandAndroid /> },
       { label: 'Distributeurs', page: 'Distributeurs', icon: <MdHorizontalDistribute />      }, //ok_Done
-      { label: 'Raisons d\'expertise', page: 'RaisonsExpertise', icon: <GiRaiseSkeleton /> }, //ok_Done
-      { label: 'List problèmes', page: 'ListProblemes', icon: <SiProbot /> }, //ok_Done
-      { label: 'Demande client', page: 'DemandeClient', icon: <GoGitPullRequestDraft /> }, //ok_Done
-      { label: 'Notes pour client', page: 'NoteToCustomers', icon: <AiOutlineUser /> }, //ok_Done
-      { label: 'liste des piéces total', page: 'listePiécesTotal', icon: <PiListBullets />      },
-      { label: 'Niveau de réparation', page: 'NiveauRéparation', icon: <SiLevelsdotfyi />      },
-      { label: 'Autres Frais', page: 'AutresFrais', icon: <GrMoney />},
+      { label: 'Raisonsexpertise', page: 'RaisonsExpertise', icon: <GiRaiseSkeleton /> }, //ok_Done
+      { label: 'ListProblem', page: 'ListProblemes', icon: <SiProbot /> }, //ok_Done
+      { label: 'CustomerRequest', page: 'DemandeClient', icon: <GoGitPullRequestDraft /> }, //ok_Done
+      { label: 'NoteClient', page: 'NoteToCustomers', icon: <AiOutlineUser /> }, //ok_Done
+      { label: 'ListAllPart', page: 'listePiécesTotal', icon: <PiListBullets />      },
+      { label: 'LevelRepair', page: 'NiveauRéparation', icon: <SiLevelsdotfyi />      },
+      { label: 'OthersCoast', page: 'AutresFrais', icon: <GrMoney />},
     ],
   },
   {
@@ -87,30 +95,30 @@ export const menuItems: MenuItem[] = [
   },
 
   {
-    label: 'Modéles et Accessoire',
+    label: 'ModelsAccessory',
     icon: <LuTabletSmartphone />,
     children: [
       { label: 'Accessoires', page: 'Accessoires', icon: <BsEarbuds /> }, //ok_Done
       { label: 'Modéles', page: 'Modéles', icon: <SlScreenSmartphone />      },
-      { label: 'Type Modéle', page: 'TypeModéle', icon: <FcMultipleSmartphones />
+      { label: 'TypeModel', page: 'TypeModéle', icon: <FcMultipleSmartphones />
       },
     ]
 
   },
 
   {
-    label: 'Gestion des stocks',
+    label: 'Gestionstocks',
     icon: <LiaDatabaseSolid />
     ,
     children: [
-      { label: 'Accord piéces', page: 'AccordPiéces', icon: <VscCoverage />      },  
+      { label: 'ApprovePart', page: 'AccordPiéces', icon: <VscCoverage />      },  
       { label: 'Reférences', page: 'Reférences', icon: <GoNumber /> },
       { label: 'case', page: 'case', icon: <CommitIcon /> },
-      { label: 'Etat du stock', page: 'EtatStock', icon: <SiDatabricks /> }, 
-      { label: 'Remplissage de stock', page: 'RemplissageStock', icon: <TbDatabasePlus />      },
-      { label: 'Transfert piéces', page: 'TransfertPiéces', icon: <TbTransitionRight />      },
-      { label: 'Reçoi piéces', page: 'ReçoiPiéces', icon: <TbTransitionLeft />      }, 
-      { label: 'Ajuster Prix des piéces', page: 'AjusterPrixPiéces', icon: <PriceCheckIcon /> },
+      { label: 'StateStock', page: 'EtatStock', icon: <SiDatabricks /> }, 
+      { label: 'RemplireStock', page: 'RemplissageStock', icon: <TbDatabasePlus />      },
+      { label: 'Transfertpiéces', page: 'TransfertPiéces', icon: <TbTransitionRight />      },
+      { label: 'Reçoipiéces', page: 'ReçoiPiéces', icon: <TbTransitionLeft />      }, 
+      { label: 'AjusterPrix', page: 'AjusterPrixPiéces', icon: <PriceCheckIcon /> },
       { label: 'Défalcation', page: 'Défalcation', icon: <RiPageSeparator /> },
     ]
   },
@@ -119,12 +127,12 @@ export const menuItems: MenuItem[] = [
     label: 'Reception',
     icon: <FaPersonDotsFromLine />    ,
     children: [
-      { label: 'Reçoi produit', page: 'ReçoiProduit', icon: <BsEarbuds /> }, 
-      { label: 'Etat des produit', page: 'EtatProduit', icon: <BsEarbuds /> },
-      { label: 'Envoyer vers affectation', page: 'EnvoyeAffectation', icon: <BsEarbuds /> },
-      { label: 'Recevoire depuis controle qualité', page: 'RecevoireQC', icon: <BsEarbuds /> },
-      { label: 'Récuperer produit', page: 'RécupererProduit', icon: <BsEarbuds /> },
-      { label: 'Etat de récuperation', page: 'EtatRécuperation', icon: <BsEarbuds /> },
+      { label: 'Reçoiproduit', page: 'ReçoiProduit', icon: <BsEarbuds /> }, 
+      { label: 'Etatproduit', page: 'EtatProduit', icon: <BsEarbuds /> },
+      { label: 'Envoyeraffectation', page: 'EnvoyeAffectation', icon: <BsEarbuds /> },
+      { label: 'ReciveQC', page: 'RecevoireQC', icon: <BsEarbuds /> },
+      { label: 'Récupererproduit', page: 'RécupererProduit', icon: <BsEarbuds /> },
+      { label: 'Etatrécuperation', page: 'EtatRécuperation', icon: <BsEarbuds /> },
       { label: 'Factures', page: 'Factures', icon: <BsEarbuds /> }, 
       { label: 'Vente', page: 'Vente', icon: <BsEarbuds /> },
     ]
@@ -134,9 +142,9 @@ export const menuItems: MenuItem[] = [
     label: 'Réparation',
     icon: <GiAutoRepair />,
     children: [
-      { label: 'Reçoi depuis Affectation', page: 'ReçoiAffectation', icon: <BsEarbuds /> }, 
-      { label: 'list Total', page: 'listTotal', icon: <BsEarbuds /> },
-       { label: 'Envoyé vers CQ', page: 'EnvoyéVersCQ', icon: <BsEarbuds /> },    
+      { label: 'ReçoitAffectation', page: 'ReçoiAffectation', icon: <BsEarbuds /> }, 
+      { label: 'listTotal', page: 'listTotal', icon: <BsEarbuds /> },
+       { label: 'SentQc', page: 'EnvoyéVersCQ', icon: <BsEarbuds /> },    
     ]
   } ,
 
@@ -144,30 +152,26 @@ export const menuItems: MenuItem[] = [
     label: 'Coordination',
     icon: <HubOutlinedIcon />,
     children: [
-      { label: 'Reçoi depuis reception', page: 'ReçoiReception', icon: <BsEarbuds /> }, 
+      { label: 'Reçoireception', page: 'ReçoiReception', icon: <BsEarbuds /> }, 
       { label: 'Affectation', page: 'Affectation', icon: <BsEarbuds /> },
       { label: 'Réaffectation', page: 'Réaffectation', icon: <BsEarbuds /> },
-      { label: 'Envoyé pour récuperer', page: 'EnvoyéRécuperer', icon: <BsEarbuds /> },
-      { label: 'Transfert produit', page: 'TransfertProduit', icon: <BsEarbuds /> },
+      { label: 'Envoyérécuperer', page: 'EnvoyéRécuperer', icon: <BsEarbuds /> },
+      { label: 'Transfertproduit', page: 'TransfertProduit', icon: <BsEarbuds /> },
       
     ]
   } ,
 
   {
-    label:' Consulter piéces', page:' ConsulterPiéces', icon:<BiShowAlt />
+    label:'Consulterpiéces', page:' ConsulterPiéces', icon:<BiShowAlt />
   },
  
   {
-    label:'Consulter appareille', page:'ConsulterAppareille', icon:<BiSolidShow />
+    label:'Consulterappareille', page:'ConsulterAppareille', icon:<BiSolidShow />
   },
 
 ];
-export default function Navigation({ onSelectPage, selectedPage }: NavigationProps) {
-
-
   const [filteredMenuItems, setFilteredMenuItems] = React.useState<MenuItem[]>([]);
-  const navigate = useNavigate();
-
+ 
   React.useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -175,15 +179,22 @@ export default function Navigation({ onSelectPage, selectedPage }: NavigationPro
         // Appliquer le filtrage
         let tempFiltered: MenuItem[] = [];
 
-        if (currentUser.role.includes('Admin')) { tempFiltered = menuItems; }  
+       
+ 
 
-        if (currentUser.role.includes('Receptionniste')) { tempFiltered = [...tempFiltered, menuItems[1]];  }  
+// ...
+        if (currentUser.role.includes('Reception')) { 
+          tempFiltered = [  menuItems[2], menuItems[4]];
+        }
 
-        if (currentUser.role.includes('Technicien')) { tempFiltered =  menuItems  }  
+        if (currentUser.role.includes('Technicien')) { tempFiltered =  [...tempFiltered, menuItems[5] ] }  
 
-        if (currentUser.role.includes('StocKeeper')) { tempFiltered = [...tempFiltered, menuItems[0], menuItems[1]]; } 
+        if (currentUser.role.includes('Gestionnaire_de_stocks')) { tempFiltered = [...tempFiltered, menuItems[3] ]; } 
 
-        if (currentUser.role.includes('Coordinateur')) { tempFiltered = [...tempFiltered, menuItems[1]] } 
+        if (currentUser.role.includes('Coordinateur')) { tempFiltered = [...tempFiltered, menuItems[6]] } 
+
+        tempFiltered = [...tempFiltered,  menuItems[7],menuItems[8]];
+        if (currentUser.role.includes('Administrateur')) { tempFiltered = menuItems; }  
 
         setFilteredMenuItems(tempFiltered);
       } catch (error) {
@@ -200,9 +211,7 @@ export default function Navigation({ onSelectPage, selectedPage }: NavigationPro
       sx={{ '--ListItem-radius': 'var(--joy-radius-sm)', '--List-gap': '4px' }}
     >
       <ListItem nested>
-        <ListSubheader sx={{ letterSpacing: '2px', fontWeight: '800' }}>
-
-        </ListSubheader>
+ 
         <List
           aria-labelledby="nav-list-browse"
           sx={{ '& .JoyListItemButton-root': { p: '8px' } }}
@@ -210,49 +219,39 @@ export default function Navigation({ onSelectPage, selectedPage }: NavigationPro
 
 
 
-          {filteredMenuItems.map((item, index) => (
-            <React.Fragment key={index}>
-              {hasChildren(item) ? (
-                <Accordion>
-                  <AccordionSummary>
-                    <ListItemButton>
-                      <ListItemDecorator>{item.icon}</ListItemDecorator>
-                      <ListItemContent>{item.label}</ListItemContent>
-                    </ListItemButton>
-                  </AccordionSummary>
-                  <AccordionDetails>
-                    <List sx={{ pl: 2 }}>
-                      {item.children.map((subItem, subIndex) => (
-                        <ListItem key={subIndex}>
-                          <ListItemButton
-                            selected={selectedPage === subItem.page}
-                            onClick={() => onSelectPage(subItem.page)}
-                          >
-                            <ListItemDecorator>{subItem.icon}</ListItemDecorator>
-                            <ListItemContent>{subItem.label}</ListItemContent>
-                          </ListItemButton>
-                        </ListItem>
-                      ))}
-                    </List>
-                  </AccordionDetails>
-                </Accordion>
-              ) : (
-                <ListItem>
-                  <ListItemButton selected={selectedPage === item.page} onClick={() => onSelectPage(item.page)}>
+         {filteredMenuItems.map((item, index) => (
+          <Box key={index}>
+            {hasChildren(item) ? (
+              <Accordion>
+                <AccordionSummary>
+                  <ListItemButton>
                     <ListItemDecorator>{item.icon}</ListItemDecorator>
-                    <ListItemContent>{item.label}</ListItemContent>
+                    <ListItemContent>{t(item.label)}</ListItemContent>
                   </ListItemButton>
-                </ListItem>
-              )}
-            </React.Fragment>
-          ))}
-
-
-
-
-
-
-
+                </AccordionSummary>
+                <AccordionDetails>
+                  <List sx={{ pl: 2 }}>
+                    {item.children.map((subItem, subIndex) => (
+                      <ListItemButton
+                        key={subIndex}
+                        onClick={() => handleNavigation(subItem.page)}
+                      >
+                        <ListItemDecorator>{subItem.icon}</ListItemDecorator>
+                        <ListItemContent>{t(subItem.label)}</ListItemContent>
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </AccordionDetails>
+              </Accordion>
+            ) : (
+              <ListItemButton onClick={() => handleNavigation(item.page)}>
+                <ListItemDecorator>{item.icon}</ListItemDecorator>
+                <ListItemContent>{t(item.label)}</ListItemContent>
+              </ListItemButton>
+            )}
+          </Box>
+))}
+ 
         </List>
       </ListItem>
     </List>

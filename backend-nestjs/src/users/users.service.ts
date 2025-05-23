@@ -21,21 +21,19 @@ export class UsersService {
     createUserDto.name =this.appService.cleanSpaces(createUserDto.name)
     createUserDto.login =this.appService.cleanSpaces(createUserDto.login)
 
-    const permissions = await this.permissionRepositry.find( { where: { id: In(createUserDto.permissionsIds)} });
     const branch = createUserDto.branch ? await this.branchRepositry.findOne({ where: { id: createUserDto.branch } }):undefined;
-
-    if (!permissions.length) { throw new NotFoundException("No valid permissions found.");}
     if (!branch) { throw new NotFoundException("No valid branch found.");}
 
-    const newCreate =  this.userRepositry.create( { ...createUserDto , branch: branch || undefined , permissions ,role: Array.isArray(createUserDto.role)
+    const newCreate =  this.userRepositry.create( { ...createUserDto , branch: branch || undefined ,role: Array.isArray(createUserDto.role)
       ? createUserDto.role : [createUserDto.role], })
     return await this.userRepositry.save(newCreate);
 
     
   }
+ 
 
   async findAll():Promise<User[]> {
-    const allUsers= await this.userRepositry.find()
+    const allUsers= await this.userRepositry.find({relations: ['branch'],})
       if ( !allUsers || allUsers.length === 0){
         throw new NotFoundException("There is no users data Available")
       }
@@ -52,7 +50,7 @@ export class UsersService {
 
 
 async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-  const { branch, permissionsIds, ...rest } = updateUserDto; // Exclure branch et permissionsIds de updateUserDto
+  const { branch,  ...rest } = updateUserDto; // Exclure branch et permissionsIds de updateUserDto
 
   const updateData: Partial<User> = { ...rest,    role: rest.role ? (Array.isArray(rest.role) ? rest.role : [rest.role]) : undefined,
   };
@@ -65,16 +63,11 @@ async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
       }
       updateData.branch = branchEntity; // Assigner l'entité Branch
   }
-
-  // Vérifier si une mise à jour des permissions est nécessaire
-  if (permissionsIds) {
-      const permissions = await this.permissionRepositry.find({ where: { id: In(permissionsIds) } });
-      updateData.permissions = permissions; // Assigner la liste des permissions
-  }
-
+ 
+   
   await this.userRepositry.update(id, updateData);
 
-  const updatedUser = await this.userRepositry.findOne({ where: { id }, relations: ['branch', 'permissions'] });
+  const updatedUser = await this.userRepositry.findOne({ where: { id }, relations: ['branch'/* , 'permissions' */] });
   if (!updatedUser) {
       throw new NotFoundException('User not found after update');
   }

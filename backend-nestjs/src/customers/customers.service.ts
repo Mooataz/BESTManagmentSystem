@@ -78,16 +78,19 @@ export class CustomersService {
     }
     return findAll
   }
-
-  async findByName(name: string): Promise<Customer[]> {
-    const findAll = await this.customerRepositry
+ 
+  async findByName(name:string, phone: number ,distributer): Promise<Customer> {
+    let customer = await this.customerRepositry
       .createQueryBuilder('customer')
       .where('name = :name', { name }) // Filtre sur l'ID de repair
-      .getMany();
-    if (!findAll || findAll.length === 0) {
-      throw new NotFoundException("There is no data Available")
+      .andWhere('phone = :phone', { phone })
+      .getOne();
+    if (!customer ) {
+      
+      customer = this.customerRepositry.create({ name, phone, distributer });
+    await this.customerRepositry.save(customer);
     }
-    return findAll
+    return customer
   }
 }
 

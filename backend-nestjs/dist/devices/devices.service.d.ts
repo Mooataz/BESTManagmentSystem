@@ -17,4 +17,5 @@ export declare class DevicesService {
     filterDevicesByCustomer(customerId: number): Promise<Device[]>;
     filterBySerialNumber(serialNumber: number): Promise<Device[]>;
     filterByModel(model: number): Promise<Device[]>;
+    chekDevice(serialenumber: string, purchaseDate: string, warrentyProof: string, model: number): Promise<Device>;
 }

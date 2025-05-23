@@ -119,7 +119,9 @@ export class CompanyController {
   @Patch(':id')
   async update(@Param('id') id: number, @Body() updateCompanyDto: UpdateCompanyDto, @Res() res, @UploadedFile() logo:Express.Multer.File) {
     try {
-      updateCompanyDto.logo=logo.filename
+       if (logo) {
+      updateCompanyDto.logo = logo.filename;
+    }
       const updatedata = await this.companyService.update(id,updateCompanyDto)
       return res.status(HttpStatus.OK).json({
         message:"Company updated successfuly !",

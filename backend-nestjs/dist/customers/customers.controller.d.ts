@@ -6,8 +6,11 @@ export declare class CustomersController {
     constructor(customersService: CustomersService);
     create(createCustomerDto: CreateCustomerDto, res: any): Promise<any>;
     getByDistributerId(distributerId: number, res: any): Promise<any>;
-    getByPhone(phone: number, res: any): Promise<any>;
-    getByName(name: string, res: any): Promise<any>;
+    getByName(body: {
+        name: string;
+        phone: number;
+        distributer: any;
+    }, res: any): Promise<any>;
     findAll(res: any): Promise<any>;
     findOne(id: number, res: any): Promise<any>;
     update(id: number, updateCustomerDto: UpdateCustomerDto, res: any): Promise<any>;

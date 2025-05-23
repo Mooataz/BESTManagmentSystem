@@ -33,12 +33,7 @@ let DevicesService = class DevicesService {
             createDeviceDto.serialeNumber = this.appService.cleanSpaces(createDeviceDto.serialeNumber);
         }
         ;
-        const customer = await this.customerRepositry.find({ where: { id: (0, typeorm_2.In)(createDeviceDto.customer) }, });
-        if (!customer.length) {
-            throw new common_1.NotFoundException('No model');
-        }
-        ;
-        const createNew = this.deviceRepositry.create({ ...createDeviceDto, customer });
+        const createNew = this.deviceRepositry.create({ ...createDeviceDto });
         return await this.deviceRepositry.save(createNew);
     }
     async findAll() {
@@ -56,15 +51,8 @@ let DevicesService = class DevicesService {
         return findOne;
     }
     async update(id, updateDeviceDto) {
-        const { customer, ...rest } = updateDeviceDto;
+        const { ...rest } = updateDeviceDto;
         let updateData = { ...rest };
-        if (customer !== undefined) {
-            const customers = await this.customerRepositry.find({ where: { id: (0, typeorm_2.In)(customer) } });
-            if (!customers.length) {
-                throw new common_1.NotFoundException('No customer found');
-            }
-            updateData.customer = customers;
-        }
         await this.deviceRepositry.update(id, updateData);
         const updatedDevice = await this.deviceRepositry.findOne({ where: { id }, relations: ['customer'] });
         if (!updatedDevice) {
@@ -110,6 +98,19 @@ let DevicesService = class DevicesService {
             throw new common_1.NotFoundException("There is no data Available");
         }
         return findAll;
+    }
+    async chekDevice(serialenumber, purchaseDate, warrentyProof, model) {
+        console.log('Backend: ', serialenumber, ' _ ', purchaseDate, ' _ ', model);
+        let device = await this.deviceRepositry
+            .createQueryBuilder('devices')
+            .where('serialenumber = :serialenumber', { serialenumber })
+            .getOne();
+        if (!device) {
+            device = this.deviceRepositry.create({ serialenumber, purchaseDate, warrentyProof, model: { id: model } });
+            await this;
+            this.deviceRepositry.save(device);
+        }
+        return device;
     }
 };
 exports.DevicesService = DevicesService;
