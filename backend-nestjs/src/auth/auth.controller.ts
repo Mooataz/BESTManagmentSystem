@@ -26,7 +26,11 @@ export class AuthController {
     const userId = user.sub
     return this.authService.logout(userId);
   }
- 
+
+  @Get('id')
+ async getUserId(@Param('id') id: number, @Res() res){
+
+ }
   
   @ApiBearerAuth('access-token')
 @UseGuards(AccessTokenGuard)

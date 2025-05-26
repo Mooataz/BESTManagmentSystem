@@ -26,3 +26,4 @@ export function InputDate({ onChange }: Props) {
     />
   );
 }
+  

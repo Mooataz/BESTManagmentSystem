@@ -25,6 +25,9 @@ import { getAgencies } from '../../../api/administration/Agencies';
 import { AgencieList } from '../../Administration/Users/Employees';
 import { useTranslation } from 'react-i18next';
 import Switch from '@mui/joy/Switch';
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState } from '../../../Redux/store';
+import { setBranch } from '../../../Redux/userSlice';
  interface Company {
   id: number;
   name: string;
@@ -95,9 +98,11 @@ export default function Header() {
   };
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = React.useState<User | null>(null);
-  const [branch, setBranch] = React.useState<{ branch: Agency | undefined }>();
-  const [company, setCompany] = React.useState<Company>();
+   const [company, setCompany] = React.useState<Company>();
   const [agencies, setAgencies] = React.useState<Agency[]>([]);
+    
+  const user = useSelector((state: RootState) => state.user);
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
     const fetchUser = async () => {
@@ -188,15 +193,14 @@ const handleNavigation = () => {
           gap: 1.5,
           alignItems: 'center',
         }}
-      >    
+      >     
         {currentUser?.role.includes('Administrateur') ? (
           <AgencieList
             agencies={agencies}
             onSelect={(agency) => {
-              setBranch((prev) => ({
-                ...prev,
-                branch: agency ?? prev?.branch,
-              }));
+              if (agency) {
+                dispatch(setBranch(agency)); // Met à jour Redux avec la nouvelle agence
+              }
             }}
           />
 

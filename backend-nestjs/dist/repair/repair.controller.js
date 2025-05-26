@@ -17,17 +17,14 @@ const common_1 = require("@nestjs/common");
 const repair_service_1 = require("./repair.service");
 const create_repair_dto_1 = require("./dto/create-repair.dto");
 const update_repair_dto_1 = require("./dto/update-repair.dto");
-const platform_express_1 = require("@nestjs/platform-express");
-const multer_1 = require("multer");
 const swagger_1 = require("@nestjs/swagger");
 let RepairController = class RepairController {
     repairService;
     constructor(repairService) {
         this.repairService = repairService;
     }
-    async create(createRepairDto, files, res) {
+    async create(createRepairDto, res) {
         try {
-            createRepairDto.files = files?.map((file) => file.filename) || [];
             const newCreate = await this.repairService.create(createRepairDto);
             return res.status(common_1.HttpStatus.CREATED).json({
                 message: 'Created Successfully!',
@@ -76,13 +73,6 @@ let RepairController = class RepairController {
                 data: null
             });
         }
-    }
-    async updateRepair(id, updateRepairDto) {
-        const updatedRepair = await this.repairService.updateRepairWithParts(+id, updateRepairDto);
-        return {
-            message: 'Repair updated successfully',
-            data: updatedRepair,
-        };
     }
     async update(id, updateRepairDto, res) {
         try {
@@ -198,7 +188,6 @@ let RepairController = class RepairController {
 exports.RepairController = RepairController;
 __decorate([
     (0, common_1.Post)(),
-    (0, swagger_1.ApiConsumes)('multipart/form-data'),
     (0, swagger_1.ApiBody)({
         schema: {
             type: 'object',
@@ -247,17 +236,10 @@ __decorate([
             },
         },
     }),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('files', 5, {
-        storage: (0, multer_1.diskStorage)({
-            destination: './upload/repairs',
-            filename: (_request, file, callback) => callback(null, `${new Date().getTime()}-${file.originalname}`),
-        }),
-    })),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.UploadedFiles)()),
-    __param(2, (0, common_1.Res)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_repair_dto_1.CreateRepairDto, Array, Object]),
+    __metadata("design:paramtypes", [create_repair_dto_1.CreateRepairDto, Object]),
     __metadata("design:returntype", Promise)
 ], RepairController.prototype, "create", null);
 __decorate([
@@ -275,14 +257,6 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], RepairController.prototype, "findOne", null);
-__decorate([
-    (0, common_1.Patch)('updatePartRepair/:id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_repair_dto_1.UpdateRepairDto]),
-    __metadata("design:returntype", Promise)
-], RepairController.prototype, "updateRepair", null);
 __decorate([
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),

@@ -28,10 +28,25 @@ import { Model } from '../ModelAccessory/Model';
  import imgAcceuille from '../../assets/imgAcceuille.jpg'
  import Card from '@mui/joy/Card';
 import { AddProduct } from '../Reception/AddProduct';
- ;
+import { getCurrentUser } from '../../api/administration/login';
+ import { useDispatch, useSelector } from 'react-redux';
+ import type{ RootState } from '../../Redux/store';
+ import {setUser} from '../../Redux/userSlice'
  export default function Dashboard() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
-   
+  const dispatch = useDispatch();
+     React.useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const user = await getCurrentUser();
+        dispatch(setUser(user));
+      } catch (error) {
+        console.error("Erreur récupération utilisateur", error);
+      }
+    };
+
+    fetchUser();
+  }, [dispatch]);
   
   return (
     <CssVarsProvider disableTransitionOnChange>

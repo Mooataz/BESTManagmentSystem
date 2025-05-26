@@ -26,9 +26,9 @@ export declare class RepairService {
     private readonly userRepositry;
     private readonly stockPartRepositry;
     private readonly approveStockRepositry;
-    private readonly CustomerStockRepositry;
+    private readonly customerRepositry;
     private appService;
-    constructor(repairRepositry: Repository<Repair>, accessoryRepositry: Repository<Accessory>, listFaultRepositry: Repository<ListFault>, customerRequestRepositry: Repository<CustomerRequest>, notesCustomerRepositry: Repository<NotesCustomer>, expertiseReasonRepositry: Repository<ExpertiseReason>, repairActionRepositry: Repository<RepairAction>, deviceRepositry: Repository<Device>, userRepositry: Repository<User>, stockPartRepositry: Repository<StockPart>, approveStockRepositry: Repository<ApproveStock>, CustomerStockRepositry: Repository<Customer>, appService: AppService);
+    constructor(repairRepositry: Repository<Repair>, accessoryRepositry: Repository<Accessory>, listFaultRepositry: Repository<ListFault>, customerRequestRepositry: Repository<CustomerRequest>, notesCustomerRepositry: Repository<NotesCustomer>, expertiseReasonRepositry: Repository<ExpertiseReason>, repairActionRepositry: Repository<RepairAction>, deviceRepositry: Repository<Device>, userRepositry: Repository<User>, stockPartRepositry: Repository<StockPart>, approveStockRepositry: Repository<ApproveStock>, customerRepositry: Repository<Customer>, appService: AppService);
     create(createRepairDto: CreateRepairDto): Promise<Repair>;
     findAll(): Promise<Repair[]>;
     findOne(id: number): Promise<Repair>;
@@ -38,5 +38,4 @@ export declare class RepairService {
     filterRepairByUser(userId: number): Promise<Repair[]>;
     filterByNewSerialNumber(newSerialNumber: number): Promise<Repair[]>;
     filterByActuellyBranch(actuellyBranch: number): Promise<Repair[]>;
-    updateRepairWithParts(repairId: number, updateData: UpdateRepairDto): Promise<Repair>;
 }

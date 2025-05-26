@@ -12,13 +12,9 @@ export class CreateDeviceDto {
         type:Date,
         description: "Required"
     })
-    purchaseDate? : Date ;
+    purchaseDate : Date ;
 
-    @ApiProperty({
-        type:String,
-        description: "Required"
-    })
-    warrentyProof : string;
+  
    
  
    

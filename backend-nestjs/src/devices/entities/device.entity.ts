@@ -12,10 +12,6 @@ export class Device {
     @Column({ type: 'timestamptz' })
         purchaseDate : Date ;
     
-    @Column()
-        warrentyProof : string;
-
-
     @OneToMany( () => Repair, repair => repair.device)
     repair: Repair[];
 

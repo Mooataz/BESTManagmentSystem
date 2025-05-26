@@ -19,13 +19,16 @@ const device_entity_1 = require("./entities/device.entity");
 const typeorm_2 = require("typeorm");
 const customer_entity_1 = require("../customers/entities/customer.entity");
 const app_service_1 = require("../app.service");
+const model_entity_1 = require("../models/entities/model.entity");
 let DevicesService = class DevicesService {
     deviceRepositry;
     customerRepositry;
+    modelRepositry;
     appService;
-    constructor(deviceRepositry, customerRepositry, appService) {
+    constructor(deviceRepositry, customerRepositry, modelRepositry, appService) {
         this.deviceRepositry = deviceRepositry;
         this.customerRepositry = customerRepositry;
+        this.modelRepositry = modelRepositry;
         this.appService = appService;
     }
     async create(createDeviceDto) {
@@ -99,17 +102,27 @@ let DevicesService = class DevicesService {
         }
         return findAll;
     }
-    async chekDevice(serialenumber, purchaseDate, warrentyProof, model) {
-        console.log('Backend: ', serialenumber, ' _ ', purchaseDate, ' _ ', model);
-        let device = await this.deviceRepositry
+    async chekDevice(serialenumber, purchaseDate, Fmodel) {
+        let device;
+        device = await this.deviceRepositry
             .createQueryBuilder('devices')
             .where('serialenumber = :serialenumber', { serialenumber })
             .getOne();
-        if (!device) {
-            device = this.deviceRepositry.create({ serialenumber, purchaseDate, warrentyProof, model: { id: model } });
-            await this;
-            this.deviceRepositry.save(device);
+        let model = null;
+        if (Fmodel) {
+            model = await this.modelRepositry.findOne({ where: { id: Fmodel } });
         }
+        const deviceData = {
+            serialenumber,
+        };
+        if (purchaseDate) {
+            deviceData.purchaseDate = new Date(purchaseDate);
+        }
+        if (model) {
+            deviceData.model = model;
+        }
+        device = this.deviceRepositry.create(deviceData);
+        await this.deviceRepositry.save(device);
         return device;
     }
 };
@@ -118,7 +131,9 @@ exports.DevicesService = DevicesService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(device_entity_1.Device)),
     __param(1, (0, typeorm_1.InjectRepository)(customer_entity_1.Customer)),
+    __param(2, (0, typeorm_1.InjectRepository)(model_entity_1.Model)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.Repository,
         app_service_1.AppService])
 ], DevicesService);

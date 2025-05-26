@@ -42,3 +42,16 @@ import axios from 'axios';
     });
     return response.data;
   };
+
+   export const getUserId = async ( id:number) => {
+    try {
+        const response = await API.get(`users/${id}`);
+        return response.data;
+    } catch (error: any) {
+        if (error.response) {
+            throw new Error(error.response.data.message); // message d'erreur propre
+          } else {
+            throw new Error('Erreur réseau');
+          }
+    }
+  }

@@ -20,36 +20,36 @@ export class Repair {
     @PrimaryGeneratedColumn()
     id: number;
     
-    @Column({ type: 'boolean', default: false })
-    warrenty?: boolean;
+    @Column({ type: 'boolean', nullable: true  })
+    warrenty: boolean;
 
-    @Column({ type: 'boolean', default: false })
-    approveRepair?: boolean;
+    @Column({ type: 'boolean', nullable: true })
+    approveRepair: boolean;
+
+    @Column({ nullable: true })
+    newSerialNumber: string;
+
+    @Column({ nullable: true })
+    advancePayment: number;
 
     @Column()
-    newSerialNumber?: string;
-
-    @Column()
-    advancePayment?: number;
-
-    @Column()
-    actuellyBranch: number;
+    actuellyBranch: string;
 
     @Column('jsonb', { nullable: true })
-    files?: string[]; 
+    files: string[]; 
 
     @Column("simple-array", { nullable: true})
-    partsNeed?: number[] ;
+    partsNeed: number[] ;
 
-    @Column()
-    remark?: string;
+    @Column({ nullable: true })
+    remark: string;
 
     @Column()
     deviceStateReceive: string;
 
-    @ManyToMany ( () => Accessory, (accessory) =>accessory.repair , { cascade : true})
+    @ManyToMany ( () => Accessory, (accessory) =>accessory.repair , { cascade : true}, )
     @JoinTable()
-    accessory? : Accessory[];
+    accessory : Accessory[];
     
     @ManyToMany ( () => ListFault, (listFault) =>listFault.repair , { cascade : true})
     @JoinTable()
@@ -57,19 +57,19 @@ export class Repair {
 
     @ManyToMany ( () => CustomerRequest, (customerRequest) =>customerRequest.repair , { cascade : true})
     @JoinTable()
-    customerRequest? : CustomerRequest[];
+    customerRequest : CustomerRequest[];
 
     @ManyToMany ( () => NotesCustomer, (notesCustomer) =>notesCustomer.repair , { cascade : true})
     @JoinTable()
-    notesCustomer? : NotesCustomer[];
+    notesCustomer : NotesCustomer[];
 
     @ManyToMany ( () => ExpertiseReason, (expertiseReason) =>expertiseReason.repair , { cascade : true})
     @JoinTable()
-    expertiseReason? : ExpertiseReason[];
+    expertiseReason : ExpertiseReason[];
 
     @ManyToMany ( () => RepairAction, (repairAction) =>repairAction.repair , { cascade : true})
     @JoinTable()
-    repairAction? : RepairAction[];
+    repairAction : RepairAction[];
 
     @ManyToOne( () => Device, device => device.repair)
     device :Device;
@@ -78,7 +78,7 @@ export class Repair {
     user : User;
 
     @OneToMany( () => ApproveStock, approveStock => approveStock.repair)
-    approveStock? : ApproveStock[];
+    approveStock : ApproveStock[];
 
     @OneToMany( () => HistoryRepair, historyRepair => historyRepair.repair)
     historyRepair : HistoryRepair[]; 

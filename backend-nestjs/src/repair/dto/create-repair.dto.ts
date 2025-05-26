@@ -1,65 +1,89 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsBoolean, IsNumber } from "class-validator";
+import { IsArray, IsBoolean, IsNumber, IsOptional } from "class-validator";
 import { type } from "os";
 
 export class CreateRepairDto {
-    @ApiProperty({ type: Boolean, description: "Required" })
-    @IsBoolean()
-    warrenty?: boolean;
 
-    @ApiProperty({type: Boolean, description: "Required" })
-    @IsBoolean()
-    approveRepair?: boolean;
-
-    @ApiProperty({ type: [String],description: "Required"})
-    @IsArray()
-    files?: string[];
+    
+    @ApiProperty({ type: String  })
+    @IsOptional()
+    actuellyBranch: string;
 
     @ApiProperty({type: Number,})
     @IsNumber()
-    newSerialNumber?: string;
-
-    @ApiProperty({type: Number, description: "Required"})
-    advancePayment?: number;
+    @IsOptional()
+    customer: number;
     
-    @ApiProperty({ type: Number, description: "Required" })
-    actuellyBranch: number;
-    
-    @ApiProperty({ type: [Number], description: "Required" })
-    @IsArray()
-    @IsNumber({}, { each: true})
-    partsNeed?: number[]; 
-
-    @ApiProperty({ type: String, description: "Required"  })
-    remark?: string;
-
-    @ApiProperty({ type: String, description: "Required" })
-    deviceStateReceive?: string;
-
-    @ApiProperty({ type: Array, description: "Required"  })
-    accessoryIds?: number[];
-
-    @ApiProperty({ type: Array, description: "Required" })
-    listFaultIds?: number[];
-
-    @ApiProperty({ type: Array, description: "Required" })
-    customerRequestIds?: number[];
-
-    @ApiProperty({ type: Array, description: "Required" })
-    notesCustomerIds?: number[];
-
-    @ApiProperty({ type: Array, description: "Required" })
-    expertiseReasonsIds?: number[];
-
-    @ApiProperty({ type: Array, description: "Required" })
-    repairActionIds?: number[];
-
-    @ApiProperty({ type: Number,})   
+    @ApiProperty({ type: Number,})
+    @IsNumber()
+    @IsOptional()   
     device: number;
 
-    @ApiProperty({type: Number,})
-    user?: number;
+    @ApiProperty({ type: String   })
+    @IsOptional()
+    remark: string;
 
-    @ApiProperty({type: Number,})
-    customer: number;
+    @ApiProperty({ type: String  })
+    deviceStateReceive: string;
+
+    @ApiProperty({ type: Array   })
+    @IsOptional()
+    accessoryIds: number[];
+
+    @ApiProperty({ type: [Number], required: true })
+    @IsArray()
+    @IsNumber({}, { each: true })
+    listFaultIds: number[];
+
+    @ApiProperty({ type: Array  })
+    @IsOptional()
+    customerRequestIds: number[];
+
+   /*  @ApiProperty({ type: Array  })
+    @IsOptional()
+    notesCustomerIds: number[];
+
+    @ApiProperty({ type: Array })
+    @IsOptional()
+    expertiseReasonsIds: number[];
+
+    @ApiProperty({ type: Array  })
+    @IsOptional()
+    repairActionIds: number[]; */
+
+       /*  @ApiProperty({ type: Boolean   })
+    @IsBoolean()
+    @IsOptional()
+    warrenty: boolean;
+
+    @ApiProperty({type: Boolean })
+    @IsBoolean()
+    @IsOptional()
+    approveRepair: boolean;
+
+    @ApiProperty({ type: [String] })
+    @IsArray()
+    @IsOptional()
+    files: string[]; */
+
+    /* @ApiProperty({type: Number,})
+    @IsNumber()
+    @IsOptional()
+    newSerialNumber: string;
+
+    @ApiProperty({type: Number })
+    @IsOptional()
+    advancePayment: number; */
+
+   /*  @ApiProperty({type: Number,})
+    @IsOptional()
+    user: number; */
+
+     /*  @ApiProperty({ type: [Number]  })
+    @IsArray()
+    @IsNumber({}, { each: true})
+    @IsOptional()
+    partsNeed: number[];  */
+
+    
 }

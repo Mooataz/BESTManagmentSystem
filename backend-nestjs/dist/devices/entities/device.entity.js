@@ -17,7 +17,6 @@ let Device = class Device {
     id;
     serialenumber;
     purchaseDate;
-    warrentyProof;
     repair;
     model;
 };
@@ -34,10 +33,6 @@ __decorate([
     (0, typeorm_1.Column)({ type: 'timestamptz' }),
     __metadata("design:type", Date)
 ], Device.prototype, "purchaseDate", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Device.prototype, "warrentyProof", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => repair_entity_1.Repair, repair => repair.device),
     __metadata("design:type", Array)

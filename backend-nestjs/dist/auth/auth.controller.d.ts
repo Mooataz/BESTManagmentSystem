@@ -12,6 +12,7 @@ export declare class AuthController {
         };
     }>;
     logout(req: Request): Promise<void>;
+    getUserId(id: number, res: any): Promise<void>;
     getMe(req: Request): Promise<import("../users/entities/user.entity").User | null>;
     updatePassword(userId: number, passwordDTO: {
         currentPassword: string;

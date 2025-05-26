@@ -57,24 +57,24 @@ __decorate([
     __metadata("design:type", Number)
 ], Repair.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'boolean', default: false }),
+    (0, typeorm_1.Column)({ type: 'boolean', nullable: true }),
     __metadata("design:type", Boolean)
 ], Repair.prototype, "warrenty", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'boolean', default: false }),
+    (0, typeorm_1.Column)({ type: 'boolean', nullable: true }),
     __metadata("design:type", Boolean)
 ], Repair.prototype, "approveRepair", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Repair.prototype, "newSerialNumber", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", Number)
 ], Repair.prototype, "advancePayment", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
-    __metadata("design:type", Number)
+    __metadata("design:type", String)
 ], Repair.prototype, "actuellyBranch", void 0);
 __decorate([
     (0, typeorm_1.Column)('jsonb', { nullable: true }),
@@ -85,7 +85,7 @@ __decorate([
     __metadata("design:type", Array)
 ], Repair.prototype, "partsNeed", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Repair.prototype, "remark", void 0);
 __decorate([

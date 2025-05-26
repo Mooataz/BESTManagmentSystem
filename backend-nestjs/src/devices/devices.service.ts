@@ -6,11 +6,13 @@ import { Device } from './entities/device.entity';
 import { In, Repository } from 'typeorm';
 import { Customer } from 'src/customers/entities/customer.entity';
 import { AppService } from 'src/app.service';
+import { Model } from 'src/models/entities/model.entity';
 
 @Injectable()
 export class DevicesService {
   constructor(@InjectRepository(Device) private readonly deviceRepositry: Repository<Device>,
     @InjectRepository(Customer) private readonly customerRepositry: Repository<Customer>,
+    @InjectRepository(Model) private readonly modelRepositry: Repository<Model>,
     private appService: AppService
   ) { }
 
@@ -96,17 +98,41 @@ export class DevicesService {
   return findAll
   }
 
-  async chekDevice (serialenumber:string, purchaseDate:string, warrentyProof:string, model:number):Promise<Device> {
-    console.log('Backend: ',serialenumber,' _ ',purchaseDate, ' _ ',model )
-    let device = await this.deviceRepositry
-      .createQueryBuilder('devices')
-      .where('serialenumber = :serialenumber', {serialenumber})
-      .getOne();
+  async chekDevice (serialenumber?:string, 
+                    purchaseDate?:string, 
+                    
+                    Fmodel?:number):Promise<Device> {
+     let device: Device | null;
 
-      if(!device) { 
-        device = this.deviceRepositry.create({serialenumber, purchaseDate, warrentyProof, model: { id: model }});
-        await this;this.deviceRepositry.save(device)
-      }
+   
+    device = await this.deviceRepositry
+      .createQueryBuilder('devices')
+      .where('serialenumber = :serialenumber', { serialenumber })
+      .getOne();
+  
+
+ let model: Model | null = null;
+
+if (Fmodel) {
+  model = await this.modelRepositry.findOne({ where: { id: Fmodel } });
+}
+
+ const deviceData: Partial<Device> = {
+  serialenumber,
+   
+   
+};
+if (purchaseDate) {
+  deviceData.purchaseDate = new Date(purchaseDate);
+}
+if (model) {
+  deviceData.model = model;
+}
+
+device = this.deviceRepositry.create(deviceData);
+
+    await this.deviceRepositry.save(device);
+   
 
     return device
   }

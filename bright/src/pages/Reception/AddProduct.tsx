@@ -2,7 +2,7 @@ import { Card,Typography ,Button, ListItemContent, Option,  TextField, Input } f
 import { Box } from "@mui/material";
 import React from "react";
 import Autocomplete from '@mui/joy/Autocomplete';
-import { getCustomer, getDevices, getOneCustomer, getOneDevice } from "../../api/Reception/CreateRepair";
+import { addRepair, getAccessory, getCustomer, getCustomerRequest, getDevices, getListFault, getOneCustomer, getOneDevice  } from "../../api/Reception/CreateRepair";
 import FormControl from '@mui/joy/FormControl';
 import FormLabel from '@mui/joy/FormLabel';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +22,18 @@ import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArro
 import { getMarque } from "../../api/administration/Marque";
 import { useNotification } from "../Componants/NotificationContext";
 import BurstModeIcon from '@mui/icons-material/BurstMode';
+import Checkbox from '@mui/joy/Checkbox';
+import List from '@mui/joy/List';
+import ListItem from '@mui/joy/ListItem';
+ import Sheet from '@mui/joy/Sheet';
+import Done from '@mui/icons-material/Done';
+import Select from '@mui/joy/Select';
+ import Textarea from '@mui/joy/Textarea';
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState } from '../../Redux/store';
+import { PiEmptyThin } from "react-icons/pi";
+import {    CreateRepairPDF } from "../../api/PDF/Repair";
+
 
   export function AddProduct () {
   const [step, setStep] = React.useState(0);
@@ -30,14 +42,23 @@ import BurstModeIcon from '@mui/icons-material/BurstMode';
   const back = () => setStep((prev) => prev - 1);
   const [customer, setCustomer] = React.useState<Customer | null>(null);
   const [device, setDevice] = React.useState<Device | null > (null);
+  const [repair, setRepair] = React.useState<TypeForm | null > (null);
   const renderStepContent = () => {
     switch (step) {
       case 0:
-        return <Typography level="title-md"> <AddCustomer onChange={setCustomer}/> </Typography>;
+        return   <AddCustomer onChange={setCustomer}/>  ;
       case 1:
-        return <Typography level="title-md"> <AddDevice onChange={setDevice}/> </Typography>;
+        return   <AddDevice onChange={setDevice}/>  ;
       case 2:
-        return <Typography level="title-md"> <AddRepair /> </Typography>;
+              if (!customer || !device) {
+                return <Typography level="body-sm" color="danger">Veuillez remplir les étapes précédentes.</Typography>;
+              }
+
+              return (
+                 
+                  <AddRepair onChange={setRepair} customerr={customer} devicee={device} />
+                
+              );
       default:
         return <Typography>Étape inconnue</Typography>;
     }
@@ -45,42 +66,124 @@ import BurstModeIcon from '@mui/icons-material/BurstMode';
     return(
         <div>
              <Box sx={{display:'flex', justifyContent:'space-around'}}>
-                <Card sx={{width:'40%', height:'750px'}}>
+                <Card sx={{width:'40%', height:'750px',bgcolor: '#cfe8fc'}}>
                      <Typography level="title-md">Client sélectionné</Typography>
                         {customer ? (
                             <>
-                            <Typography>Nom : {customer.name}</Typography>
-                            <Typography>Téléphone : {customer.phone}</Typography>
-                            {customer.distributer && (
-                                <>
-                                <Typography>Distributeur : {customer.distributer.name}</Typography>
-                                <Typography>Email : {customer.distributer.email}</Typography>
-                                </>
-                            )}
+                              <table style={{ border: '2px solid darkgray'  }}>                              
+                                <tr>
+                                 <td  style={{ border: '2px solid darkgray', width:'200px'  }}>Nom</td>  <td style={{ border: '2px solid darkgray'  }}>{customer.name}</td>
+                                </tr>
+                              <tr>
+                                <td style={{ border: '2px solid darkgray'  }}>Téléphone</td> <td style={{ border: '2px solid darkgray'  }}>{customer.phone}</td>
+                              </tr>
+                              {customer.distributer && (
+                                <tr>
+                                  <td style={{ border: '2px solid darkgray'  }}>Distributeur</td> <td>{customer.distributer.name}</td>
+
+                                </tr>
+
+                                 )}
+
+                            </table>
+                             
+                           
+                            
                             </>
                         ) : (
-                            <Typography>Aucun client sélectionné</Typography>
+                            <Typography><PiEmptyThin /></Typography>
                         )}
 
                          <Typography level="title-md">Appareille</Typography>
                          {
                           device ? (
-                            <div>
-                               <Typography> Imei: {device.serialenumber} </Typography>
-                               <Typography> Modéle: {device.model.name} </Typography>
-                               <Typography> Date d'achat:  </Typography>
-                            </div>
+                            <table style={{ border: '2px solid darkgray'  }}>
+                              <tr>
+                                <td  style={{ border: '2px solid darkgray', width:'200px'  }}>Imei</td>  <td style={{ border: '2px solid darkgray' , width:'400px' }}>{device.serialenumber}</td>
+
+                              </tr>
+                              <tr>
+                                <td  style={{ border: '2px solid darkgray', width:'200px'  }}>Modéle</td>  <td style={{ border: '2px solid darkgray'  }}>{device.model?.name || ''}</td>
+
+                              </tr>
+                              <tr>
+                                <td  style={{ border: '2px solid darkgray', width:'200px'  }}>Date d'achat</td>  <td style={{ border: '2px solid darkgray'  }}>{device.purchaseDate ? new Date(device.purchaseDate).toISOString().split('T')[0] : 'Non précisée'}</td>
+
+                              </tr>
+ 
+                            </table>
 
                           ) : (
-                                <Typography>Aucun Appareille sélectionné</Typography>
+                                <Typography><PiEmptyThin /></Typography>
+                          )
+                         }
+
+
+                          <Typography level="title-md">Détaille </Typography>
+                         {
+                          repair ? (
+                            
+                            <div>
+                              <table style={{ border: '2px solid darkgray'  }}>
+                                 <tr>
+                                  <td>Id</td>
+                                  <td>{repair.id}</td>
+                                 </tr>
+                                <tr>
+                                  <td  style={{ border: '2px solid darkgray', width:'200px'  } }>Accessoire</td> 
+                                  <td style={{ border: '2px solid darkgray' , width:'400px' }}>
+                                    {repair.accessory.map((item, idx) => (
+                                      <div key={idx}>
+                                        <Typography level="body-sm">• {item.name}</Typography>
+                                      </div>
+                                    ))}
+
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td  style={{ border: '2px solid darkgray', width:'200px'  } }>Liste des probléme</td>
+                                  <td style={{ border: '2px solid darkgray'  }}>
+                                    {repair.listFault.map((item, idx) => (
+                                            <div key={idx}>
+                                              <Typography level="body-sm">• {item.name}</Typography>
+                                            </div>
+                                          ))}
+
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td  style={{ border: '2px solid darkgray', width:'200px'  } }>Demandes client</td>
+                                  <td style={{ border: '2px solid darkgray'  }}>
+                                    {repair.customerRequest.map((item, idx) => (
+                                    <div key={idx}>
+                                      <Typography level="body-sm">• {item.name}</Typography>
+                                    </div>
+                                  ))}
+
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td  style={{ border: '2px solid darkgray', width:'200px'  } }>Etat de l'appareille</td>
+                                  <td style={{ border: '2px solid darkgray'  }}>{repair.deviceStateReceive}</td>
+                                </tr>
+                                <tr>
+                                  <td  style={{ border: '2px solid darkgray', width:'200px'  } }>Remarque</td>
+                                  <td style={{ border: '2px solid darkgray'  }}>{repair.remark}</td>
+                                </tr>
+                              </table>
+ 
+                            </div> 
+
+                          ) : (
+                                <Typography><PiEmptyThin /></Typography>
                           )
                          }
                 </Card>
 
-                <Card sx={{width:'55%'}}>
-                    <Box>{renderStepContent()}</Box>
+                <Card sx={{width:'55%', height: '750px', display: 'flex', flexDirection: 'column'}}>
+                    <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>{renderStepContent()}</Box>
 
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 'auto', p: 2 }}>
                         <Button disabled={step === 0} onClick={back}>Précédent</Button>
                         <Button onClick={next}>{step === 2 ? 'Terminer' : 'Suivant'}</Button>
                     </Box>
@@ -102,10 +205,15 @@ interface Customer {
    distributer?: Distributor | null;
 }
 interface Distributor {
-    id: number; name: string; phone: number; email: string; location: string; taxRegisterNumber: string;
+    id: number; 
+    name: string; 
+    phone: number; 
+    email: string; 
+    location: string; 
+    taxRegisterNumber: string;
 }
  
-function AddCustomer({ onChange }: { onChange: (c: Customer) => void }) {
+function AddCustomer({ onChange }: {onChange: (c: Customer) => void }) {
   const [customers, setCustomers] = React.useState<Customer[]>([]);
   const [valuecustomers, setValueCustomers] = React.useState<Customer | null>({name:'',phone:0,distributer: null});
 
@@ -207,13 +315,10 @@ interface Device {
 id?: number;
 serialenumber? : string;
 purchaseDate? : Date ;
-warrentyProof? : string | File; // facture d'achat
-customer? : Customer[];
-model : Model;
+model : Model ;
 }
-
 interface Model{
-    id:number;
+    id?:number;
     name: string;
     brand: Marque;
     picture: string | File;
@@ -223,21 +328,21 @@ interface Model{
 }
 interface Marque {
 
-  id: number;
+  id?: number;
   name: string;
   logo: string;
   status: string;
 
 }
 interface TypeModel {
-    id: number;
+    id?: number;
     description: string;
 }
 function AddDevice ({ onChange }: { onChange: (c: Device) => void }) {
   const [devices, setDevices] = React.useState<Device[]>([]);
   const [models, setModels] = React.useState<Model[]>([])
-
-  const [valueDevice, setValueDevice] = React.useState<Device | null>({serialenumber:'',purchaseDate: new Date(),warrentyProof:'',
+  const { notify } = useNotification();
+  const [valueDevice, setValueDevice] = React.useState<Device | null>({serialenumber:'',purchaseDate: new Date(),  
                                                                         model:{id:0,name:'',
                                                                                 brand:{ id: 0,
                                                                                         name: '',
@@ -248,8 +353,7 @@ function AddDevice ({ onChange }: { onChange: (c: Device) => void }) {
                                                                                             description: ''},
                                                                                 allpart:[]
                                                                               } });
-
-const handlePurchaseDateChange = (newDate: Date) => {
+ const handlePurchaseDateChange = (newDate: Date) => {
   setValueDevice((prev) => ({
     ...prev!,
     purchaseDate: newDate,
@@ -268,88 +372,72 @@ const handleModelSelected = (model: Model) => {
     });
   }
 };
-   const  handelSubmit = () => {
-    console.log('data Front: ' ,valueDevice )
-     getOneDevice(valueDevice)
-        .then( (data) =>onChange(data) )
+ const handelSubmit = () => {
+   if ( !valueDevice?.model || !valueDevice?.serialenumber || !valueDevice?.purchaseDate) {
+    notify("Remplire Toutes les champs.","danger");
+    return;
+  }
 
-    }
+    const body = {
+    serialenumber: valueDevice.serialenumber,
+    purchaseDate: valueDevice.purchaseDate?.toISOString(),
+    model: valueDevice.model?.id,
+  };
+
+  getOneDevice(body)
+    .then((data) => onChange(data))
+    .catch((err) => console.error("Erreur API:", err));
+};
+
     return(
         <div>
-                  <Typography>Information de l'appareille</Typography> <br></br> <br/>
-                  <FormLabel>Rechercher un appareille</FormLabel>
-                <Autocomplete
-                  disableCloseOnSelect
-                    
-                  id="customer-autocomplete"
-                  placeholder="Choisir des clients"
-                  options={devices}
-                  getOptionLabel={(option) => `${option.serialenumber} `}
-                  onChange={(_, value) => {
-                    
-                    setValueDevice(value)
-                  }}
-                  value={valueDevice}
-                /> <br/>
+ 
 
                 <form>
                   <Typography sx={{marginBottom:'5%', marginTop:'5%'}}>Ajouter un Appareille</Typography>
                       <FormControl  sx={{marginBottom:'5%'}}>
                         <FormLabel>Imei</FormLabel>
                             <Input
-                            variant="soft"
-                             
-                            sx={underlineInputStyles}
-                            value={valueDevice?.serialenumber || ""}
-                            onChange={(e) =>
-                                setValueDevice({
-                                ...valueDevice!,
-                                serialenumber: e.target.value,
-                                })
-                            }
-                            />        
+                                required
+                                variant="soft"
+                                sx={underlineInputStyles}
+                                value={valueDevice?.serialenumber ?? ""}
+                                onChange={(e) => {
+                                  const input = e.target.value;
+                                  const alphanumeric = input.replace(/[^a-zA-Z0-9]/g, '').slice(0, 15); // filtre et limite à 15 caractères
+                                  setValueDevice({
+                                    ...valueDevice!,
+                                    serialenumber: alphanumeric,
+                                  });
+                                }}
+                              />
+       
                           </FormControl>
                           <FormControl sx={{marginTop:'5%'}}>
                             <FormLabel>Date d'achat</FormLabel>
-                           {/*  <InputDate onChange={handlePurchaseDateChange} /> */}
-
-                           <input type="date" 
-                            onChange={(e) =>
-                                setValueDevice({
-                                ...valueDevice!,
-                                purchaseDate: new Date(e.target.value),
-                                })
-                            } />
+                             <InputDate onChange={handlePurchaseDateChange} />  
+  
                           </FormControl>
 
-                          <FormControl sx={{marginTop:'5%'}}>
-                            <FormLabel>Facture d'achat</FormLabel>
-                                              <Input variant="soft" sx={underlineInputStyles} type='file'
-                                                onChange={(e) => {
-                                                    const file = e.target.files?.[0] ;
-                                                    if (file) setValueDevice( (prev) => ( {
-                                                      ...prev!,
-                                                       warrentyProof: file,
-                                                    }));
-                                                  
-                                                  }} />  
-                          </FormControl>
+ 
 
                           <FormControl sx={{marginTop:'5%'}}>
                             <FormLabel>Modéle</FormLabel>
                             <div style={{display:'flex' ,justifyContent:'space-around'}}>
                                 <Autocomplete
-                               
+                               required
                                 sx={{width:'45%'}}
                               id="model-autocomplete"
                               placeholder="Choisir des modéle"
                               options={models}
                               getOptionLabel={(option) => `${option.name} `}
                               value={valueDevice?.model}
-                              onChange={(_, value) => {
-                                
-                                setValueDevice((prev) => prev? { ...prev, model: value!} : null)
-                              }}
+                            onChange={(_, value) => {
+                              setValueDevice(prev => {
+                                if (!prev) return prev; // ou même throw
+                                return { ...prev, model: value! };
+                              });
+                            }}
                               
                             /> 
 
@@ -357,18 +445,229 @@ const handleModelSelected = (model: Model) => {
   
                             </div>
 
-                          </FormControl>
+                          </FormControl><br/> <br/>
                           <Button variant="outlined" onClick={  handelSubmit}>Enregistrer</Button> 
                 </form>
         </div>
     )
 }
 
-function AddRepair() {
+interface TypeUnique{
+  id?:number;
+  name:string;
+}
 
+type TypeForm = {
+  id?: number;
+  accessory:TypeUnique[];
+  listFault:TypeUnique[];
+  customerRequest:TypeUnique[];
+  deviceStateReceive: string;
+  remark: string;
+  actuellyBranch: string;
+  device: Device;
+  customer: Customer
+}
+function AddRepair({devicee,customerr, onChange }: {devicee:Device, customerr:Customer, onChange: (c: TypeForm) => void }) {
+const [accessory,setAccessory] = React.useState<TypeUnique[]>([]);
+const [listFault,setListFault] = React.useState<TypeUnique[]>([]);
+const [customerRequest,setCustomerRequest] = React.useState<TypeUnique[]>([]);
+const user = useSelector((state: RootState) => state.user);
+  const { notify } = useNotification();
+
+const [formData, setFormData] = React.useState<TypeForm> ({
+  accessory: [],
+  listFault: [],           // obligatoire, donc initialisé à un tableau vide
+  customerRequest: [],
+  deviceStateReceive: '',   // obligatoire, donc initialisé à une chaîne vide
+  remark: '',
+  actuellyBranch:user.branch?.name || '',
+  device: {
+    id: undefined,
+    serialenumber: '',
+    purchaseDate: undefined,
+    model: {
+      id: undefined,
+      name: '',
+      brand:{
+        id: undefined,
+        name:'',
+        logo: '',
+        status: ''
+      },
+      typeModel: {
+         id: undefined,
+         description:''
+      },
+      picture: '',
+      allpart:[]
+    }, // ou un modèle vide si disponible
+  },
+  customer: {
+    id: undefined,
+    name: '',
+    phone: 0,
+    distributer: null,
+  }
+});
+ 
+    React.useEffect(() => {
+    getAccessory().then((data) => setAccessory(data));
+    getListFault().then( (data) => setListFault(data));
+    getCustomerRequest().then( (data) => setCustomerRequest(data));
+
+  }, []);
+
+   const handelSubmit = () => {
+   if (!formData) {
+    console.log("Aucun appareil renseigné.");
+    return;
+  }
+  
+  // Convert arrays to IDs
+  const accessoryIds = formData.accessory.map(a => a.id);
+  const listFaultIds = formData.listFault.map(f => f.id);
+  const customerRequestIds = formData.customerRequest.map(r => r.id);
+
+const body = {
+  accessoryIds: accessoryIds?.length ? accessoryIds : [],
+  listFaultIds: listFaultIds?.length ? listFaultIds : [],
+  customerRequestIds: customerRequestIds?.length ? customerRequestIds : [],
+  deviceStateReceive: formData.deviceStateReceive ?? '',
+  remark: formData.remark ?? ' ',
+  actuellyBranch: user.branch?.name ?? ' ',
+  device: devicee?.id ?? null,
+  customer: customerr?.id ?? null
+};
+if (!body.listFaultIds.length) {
+  return notify("Veuillez sélectionner au moins un défaut.", "danger");
+}
+/*    addRepair(body)
+    .then((data) => onChange(data) ); */
+    // Utilisation
+addRepair(body)
+  .then((data) => {
+    onChange(data);
+    return CreateRepairPDF(data.id);
+  })
+  .then((pdfBlob) => {
+    // Créer un lien de téléchargement
+    const url = window.URL.createObjectURL(new Blob([pdfBlob]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'fiche_reparation.pdf');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  })
+  .catch((error) => {
+    console.error('Erreur:', error);
+  });
+     
+};
     return(
         <div>
-            AddRepair
+            <Typography>Information Nécessaire</Typography>
+ 
+            <form>
+                        <ExampleChoiceChipCheckbox
+            accessory={accessory}
+            onChange={(selectedAccessories) =>
+              setFormData((prev) => ({
+                ...prev,
+                accessory: selectedAccessories,
+              }))
+            }
+          /> <br/> 
+          <FormLabel>List des problèmes</FormLabel>
+          <Autocomplete
+            multiple
+            disableCloseOnSelect
+            sx={{ width: '45%' }}
+            id="model-autocomplete"
+            placeholder="Choisir des pannes"
+            options={listFault}
+            getOptionLabel={(option) => `${option.name}`}
+            value={formData.listFault}
+            onChange={(_, value) => {
+              setFormData((prev) => ({ ...prev, listFault: value }));
+            }}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+          /><br/>  
+          <FormLabel>Demandes du client</FormLabel>
+                    <Autocomplete
+            multiple
+            disableCloseOnSelect
+            sx={{ width: '45%' }}
+            id="model-autocompletes"
+            placeholder="Demande"
+            options={customerRequest}
+            getOptionLabel={(option) => `${option.name}`}
+            value={formData.customerRequest}
+            onChange={(_, value) => {
+              setFormData((prev) => ({ ...prev, customerRequest: value }));
+            }}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+          /> <br />
+          <FormLabel>État de l'appareil</FormLabel>
+          <Select
+                placeholder="Sélectionner un état"
+                sx={{ width: 240 }}
+                value={formData.deviceStateReceive}
+                onChange={(e, value) => {
+                  if (value) {
+                    setFormData((prev) => ({ ...prev, deviceStateRecive: value }));
+                  }
+                }}
+                slotProps={{
+                  listbox: {
+                    placement: 'bottom-start',
+                  },
+                }}
+              >
+                <Option value="Bon condition">Bon condition</Option>
+                <Option value="Rayé">Rayé</Option>
+                <Option value="Cassé">Cassé</Option>
+                <Option value="Trace d'intervention">Trace d'intervention</Option>
+          </Select><br />
+              <FormLabel>Remarque</FormLabel>
+              <Textarea
+                minRows={2}
+                placeholder="…"
+                variant="soft"
+                value={formData.remark}
+                onChange={(e) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    remark: e.target.value,
+                  }));
+                }}
+                sx={{
+                  borderBottom: '2px solid',
+                  borderColor: 'neutral.outlinedBorder',
+                  borderRadius: 0,
+                  '&:hover': {
+                    borderColor: 'neutral.outlinedHoverBorder',
+                  },
+                  '&::before': {
+                    border: '1px solid var(--Textarea-focusedHighlight)',
+                    transform: 'scaleX(0)',
+                    left: 0,
+                    right: 0,
+                    bottom: '-2px',
+                    top: 'unset',
+                    transition: 'transform .15s cubic-bezier(0.1,0.9,0.2,1)',
+                    borderRadius: 0,
+                  },
+                  '&:focus-within::before': {
+                    transform: 'scaleX(1)',
+                  },
+                }}
+              />
+<Button variant="outlined"  onClick={  handelSubmit} >Enregistrer</Button> 
+            </form>
+
+
         </div>
     )
 }
@@ -542,4 +841,70 @@ const [currentIndex, setCurrentIndex] = React.useState<number>(0);
       </Modal>
     </React.Fragment> 
     );
+}
+
+
+export default function ExampleChoiceChipCheckbox({
+  accessory,
+  onChange,
+}: {
+  accessory: TypeUnique[];
+  onChange: (selected: TypeUnique[]) => void;
+}) {
+  const [value, setValue] = React.useState<TypeUnique[]>([]);
+
+  const toggleSelection = (item: TypeUnique) => {
+    setValue((prev) => {
+      const exists = prev.find((v) => v.id === item.id);
+      const updated = exists
+        ? prev.filter((v) => v.id !== item.id)
+        : [...prev, item];
+    onChange(updated)
+      return updated;
+    });
+
+    
+  };
+
+  return (
+    <Sheet variant="outlined" sx={{ p: 2, borderRadius: 'sm' }}>
+      <Typography level="body-sm" sx={{ fontWeight: 'lg', mb: 1.5 }}>
+        Accessoire
+      </Typography>
+      <List orientation="horizontal" wrap>
+        {accessory.map((item) => {
+          const isSelected = value.some((v) => v.id === item.id);
+          return (
+            <ListItem key={item.id}>
+              {isSelected && (
+                <Done
+                  color="primary"
+                  sx={{ ml: -0.5, zIndex: 2, pointerEvents: 'none' }}
+                />
+              )}
+              <Checkbox
+                size="sm"
+                disableIcon
+                overlay
+                label={item.name}
+                checked={isSelected}
+                variant={isSelected ? 'soft' : 'outlined'}
+                onChange={() => toggleSelection(item)}
+                slotProps={{
+                  action: ({ checked }) => ({
+                    sx: checked
+                      ? {
+                          border: '1px solid',
+                          borderColor: 'primary.500',
+                        }
+                      : {},
+                  }),
+                }}
+              />
+            </ListItem>
+          );
+        })}
+      </List>
+    </Sheet>
+  );
 }

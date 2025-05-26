@@ -31,6 +31,8 @@ let AuthController = class AuthController {
         const userId = user.sub;
         return this.authService.logout(userId);
     }
+    async getUserId(id, res) {
+    }
     getMe(req) {
         const user = req.user;
         return this.authService.findUserById(user.sub);
@@ -70,6 +72,14 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "logout", null);
+__decorate([
+    (0, common_1.Get)('id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "getUserId", null);
 __decorate([
     (0, swagger_1.ApiBearerAuth)('access-token'),
     (0, common_1.UseGuards)(accessToken_guard_1.AccessTokenGuard),

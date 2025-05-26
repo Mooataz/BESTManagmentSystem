@@ -13,102 +13,56 @@ exports.CreateRepairDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class CreateRepairDto {
-    warrenty;
-    approveRepair;
-    files;
-    newSerialNumber;
-    advancePayment;
     actuellyBranch;
-    partsNeed;
+    customer;
+    device;
     remark;
     deviceStateReceive;
     accessoryIds;
     listFaultIds;
     customerRequestIds;
-    notesCustomerIds;
-    expertiseReasonsIds;
-    repairActionIds;
-    device;
-    user;
-    customer;
 }
 exports.CreateRepairDto = CreateRepairDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: Boolean, description: "Required" }),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], CreateRepairDto.prototype, "warrenty", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ type: Boolean, description: "Required" }),
-    (0, class_validator_1.IsBoolean)(),
-    __metadata("design:type", Boolean)
-], CreateRepairDto.prototype, "approveRepair", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ type: [String], description: "Required" }),
-    (0, class_validator_1.IsArray)(),
-    __metadata("design:type", Array)
-], CreateRepairDto.prototype, "files", void 0);
+    (0, swagger_1.ApiProperty)({ type: String }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateRepairDto.prototype, "actuellyBranch", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: Number, }),
     (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", String)
-], CreateRepairDto.prototype, "newSerialNumber", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ type: Number, description: "Required" }),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
-], CreateRepairDto.prototype, "advancePayment", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ type: Number, description: "Required" }),
-    __metadata("design:type", Number)
-], CreateRepairDto.prototype, "actuellyBranch", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ type: [Number], description: "Required" }),
-    (0, class_validator_1.IsArray)(),
-    (0, class_validator_1.IsNumber)({}, { each: true }),
-    __metadata("design:type", Array)
-], CreateRepairDto.prototype, "partsNeed", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ type: String, description: "Required" }),
-    __metadata("design:type", String)
-], CreateRepairDto.prototype, "remark", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ type: String, description: "Required" }),
-    __metadata("design:type", String)
-], CreateRepairDto.prototype, "deviceStateReceive", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ type: Array, description: "Required" }),
-    __metadata("design:type", Array)
-], CreateRepairDto.prototype, "accessoryIds", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ type: Array, description: "Required" }),
-    __metadata("design:type", Array)
-], CreateRepairDto.prototype, "listFaultIds", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ type: Array, description: "Required" }),
-    __metadata("design:type", Array)
-], CreateRepairDto.prototype, "customerRequestIds", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ type: Array, description: "Required" }),
-    __metadata("design:type", Array)
-], CreateRepairDto.prototype, "notesCustomerIds", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ type: Array, description: "Required" }),
-    __metadata("design:type", Array)
-], CreateRepairDto.prototype, "expertiseReasonsIds", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({ type: Array, description: "Required" }),
-    __metadata("design:type", Array)
-], CreateRepairDto.prototype, "repairActionIds", void 0);
+], CreateRepairDto.prototype, "customer", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: Number, }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], CreateRepairDto.prototype, "device", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: Number, }),
-    __metadata("design:type", Number)
-], CreateRepairDto.prototype, "user", void 0);
+    (0, swagger_1.ApiProperty)({ type: String }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateRepairDto.prototype, "remark", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: Number, }),
-    __metadata("design:type", Number)
-], CreateRepairDto.prototype, "customer", void 0);
+    (0, swagger_1.ApiProperty)({ type: String }),
+    __metadata("design:type", String)
+], CreateRepairDto.prototype, "deviceStateReceive", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Array }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreateRepairDto.prototype, "accessoryIds", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: [Number], required: true }),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsNumber)({}, { each: true }),
+    __metadata("design:type", Array)
+], CreateRepairDto.prototype, "listFaultIds", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Array }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreateRepairDto.prototype, "customerRequestIds", void 0);
 //# sourceMappingURL=create-repair.dto.js.map

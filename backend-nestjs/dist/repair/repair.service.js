@@ -41,9 +41,9 @@ let RepairService = class RepairService {
     userRepositry;
     stockPartRepositry;
     approveStockRepositry;
-    CustomerStockRepositry;
+    customerRepositry;
     appService;
-    constructor(repairRepositry, accessoryRepositry, listFaultRepositry, customerRequestRepositry, notesCustomerRepositry, expertiseReasonRepositry, repairActionRepositry, deviceRepositry, userRepositry, stockPartRepositry, approveStockRepositry, CustomerStockRepositry, appService) {
+    constructor(repairRepositry, accessoryRepositry, listFaultRepositry, customerRequestRepositry, notesCustomerRepositry, expertiseReasonRepositry, repairActionRepositry, deviceRepositry, userRepositry, stockPartRepositry, approveStockRepositry, customerRepositry, appService) {
         this.repairRepositry = repairRepositry;
         this.accessoryRepositry = accessoryRepositry;
         this.listFaultRepositry = listFaultRepositry;
@@ -55,7 +55,7 @@ let RepairService = class RepairService {
         this.userRepositry = userRepositry;
         this.stockPartRepositry = stockPartRepositry;
         this.approveStockRepositry = approveStockRepositry;
-        this.CustomerStockRepositry = CustomerStockRepositry;
+        this.customerRepositry = customerRepositry;
         this.appService = appService;
     }
     async create(createRepairDto) {
@@ -68,45 +68,25 @@ let RepairService = class RepairService {
         const customerRequest = await this.customerRequestRepositry.find({
             where: { id: (0, typeorm_1.In)(createRepairDto.customerRequestIds ?? []) }
         });
-        const notesCustomer = await this.notesCustomerRepositry.find({
-            where: { id: (0, typeorm_1.In)(createRepairDto.notesCustomerIds ?? []) }
-        });
-        const expertiseReason = await this.expertiseReasonRepositry.find({
-            where: { id: (0, typeorm_1.In)(createRepairDto.expertiseReasonsIds ?? []) }
-        });
-        const repairAction = await this.repairActionRepositry.find({
-            where: { id: (0, typeorm_1.In)(createRepairDto.repairActionIds ?? []) }
-        });
         const device = await this.deviceRepositry.findOne({
             where: { id: createRepairDto.device }
         });
-        const user = await this.userRepositry.findOne({
-            where: { id: createRepairDto.user }
+        const customer = await this.customerRepositry.findOne({
+            where: { id: createRepairDto.customer }
         });
         if (!listFault.length)
             throw new common_1.NotFoundException('No Fault found');
         if (!device)
             throw new common_1.NotFoundException('Device not found');
-        if (!user)
-            throw new common_1.NotFoundException('User not found');
         const repairData = {
-            warrenty: createRepairDto.warrenty ?? false,
-            approveRepair: createRepairDto.approveRepair ?? false,
-            newSerialNumber: createRepairDto.newSerialNumber ?? '',
-            advancePayment: createRepairDto.advancePayment,
             actuellyBranch: createRepairDto.actuellyBranch,
-            files: createRepairDto.files,
             remark: createRepairDto.remark,
             deviceStateReceive: createRepairDto.deviceStateReceive,
-            partsNeed: createRepairDto.partsNeed,
             accessory,
             listFault,
             customerRequest,
-            notesCustomer,
-            expertiseReason,
-            repairAction,
-            device,
-            user
+            device: { id: createRepairDto.device },
+            customer: { id: createRepairDto.customer },
         };
         const newCreate = this.repairRepositry.create(repairData);
         return await this.repairRepositry.save(newCreate);
@@ -148,7 +128,7 @@ let RepairService = class RepairService {
         }
         let customer = undefined;
         if (updateRepairDto.customer !== undefined) {
-            const foundCustomer = await this.CustomerStockRepositry.findOne({ where: { id: updateRepairDto.customer } });
+            const foundCustomer = await this.customerRepositry.findOne({ where: { id: updateRepairDto.customer } });
             if (!foundCustomer) {
                 throw new common_1.NotFoundException('Customer not found');
             }
@@ -210,46 +190,6 @@ let RepairService = class RepairService {
             throw new common_1.NotFoundException("There is no data Available");
         }
         return findAll;
-    }
-    async updateRepairWithParts(repairId, updateData) {
-        const repair = await this.repairRepositry.findOne({
-            where: { id: repairId },
-            relations: ['approveStock'],
-        });
-        if (!repair) {
-            throw new common_1.NotFoundException('Repair not found');
-        }
-        if (updateData.device && typeof updateData.device === 'number') {
-            const device = await this.deviceRepositry.findOneBy({ id: updateData.device });
-            if (!device)
-                throw new common_1.NotFoundException('Device not found');
-            repair.device = device;
-        }
-        if (updateData.user && typeof updateData.user === 'number') {
-            const user = await this.userRepositry.findOneBy({ id: updateData.user });
-            if (!user)
-                throw new common_1.NotFoundException('User not found');
-            repair.user = user;
-        }
-        const previousParts = repair.partsNeed || [];
-        const newParts = updateData.partsNeed || [];
-        const addedParts = newParts.filter(p => !previousParts.includes(p));
-        const { device, user, ...restData } = updateData;
-        Object.assign(repair, restData);
-        const updatedRepair = await this.repairRepositry.save(repair);
-        if (repair.approveRepair === true) {
-            for (const partId of addedParts) {
-                const approveStock = this.approveStockRepositry.create({
-                    type: 'Repair',
-                    date: new Date(),
-                    state: 'pending',
-                    idPartRepair: partId,
-                    repair: updatedRepair,
-                });
-                await this.approveStockRepositry.save(approveStock);
-            }
-        }
-        return updatedRepair;
     }
 };
 exports.RepairService = RepairService;

@@ -18,16 +18,13 @@ const devices_service_1 = require("./devices.service");
 const create_device_dto_1 = require("./dto/create-device.dto");
 const update_device_dto_1 = require("./dto/update-device.dto");
 const swagger_1 = require("@nestjs/swagger");
-const platform_express_1 = require("@nestjs/platform-express");
-const multer_1 = require("multer");
 let DevicesController = class DevicesController {
     devicesService;
     constructor(devicesService) {
         this.devicesService = devicesService;
     }
-    async create(createDeviceDto, res, warrentyProof) {
+    async create(createDeviceDto, res) {
         try {
-            createDeviceDto.warrentyProof = warrentyProof.filename;
             const newDevice = await this.devicesService.create(createDeviceDto);
             return res.status(common_1.HttpStatus.CREATED).json({
                 message: "Device created Successfuly !",
@@ -77,9 +74,8 @@ let DevicesController = class DevicesController {
             });
         }
     }
-    async update(id, updateDeviceDto, res, warrentyProof) {
+    async update(id, updateDeviceDto, res) {
         try {
-            updateDeviceDto.warrentyProof = warrentyProof?.filename;
             const updatedata = await this.devicesService.update(+id, updateDeviceDto);
             return res.status(common_1.HttpStatus.OK).json({
                 message: "Device updated successfuly !",
@@ -112,15 +108,13 @@ let DevicesController = class DevicesController {
             });
         }
     }
-    async checkDevice(body, res, file) {
+    async checkDevice(body, res) {
         try {
-            const { serialenumber, purchaseDate, model } = body;
-            const warrentyProof = file?.filename;
-            const find = await this.devicesService.chekDevice(serialenumber, purchaseDate, warrentyProof, model);
+            const device = await this.devicesService.chekDevice(body.serialenumber, body.purchaseDate, body.model);
             return res.status(common_1.HttpStatus.OK).json({
                 message: "Founded Successfuly !",
                 status: common_1.HttpStatus.OK,
-                data: find
+                data: device
             });
         }
         catch (error) {
@@ -134,50 +128,11 @@ let DevicesController = class DevicesController {
 };
 exports.DevicesController = DevicesController;
 __decorate([
-    (0, swagger_1.ApiBody)({
-        schema: {
-            type: 'object',
-            properties: {
-                serialeNumber: { type: "string" },
-                warrentyProof: { type: "string", format: "binary" },
-                purchaseDate: { type: "Date" },
-                model: { type: "number" },
-                'customer[0]': {
-                    type: 'number',
-                    description: 'First permission',
-                    example: 1,
-                },
-                'customer[1]': {
-                    type: 'number',
-                    description: 'First permission',
-                    example: 1,
-                },
-                'customer[2]': {
-                    type: 'number',
-                    description: 'First permission',
-                    example: 1,
-                },
-                'customer[3]': {
-                    type: 'number',
-                    description: 'First permission',
-                    example: 1,
-                },
-            }
-        }
-    }),
-    (0, swagger_1.ApiConsumes)("multipart/form-data"),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('warrentyProof', {
-        storage: (0, multer_1.diskStorage)({
-            destination: "./upload/devices",
-            filename: (_request, warrentyProof, callback) => callback(null, `${new Date().getTime()}-${warrentyProof.originalname}`)
-        })
-    })),
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
-    __param(2, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_device_dto_1.CreateDeviceDto, Object, Object]),
+    __metadata("design:paramtypes", [create_device_dto_1.CreateDeviceDto, Object]),
     __metadata("design:returntype", Promise)
 ], DevicesController.prototype, "create", null);
 __decorate([
@@ -196,30 +151,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], DevicesController.prototype, "findOne", null);
 __decorate([
-    (0, swagger_1.ApiBody)({
-        schema: {
-            type: 'object',
-            properties: {
-                serialeNumber: { type: "string" },
-                warrentyProof: { type: "string", format: "binary" },
-                purchaseDate: { type: "Date" }
-            }
-        }
-    }),
-    (0, swagger_1.ApiConsumes)("multipart/form-data"),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('warrentyProof', {
-        storage: (0, multer_1.diskStorage)({
-            destination: "./upload/devices",
-            filename: (_request, warrentyProof, callback) => callback(null, `${new Date().getTime()}-${warrentyProof.originalname}`)
-        })
-    })),
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Res)()),
-    __param(3, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_device_dto_1.UpdateDeviceDto, Object, Object]),
+    __metadata("design:paramtypes", [Number, update_device_dto_1.UpdateDeviceDto, Object]),
     __metadata("design:returntype", Promise)
 ], DevicesController.prototype, "update", null);
 __decorate([
@@ -236,25 +173,16 @@ __decorate([
             type: 'object',
             properties: {
                 serialenumber: { type: "string" },
-                warrentyProof: { type: "string", format: "binary" },
                 purchaseDate: { type: "Date" },
                 model: { type: "number" },
             },
         }
     }),
-    (0, swagger_1.ApiConsumes)("multipart/form-data"),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('warrentyProof', {
-        storage: (0, multer_1.diskStorage)({
-            destination: "./upload/devices",
-            filename: (_request, warrentyProof, callback) => callback(null, `${new Date().getTime()}-${warrentyProof.originalname}`)
-        })
-    })),
     (0, common_1.Post)('Device'),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
-    __param(2, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object, Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], DevicesController.prototype, "checkDevice", null);
 exports.DevicesController = DevicesController = __decorate([

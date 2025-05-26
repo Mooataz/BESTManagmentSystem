@@ -14,7 +14,6 @@ const swagger_1 = require("@nestjs/swagger");
 class CreateDeviceDto {
     serialeNumber;
     purchaseDate;
-    warrentyProof;
 }
 exports.CreateDeviceDto = CreateDeviceDto;
 __decorate([
@@ -31,11 +30,4 @@ __decorate([
     }),
     __metadata("design:type", Date)
 ], CreateDeviceDto.prototype, "purchaseDate", void 0);
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        type: String,
-        description: "Required"
-    }),
-    __metadata("design:type", String)
-], CreateDeviceDto.prototype, "warrentyProof", void 0);
 //# sourceMappingURL=create-device.dto.js.map

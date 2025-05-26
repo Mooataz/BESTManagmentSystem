@@ -10,7 +10,7 @@ import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 export class RepairController {
   constructor(private readonly repairService: RepairService) { }
   @Post()
-  @ApiConsumes('multipart/form-data')
+ // @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
@@ -64,7 +64,7 @@ export class RepairController {
       },
     },
   })
-  @UseInterceptors(
+/*   @UseInterceptors(
     FilesInterceptor('files', 5, {
       storage: diskStorage({
         destination: './upload/repairs',
@@ -72,14 +72,14 @@ export class RepairController {
           callback(null, `${new Date().getTime()}-${file.originalname}`),
       }),
     }),
-  )
+  ) */
   async create(
     @Body() createRepairDto: CreateRepairDto,
-    @UploadedFiles() files: Express.Multer.File[],
+    //@UploadedFiles() files: Express.Multer.File[],
     @Res() res,
   ) {
     try {
-      createRepairDto.files = files?.map((file) => file.filename) || [];
+      //createRepairDto.files = files?.map((file) => file.filename) || [];
       const newCreate = await this.repairService.create(createRepairDto);
       return res.status(HttpStatus.CREATED).json({
         message: 'Created Successfully!',
@@ -131,7 +131,7 @@ export class RepairController {
       })
     }
   }
-  @Patch('updatePartRepair/:id')
+/*   @Patch('updatePartRepair/:id')
   async updateRepair(
     @Param('id') id: number,
     @Body() updateRepairDto: UpdateRepairDto
@@ -141,7 +141,7 @@ export class RepairController {
       message: 'Repair updated successfully',
       data: updatedRepair,
     };
-  }
+  } */
    @Patch(':id')
   async update(@Param('id') id: number,
     @Body() updateRepairDto: UpdateRepairDto,

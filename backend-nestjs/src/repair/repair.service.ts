@@ -32,12 +32,12 @@ export class RepairService {
     @InjectRepository(User) private readonly userRepositry: Repository<User>,
     @InjectRepository(StockPart) private readonly stockPartRepositry: Repository<StockPart>,
     @InjectRepository(ApproveStock) private readonly approveStockRepositry: Repository<ApproveStock>,
-    @InjectRepository(Customer) private readonly CustomerStockRepositry: Repository<Customer>,
+    @InjectRepository(Customer) private readonly customerRepositry: Repository<Customer>,
     private appService: AppService
 
   ) { }
   async create(createRepairDto: CreateRepairDto): Promise<Repair> {
-    // Fetch related entities (arrays)
+ 
     const accessory = await this.accessoryRepositry.find({
       where: { id: In(createRepairDto.accessoryIds?? []) }
     });
@@ -47,48 +47,32 @@ export class RepairService {
     const customerRequest = await this.customerRequestRepositry.find({
       where: { id: In(createRepairDto.customerRequestIds?? []) }
     });
-    const notesCustomer = await this.notesCustomerRepositry.find({
-      where: { id: In(createRepairDto.notesCustomerIds?? []) }
-    });
-    const expertiseReason = await this.expertiseReasonRepositry.find({
-      where: { id: In(createRepairDto.expertiseReasonsIds?? []) }
-    });
-    const repairAction = await this.repairActionRepositry.find({
-      where: { id: In(createRepairDto.repairActionIds?? []) }
-    });
-
+ 
     // Fetch single entities (not arrays)
     const device = await this.deviceRepositry.findOne({
       where: { id: createRepairDto.device }
     });
-    const user = await this.userRepositry.findOne({
-      where: { id: createRepairDto.user }
-    });
-
+    const customer = await this.customerRepositry.findOne({
+      where: { id: createRepairDto.customer}
+    })
+ 
     if (!listFault.length) throw new NotFoundException('No Fault found');
     if (!device) throw new NotFoundException('Device not found');
-    if (!user) throw new NotFoundException('User not found');
-
+ 
+  
     // Create the repair entity with required fields
     const repairData = {
-      warrenty: createRepairDto.warrenty ?? false, // default value if undefined
-      approveRepair: createRepairDto.approveRepair ?? false,
-      newSerialNumber: createRepairDto.newSerialNumber ?? '',
-      advancePayment: createRepairDto.advancePayment,
       actuellyBranch: createRepairDto.actuellyBranch,
-      files: createRepairDto.files,
       remark: createRepairDto.remark,
       deviceStateReceive: createRepairDto.deviceStateReceive,
-      partsNeed: createRepairDto.partsNeed,
       accessory,
       listFault,
       customerRequest,
-      notesCustomer,
-      expertiseReason,
-      repairAction,
-      device, // single Device entity
-      user   // single User entity
+      device:{ id: createRepairDto.device },  
+      customer:{ id: createRepairDto.customer },
+       
     };
+ 
 
     const newCreate = this.repairRepositry.create(repairData);
     return await this.repairRepositry.save(newCreate);
@@ -133,7 +117,7 @@ export class RepairService {
     }
 let customer: Customer | undefined = undefined;
 if (updateRepairDto.customer !== undefined) {
-  const foundCustomer = await this.CustomerStockRepositry.findOne({ where: { id: updateRepairDto.customer } });
+  const foundCustomer = await this.customerRepositry.findOne({ where: { id: updateRepairDto.customer } });
   if (!foundCustomer) { throw new NotFoundException('Customer not found'); }
   customer = foundCustomer;
 }
@@ -207,7 +191,7 @@ if (updateRepairDto.customer !== undefined) {
   }
 
 
-  async updateRepairWithParts(
+  /* async updateRepairWithParts(
       repairId: number,
       updateData: UpdateRepairDto, // <-- Garde bien ici le type UpdateRepairDto
     ): Promise<Repair> {
@@ -253,7 +237,7 @@ if (updateRepairDto.customer !== undefined) {
             /*  const stockPart = await this.stockPartRepositry.findOneBy({ id: partId });
             if (!stockPart) continue; */
         
-            const approveStock = this.approveStockRepositry.create({
+            /* const approveStock = this.approveStockRepositry.create({
               type: 'Repair',
               date: new Date(),
               state: 'pending',
@@ -267,6 +251,6 @@ if (updateRepairDto.customer !== undefined) {
 
     
       return updatedRepair;
-    }
-    
+    } */
+     
 }

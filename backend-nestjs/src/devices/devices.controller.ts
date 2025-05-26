@@ -11,55 +11,14 @@ export class DevicesController {
   constructor(private readonly devicesService: DevicesService) {}
 
 
-  @ApiBody({
-    schema:{
-      type:'object',
-      properties: {
-        serialeNumber:{type:"string"},
-        warrentyProof : {type:"string" , format:"binary"},
-        purchaseDate: {type :"Date"},
-        model: {type: "number"},
-        'customer[0]': {
-        type: 'number',
-        description: 'First permission',
-        example: 1,
-      },
-      'customer[1]': {
-        type: 'number',
-        description: 'First permission',
-        example: 1,
-      },
-      'customer[2]': {
-        type: 'number',
-        description: 'First permission',
-        example: 1,
-      },
-      'customer[3]': {
-        type: 'number',
-        description: 'First permission',
-        example: 1,
-      },
-      }
-    }
-    
-  })
-  @ApiConsumes("multipart/form-data")
-  // configuration Multer
-  @UseInterceptors(
-    FileInterceptor('warrentyProof', {
-      storage : diskStorage({
-        destination:"./upload/devices",
-        filename:(_request, warrentyProof, callback) =>
-          callback(null,`${new Date().getTime()}-${warrentyProof.originalname}`)
-      })
-    })
-  )
+  
+ 
   @Post()
   async create( @Body() createDeviceDto: CreateDeviceDto, 
-                @Res() res , 
-                @UploadedFile() warrentyProof:Express.Multer.File) {
+                @Res() res   
+                 ) {
     try {
-          createDeviceDto.warrentyProof=warrentyProof.filename
+           
           const newDevice = await this.devicesService.create(createDeviceDto)
           return res.status(HttpStatus.CREATED).json({
             message:"Device created Successfuly !",
@@ -113,36 +72,15 @@ export class DevicesController {
      }
   }
 
-  @ApiBody({
-    schema:{
-      type:'object',
-      properties: {
-        serialeNumber:{type:"string"},
-        warrentyProof : {type:"string" , format:"binary"},
-        purchaseDate: {type :"Date"}
-      }
-    }
-    
-  })
-  @ApiConsumes("multipart/form-data")
-  // configuration Multer
-  @UseInterceptors(
-    FileInterceptor('warrentyProof', {
-      storage : diskStorage({
-        destination:"./upload/devices",
-        filename:(_request, warrentyProof, callback) =>
-          callback(null,`${new Date().getTime()}-${warrentyProof.originalname}`)
-      })
-    })
-  )
+  
   @Patch(':id')
   async update( @Param('id') id: number, 
                 @Body() updateDeviceDto: UpdateDeviceDto, 
-                @Res() res , 
-                @UploadedFile() warrentyProof:Express.Multer.File) {
+                @Res() res  
+                ) {
 
     try {
-      updateDeviceDto.warrentyProof=warrentyProof?.filename
+       
     const updatedata = await this.devicesService.update(+id, updateDeviceDto)
     return res.status(HttpStatus.OK).json({
       message:"Device updated successfuly !",
@@ -183,41 +121,33 @@ export class DevicesController {
       type:'object',
       properties: {
         serialenumber:{type:"string"},
-        warrentyProof : {type:"string" , format:"binary"},
-        purchaseDate: {type :"Date"},
+         purchaseDate: {type :"Date"},
         model: {type: "number"},
          
       },
       }
     })
-    @ApiConsumes("multipart/form-data")
-  // configuration Multer
-  @UseInterceptors(
-    FileInterceptor('warrentyProof', {
-      storage : diskStorage({
-        destination:"./upload/devices",
-        filename:(_request, warrentyProof, callback) =>
-          callback(null,`${new Date().getTime()}-${warrentyProof.originalname}`)
-      })
-    })
-  )
+   
    @Post('Device')
    async checkDevice (@Body() body:{
-    serialenumber:string,
-    purchaseDate:string,
+    serialenumber?:string,
+    purchaseDate?:string,
      
-    model:number
-   }, @Res() res, @UploadedFile() file:Express.Multer.File){
+    model?:number
+   }, @Res() res   ){
 
-    
+     
     try {
-      const {serialenumber, purchaseDate,  model } = body;
-      const warrentyProof=file?.filename
-      const find = await this.devicesService.chekDevice(serialenumber, purchaseDate, warrentyProof, model)
+         
+    const device = await this.devicesService.chekDevice(
+      body.serialenumber,
+      body.purchaseDate,
+      body.model
+    );
       return res.status(HttpStatus.OK).json({
         message:"Founded Successfuly !",
         status:HttpStatus.OK,
-        data:find })
+        data:device })
     } catch (error) {
       return res.status(HttpStatus.BAD_REQUEST).json({
         message:error.message,

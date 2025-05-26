@@ -2,13 +2,16 @@ import V2BEST from '../../assets/V2BEST.png';
 import Input from '@mui/joy/Input';
 import Stack from '@mui/joy/Stack';
 import { useNavigate } from 'react-router-dom';
-import { handleAuthen } from '../../api/administration/login';
+import { getUserId, handleAuthen } from '../../api/administration/login';
 import Button from '@mui/joy/Button';
 import * as React from 'react';
 import Snackbar  from '@mui/joy/Snackbar';
 import   SnackbarProps  from '@mui/joy/Snackbar';
 import { useNotification } from '../Componants/NotificationContext';
 import { Typography } from '@mui/material';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../Redux/userSlice';
+
  interface FormElements extends HTMLFormControlsCollection {
   email: HTMLInputElement;
   password: HTMLInputElement;
@@ -23,6 +26,10 @@ function Authentification() {
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false); 
   const { notify } = useNotification();
+  const dispatch = useDispatch();
+  const [getUser, setGetUser] = React.useState()
+
+  
   return (
 <div style={{ display: 'flex', width: '100vw', height: '100vh', margin: 0, padding: 0 }}>
 {/* Bloc de login */}
@@ -45,6 +52,7 @@ function Authentification() {
             };
             try {
               const result = await handleAuthen(data.login, data.password);
+              
               localStorage.setItem('accessToken', result.token.accessToken);
               navigate('/dashboard');
             } catch (err) {

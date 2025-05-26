@@ -4,13 +4,9 @@ import { UpdateRepairDto } from './dto/update-repair.dto';
 export declare class RepairController {
     private readonly repairService;
     constructor(repairService: RepairService);
-    create(createRepairDto: CreateRepairDto, files: Express.Multer.File[], res: any): Promise<any>;
+    create(createRepairDto: CreateRepairDto, res: any): Promise<any>;
     findAll(res: any): Promise<any>;
     findOne(id: number, res: any): Promise<any>;
-    updateRepair(id: number, updateRepairDto: UpdateRepairDto): Promise<{
-        message: string;
-        data: import("./entities/repair.entity").Repair;
-    }>;
     update(id: number, updateRepairDto: UpdateRepairDto, res: any): Promise<any>;
     remove(id: number, res: any): Promise<any>;
     getRepairByDevice(deviceId: string, res: any): Promise<any>;

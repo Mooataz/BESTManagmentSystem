@@ -59,6 +59,7 @@ import { NotificationModule } from './notification/notification.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { PdfModule } from './pdf/pdf.module';
 
 @Module({
   imports: [
@@ -120,7 +121,8 @@ import { join } from 'path';
     ReceptionistModule,
     AuthModule,
     ConfigModule.forRoot({isGlobal: true}),
-    NotificationModule
+    NotificationModule,
+    PdfModule
   ],
   controllers: [AppController],
   providers: [AppService],

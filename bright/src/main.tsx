@@ -7,15 +7,20 @@ import { NotificationProvider } from './pages/Componants/NotificationContext.tsx
 import './i18n';
 import { CssVarsProvider } from '@mui/joy/styles';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import { store } from './Redux/store.ts';
+import { Provider } from 'react-redux';
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
-    <CssVarsProvider>
-      <NotificationProvider>  
-        <App />
-      </NotificationProvider>
-      </CssVarsProvider>
-    </BrowserRouter>
+    <Provider store={store}> 
+        <BrowserRouter>
+    
+          <CssVarsProvider  >
+            <NotificationProvider>  
+              <App />
+            </NotificationProvider>
+            </CssVarsProvider>
+    
+        </BrowserRouter>
+    </Provider>
   </React.StrictMode>,
 )
