@@ -20,5 +20,6 @@ import { Customer } from 'src/customers/entities/customer.entity';
   imports: [TypeOrmModule.forFeature([Repair,Accessory,ListFault,CustomerRequest,NotesCustomer, ExpertiseReason, RepairAction, Device, User, StockPart, ApproveStock,Customer])],
   controllers: [RepairController],
   providers: [RepairService,AppService],
+  exports: [TypeOrmModule,RepairService],
 })
 export class RepairModule {}

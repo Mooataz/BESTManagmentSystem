@@ -20,6 +20,7 @@ exports.RepairActionModule = RepairActionModule = __decorate([
         imports: [typeorm_1.TypeOrmModule.forFeature([repair_action_entity_1.RepairAction])],
         controllers: [repair_action_controller_1.RepairActionController],
         providers: [repair_action_service_1.RepairActionService],
+        exports: [typeorm_1.TypeOrmModule, repair_action_service_1.RepairActionService],
     })
 ], RepairActionModule);
 //# sourceMappingURL=repair-action.module.js.map

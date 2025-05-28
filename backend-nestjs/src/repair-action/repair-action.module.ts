@@ -8,5 +8,6 @@ import { RepairAction } from './entities/repair-action.entity';
   imports: [TypeOrmModule.forFeature([RepairAction])],
   controllers: [RepairActionController],
   providers: [RepairActionService],
+   exports: [TypeOrmModule, RepairActionService],
 })
 export class RepairActionModule {}

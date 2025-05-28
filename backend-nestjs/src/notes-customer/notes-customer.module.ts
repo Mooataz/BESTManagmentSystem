@@ -9,5 +9,6 @@ import { AppService } from 'src/app.service';
   imports:[TypeOrmModule.forFeature([NotesCustomer])],
   controllers: [NotesCustomerController],
   providers: [NotesCustomerService,AppService],
+  exports: [TypeOrmModule, NotesCustomerService],
 })
 export class NotesCustomerModule {}

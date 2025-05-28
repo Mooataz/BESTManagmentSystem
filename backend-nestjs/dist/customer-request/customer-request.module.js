@@ -21,6 +21,7 @@ exports.CustomerRequestModule = CustomerRequestModule = __decorate([
         imports: [typeorm_1.TypeOrmModule.forFeature([customer_request_entity_1.CustomerRequest])],
         controllers: [customer_request_controller_1.CustomerRequestController],
         providers: [customer_request_service_1.CustomerRequestService, app_service_1.AppService],
+        exports: [typeorm_1.TypeOrmModule, customer_request_service_1.CustomerRequestService],
     })
 ], CustomerRequestModule);
 //# sourceMappingURL=customer-request.module.js.map

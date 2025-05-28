@@ -32,6 +32,7 @@ exports.RepairModule = RepairModule = __decorate([
         imports: [typeorm_1.TypeOrmModule.forFeature([repair_entity_1.Repair, accessory_entity_1.Accessory, list_fault_entity_1.ListFault, customer_request_entity_1.CustomerRequest, notes_customer_entity_1.NotesCustomer, expertise_reason_entity_1.ExpertiseReason, repair_action_entity_1.RepairAction, device_entity_1.Device, user_entity_1.User, stock_part_entity_1.StockPart, approve_stock_entity_1.ApproveStock, customer_entity_1.Customer])],
         controllers: [repair_controller_1.RepairController],
         providers: [repair_service_1.RepairService, app_service_1.AppService],
+        exports: [typeorm_1.TypeOrmModule, repair_service_1.RepairService],
     })
 ], RepairModule);
 //# sourceMappingURL=repair.module.js.map

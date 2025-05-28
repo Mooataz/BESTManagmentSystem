@@ -60,6 +60,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PdfModule } from './pdf/pdf.module';
+import { CoreModule } from './core/core.module';
 
 @Module({
   imports: [
@@ -80,7 +81,7 @@ import { PdfModule } from './pdf/pdf.module';
       synchronize: true,
  
     }),
-   
+   CoreModule,
     CompanyModule,
     BrandsModule,
     CustomersModule,
@@ -122,7 +123,8 @@ import { PdfModule } from './pdf/pdf.module';
     AuthModule,
     ConfigModule.forRoot({isGlobal: true}),
     NotificationModule,
-    PdfModule
+    PdfModule,
+    CoreModule
   ],
   controllers: [AppController],
   providers: [AppService],

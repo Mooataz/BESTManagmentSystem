@@ -1,14 +1,9 @@
 import { PdfService } from './pdf.service';
-import { CreatePdfDto } from './dto/create-pdf.dto';
-import { UpdatePdfDto } from './dto/update-pdf.dto';
 import { Response } from 'express';
+import { RepairService } from '../repair/repair.service';
 export declare class PdfController {
+    private readonly repairService;
     private readonly pdfService;
-    constructor(pdfService: PdfService);
-    generateRepairPdf(id: number, res: Response): Promise<void>;
-    create(createPdfDto: CreatePdfDto): string;
-    findAll(): string;
-    findOne(id: number): string;
-    update(id: string, updatePdfDto: UpdatePdfDto): string;
-    remove(id: string): string;
+    constructor(repairService: RepairService, pdfService: PdfService);
+    generateRepairsPdf(id: number, res: Response): Promise<void>;
 }

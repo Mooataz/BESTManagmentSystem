@@ -9,5 +9,6 @@ import { AppService } from 'src/app.service';
   imports: [TypeOrmModule.forFeature([ExpertiseReason])],
   controllers: [ExpertiseReasonsController],
   providers: [ExpertiseReasonsService,AppService],
+   exports: [TypeOrmModule, ExpertiseReasonsService],
 })
 export class ExpertiseReasonsModule {}

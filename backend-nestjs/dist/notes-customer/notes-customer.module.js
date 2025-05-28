@@ -21,6 +21,7 @@ exports.NotesCustomerModule = NotesCustomerModule = __decorate([
         imports: [typeorm_1.TypeOrmModule.forFeature([notes_customer_entity_1.NotesCustomer])],
         controllers: [notes_customer_controller_1.NotesCustomerController],
         providers: [notes_customer_service_1.NotesCustomerService, app_service_1.AppService],
+        exports: [typeorm_1.TypeOrmModule, notes_customer_service_1.NotesCustomerService],
     })
 ], NotesCustomerModule);
 //# sourceMappingURL=notes-customer.module.js.map

@@ -88,7 +88,8 @@ export class RepairService {
   }
 
   async findOne(id: number): Promise<Repair> {
-    const onefind = await this.repairRepositry.findOne({ where: { id } })
+    const onefind = await this.repairRepositry.findOne({ where: { id } ,
+      relations: ['customer', 'device'],})
     if (!onefind) {
       throw new NotFoundException('No data available')
     }

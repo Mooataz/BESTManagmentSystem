@@ -15,41 +15,36 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PdfController = void 0;
 const common_1 = require("@nestjs/common");
 const pdf_service_1 = require("./pdf.service");
-const create_pdf_dto_1 = require("./dto/create-pdf.dto");
-const update_pdf_dto_1 = require("./dto/update-pdf.dto");
+const repair_service_1 = require("../repair/repair.service");
 let PdfController = class PdfController {
+    repairService;
     pdfService;
-    constructor(pdfService) {
+    constructor(repairService, pdfService) {
+        this.repairService = repairService;
         this.pdfService = pdfService;
     }
-    async generateRepairPdf(id, res) {
+    async generateRepairsPdf(id, res) {
         try {
-            console.log('id: ', id);
-            const pdfBuffer = await this.pdfService.generatRepairPdf(id);
+            const repair = await this.repairService.findOne(id);
+            if (!repair) {
+                throw new common_1.NotFoundException('Réparation non trouvée');
+            }
+            const pdfBuffer = await this.pdfService.generatRepairPdf(repair);
             res.set({
                 'Content-Type': 'application/pdf',
-                'Content-Disposition': 'attachment; filename=fiche_reparation.pdf',
+                'Content-Disposition': 'attachment; filename="fiche_reparation.pdf"',
+                'Content-Length': pdfBuffer.length
             });
             res.send(pdfBuffer);
         }
         catch (error) {
-            res.status(404).send(error.message);
+            if (error instanceof common_1.NotFoundException) {
+                res.status(404).send(error.message);
+            }
+            else {
+                res.status(500).send('Erreur lors de la génération du PDF');
+            }
         }
-    }
-    create(createPdfDto) {
-        return this.pdfService.create(createPdfDto);
-    }
-    findAll() {
-        return this.pdfService.findAll();
-    }
-    findOne(id) {
-        return this.pdfService.findOne(+id);
-    }
-    update(id, updatePdfDto) {
-        return this.pdfService.update(+id, updatePdfDto);
-    }
-    remove(id) {
-        return this.pdfService.remove(+id);
     }
 };
 exports.PdfController = PdfController;
@@ -60,44 +55,10 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
-], PdfController.prototype, "generateRepairPdf", null);
-__decorate([
-    (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_pdf_dto_1.CreatePdfDto]),
-    __metadata("design:returntype", void 0)
-], PdfController.prototype, "create", null);
-__decorate([
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], PdfController.prototype, "findAll", null);
-__decorate([
-    (0, common_1.Get)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
-    __metadata("design:returntype", void 0)
-], PdfController.prototype, "findOne", null);
-__decorate([
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_pdf_dto_1.UpdatePdfDto]),
-    __metadata("design:returntype", void 0)
-], PdfController.prototype, "update", null);
-__decorate([
-    (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], PdfController.prototype, "remove", null);
+], PdfController.prototype, "generateRepairsPdf", null);
 exports.PdfController = PdfController = __decorate([
     (0, common_1.Controller)('pdf'),
-    __metadata("design:paramtypes", [pdf_service_1.PdfService])
+    __metadata("design:paramtypes", [repair_service_1.RepairService,
+        pdf_service_1.PdfService])
 ], PdfController);
 //# sourceMappingURL=pdf.controller.js.map

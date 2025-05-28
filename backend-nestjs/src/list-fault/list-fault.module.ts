@@ -9,5 +9,6 @@ import { AppService } from 'src/app.service';
   imports:[TypeOrmModule.forFeature([ListFault])],
   controllers: [ListFaultController],
   providers: [ListFaultService,AppService],
+  exports: [TypeOrmModule, ListFaultService],
 })
 export class ListFaultModule {}

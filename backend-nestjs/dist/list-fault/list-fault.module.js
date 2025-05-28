@@ -21,6 +21,7 @@ exports.ListFaultModule = ListFaultModule = __decorate([
         imports: [typeorm_1.TypeOrmModule.forFeature([list_fault_entity_1.ListFault])],
         controllers: [list_fault_controller_1.ListFaultController],
         providers: [list_fault_service_1.ListFaultService, app_service_1.AppService],
+        exports: [typeorm_1.TypeOrmModule, list_fault_service_1.ListFaultService],
     })
 ], ListFaultModule);
 //# sourceMappingURL=list-fault.module.js.map

@@ -56,6 +56,7 @@ const schedule_1 = require("@nestjs/schedule");
 const serve_static_1 = require("@nestjs/serve-static");
 const path_1 = require("path");
 const pdf_module_1 = require("./pdf/pdf.module");
+const core_module_1 = require("./core/core.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -77,6 +78,7 @@ exports.AppModule = AppModule = __decorate([
                 entities: [__dirname + '/**/*.entity{.ts,.js}'],
                 synchronize: true,
             }),
+            core_module_1.CoreModule,
             company_module_1.CompanyModule,
             brands_module_1.BrandsModule,
             customers_module_1.CustomersModule,
@@ -118,7 +120,8 @@ exports.AppModule = AppModule = __decorate([
             auth_module_1.AuthModule,
             config_1.ConfigModule.forRoot({ isGlobal: true }),
             notification_module_1.NotificationModule,
-            pdf_module_1.PdfModule
+            pdf_module_1.PdfModule,
+            core_module_1.CoreModule
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

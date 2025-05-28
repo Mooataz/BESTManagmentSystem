@@ -9,5 +9,6 @@ import { AppService } from 'src/app.service';
   imports: [ TypeOrmModule.forFeature([Accessory])],
   controllers: [AccessoryController],
   providers: [AccessoryService,AppService],
+  exports: [TypeOrmModule, AccessoryService],
 })
 export class AccessoryModule {}

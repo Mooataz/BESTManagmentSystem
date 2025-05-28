@@ -4,8 +4,11 @@ const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
 const swagger_1 = require("@nestjs/swagger");
 const path_1 = require("path");
+const common_1 = require("@nestjs/common");
 async function bootstrap() {
-    const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    const app = await core_1.NestFactory.create(app_module_1.AppModule, {
+        logger: ['log', 'error', 'warn', 'debug', 'verbose'],
+    });
     const config = new swagger_1.DocumentBuilder()
         .setTitle('BEST_Managment_System')
         .setDescription('Projet PFE')
@@ -31,6 +34,7 @@ async function bootstrap() {
         prefix: '/upload/',
     });
     await app.listen(3000);
+    common_1.Logger.log('Application is running on: http://localhost:3000', 'Bootstrap');
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

@@ -21,6 +21,7 @@ exports.AccessoryModule = AccessoryModule = __decorate([
         imports: [typeorm_1.TypeOrmModule.forFeature([accessory_entity_1.Accessory])],
         controllers: [accessory_controller_1.AccessoryController],
         providers: [accessory_service_1.AccessoryService, app_service_1.AppService],
+        exports: [typeorm_1.TypeOrmModule, accessory_service_1.AccessoryService],
     })
 ], AccessoryModule);
 //# sourceMappingURL=accessory.module.js.map

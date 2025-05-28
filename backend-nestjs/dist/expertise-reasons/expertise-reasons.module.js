@@ -21,6 +21,7 @@ exports.ExpertiseReasonsModule = ExpertiseReasonsModule = __decorate([
         imports: [typeorm_1.TypeOrmModule.forFeature([expertise_reason_entity_1.ExpertiseReason])],
         controllers: [expertise_reasons_controller_1.ExpertiseReasonsController],
         providers: [expertise_reasons_service_1.ExpertiseReasonsService, app_service_1.AppService],
+        exports: [typeorm_1.TypeOrmModule, expertise_reasons_service_1.ExpertiseReasonsService],
     })
 ], ExpertiseReasonsModule);
 //# sourceMappingURL=expertise-reasons.module.js.map

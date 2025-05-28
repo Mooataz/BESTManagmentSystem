@@ -18,5 +18,6 @@ import { Company } from 'src/company/entities/company.entity';
   imports :[BranchesModule,ModelsModule,ReferencesModule,StockPartsModule,TypeOrmModule.forFeature([ApproveStock, StockPart, Branch, Bin, Company])],
   controllers: [ApproveStockController],
   providers: [ApproveStockService, StockPartsService,AppService],
+  exports: [TypeOrmModule, ApproveStockService],
 })
 export class ApproveStockModule {}

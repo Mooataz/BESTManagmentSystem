@@ -99,7 +99,8 @@ let RepairService = class RepairService {
         return allfind;
     }
     async findOne(id) {
-        const onefind = await this.repairRepositry.findOne({ where: { id } });
+        const onefind = await this.repairRepositry.findOne({ where: { id },
+            relations: ['customer', 'device'], });
         if (!onefind) {
             throw new common_1.NotFoundException('No data available');
         }

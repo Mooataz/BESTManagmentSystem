@@ -29,7 +29,7 @@ exports.StockPartsModule = StockPartsModule = __decorate([
         imports: [models_module_1.ModelsModule, references_module_1.ReferencesModule, typeorm_1.TypeOrmModule.forFeature([stock_part_entity_1.StockPart, model_entity_1.Model, reference_entity_1.Reference, all_part_entity_1.AllPart, branch_entity_1.Branch, bin_entity_1.Bin, company_entity_1.Company])],
         controllers: [stock_parts_controller_1.StockPartsController],
         providers: [stock_parts_service_1.StockPartsService, app_service_1.AppService],
-        exports: [stock_parts_service_1.StockPartsService]
+        exports: [typeorm_1.TypeOrmModule, stock_parts_service_1.StockPartsService]
     })
 ], StockPartsModule);
 //# sourceMappingURL=stock-parts.module.js.map

@@ -30,6 +30,7 @@ exports.ApproveStockModule = ApproveStockModule = __decorate([
         imports: [branches_module_1.BranchesModule, models_module_1.ModelsModule, references_module_1.ReferencesModule, stock_parts_module_1.StockPartsModule, typeorm_1.TypeOrmModule.forFeature([approve_stock_entity_1.ApproveStock, stock_part_entity_1.StockPart, branch_entity_1.Branch, bin_entity_1.Bin, company_entity_1.Company])],
         controllers: [approve_stock_controller_1.ApproveStockController],
         providers: [approve_stock_service_1.ApproveStockService, stock_parts_service_1.StockPartsService, app_service_1.AppService],
+        exports: [typeorm_1.TypeOrmModule, approve_stock_service_1.ApproveStockService],
     })
 ], ApproveStockModule);
 //# sourceMappingURL=approve-stock.module.js.map

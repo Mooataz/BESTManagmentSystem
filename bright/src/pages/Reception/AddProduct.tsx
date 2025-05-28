@@ -72,7 +72,7 @@ import {    CreateRepairPDF } from "../../api/PDF/Repair";
                             <>
                               <table style={{ border: '2px solid darkgray'  }}>                              
                                 <tr>
-                                 <td  style={{ border: '2px solid darkgray', width:'200px'  }}>Nom</td>  <td style={{ border: '2px solid darkgray'  }}>{customer.name}</td>
+                                 <td  style={{ border: '2px solid darkgray', width:'200px'  }}>Nom</td>  <td style={{ border: '2px solid darkgray', width:'400px'   }}>{customer.name}</td>
                                 </tr>
                               <tr>
                                 <td style={{ border: '2px solid darkgray'  }}>Téléphone</td> <td style={{ border: '2px solid darkgray'  }}>{customer.phone}</td>
@@ -126,7 +126,7 @@ import {    CreateRepairPDF } from "../../api/PDF/Repair";
                             <div>
                               <table style={{ border: '2px solid darkgray'  }}>
                                  <tr>
-                                  <td>Id</td>
+                                  <td  style={{ border: '2px solid darkgray', width:'200px'  } }>Id</td>
                                   <td>{repair.id}</td>
                                  </tr>
                                 <tr>
@@ -542,27 +542,9 @@ const body = {
 if (!body.listFaultIds.length) {
   return notify("Veuillez sélectionner au moins un défaut.", "danger");
 }
-/*    addRepair(body)
-    .then((data) => onChange(data) ); */
-    // Utilisation
-addRepair(body)
-  .then((data) => {
-    onChange(data);
-    return CreateRepairPDF(data.id);
-  })
-  .then((pdfBlob) => {
-    // Créer un lien de téléchargement
-    const url = window.URL.createObjectURL(new Blob([pdfBlob]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'fiche_reparation.pdf');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  })
-  .catch((error) => {
-    console.error('Erreur:', error);
-  });
+   addRepair(body)
+    .then((data) => {onChange(data) ,CreateRepairPDF(data.id)} ); 
+ 
      
 };
     return(
@@ -616,7 +598,7 @@ addRepair(body)
                 value={formData.deviceStateReceive}
                 onChange={(e, value) => {
                   if (value) {
-                    setFormData((prev) => ({ ...prev, deviceStateRecive: value }));
+                    setFormData((prev) => ({ ...prev, deviceStateReceive: value }));
                   }
                 }}
                 slotProps={{
@@ -664,7 +646,7 @@ addRepair(body)
                   },
                 }}
               />
-<Button variant="outlined"  onClick={  handelSubmit} >Enregistrer</Button> 
+<Button variant="outlined"  onClick={handelSubmit}   >Enregistrer</Button> 
             </form>
 
 

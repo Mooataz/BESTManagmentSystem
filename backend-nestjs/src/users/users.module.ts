@@ -12,6 +12,6 @@ import { AppService } from 'src/app.service';
   imports: [TypeOrmModule.forFeature([User,Permission ,Branch ])],
   controllers: [UsersController],
   providers: [UsersService,AppService],
-  exports:[UsersService]
+  exports:[TypeOrmModule,UsersService]
 })
 export class UsersModule {}

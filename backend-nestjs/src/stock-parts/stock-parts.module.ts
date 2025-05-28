@@ -20,6 +20,6 @@ import { Company } from 'src/company/entities/company.entity';
   imports: [ModelsModule,ReferencesModule,/* AppModule, */ TypeOrmModule.forFeature([StockPart,  Model, Reference, AllPart, Branch, Bin, Company])],
   controllers: [StockPartsController],
   providers: [StockPartsService, AppService],
-  exports:[StockPartsService]
+  exports:[TypeOrmModule,StockPartsService]
 })
 export class StockPartsModule {}
