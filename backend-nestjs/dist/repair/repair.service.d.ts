@@ -8,12 +8,13 @@ import { CustomerRequest } from 'src/customer-request/entities/customer-request.
 import { NotesCustomer } from 'src/notes-customer/entities/notes-customer.entity';
 import { ExpertiseReason } from 'src/expertise-reasons/entities/expertise-reason.entity';
 import { RepairAction } from 'src/repair-action/entities/repair-action.entity';
-import { AppService } from 'src/app.service';
 import { Device } from 'src/devices/entities/device.entity';
 import { User } from 'src/users/entities/user.entity';
 import { StockPart } from 'src/stock-parts/entities/stock-part.entity';
 import { ApproveStock } from 'src/approve-stock/entities/approve-stock.entity';
 import { Customer } from 'src/customers/entities/customer.entity';
+import { HistoryRepair } from 'src/history-repair/entities/history-repair.entity';
+import { Tracability } from 'src/tracability/entities/tracability.entity';
 export declare class RepairService {
     private readonly repairRepositry;
     private readonly accessoryRepositry;
@@ -27,9 +28,10 @@ export declare class RepairService {
     private readonly stockPartRepositry;
     private readonly approveStockRepositry;
     private readonly customerRepositry;
-    private appService;
-    constructor(repairRepositry: Repository<Repair>, accessoryRepositry: Repository<Accessory>, listFaultRepositry: Repository<ListFault>, customerRequestRepositry: Repository<CustomerRequest>, notesCustomerRepositry: Repository<NotesCustomer>, expertiseReasonRepositry: Repository<ExpertiseReason>, repairActionRepositry: Repository<RepairAction>, deviceRepositry: Repository<Device>, userRepositry: Repository<User>, stockPartRepositry: Repository<StockPart>, approveStockRepositry: Repository<ApproveStock>, customerRepositry: Repository<Customer>, appService: AppService);
-    create(createRepairDto: CreateRepairDto): Promise<Repair>;
+    private readonly historyRepairRepositry;
+    private readonly tracabilityRepositry;
+    constructor(repairRepositry: Repository<Repair>, accessoryRepositry: Repository<Accessory>, listFaultRepositry: Repository<ListFault>, customerRequestRepositry: Repository<CustomerRequest>, notesCustomerRepositry: Repository<NotesCustomer>, expertiseReasonRepositry: Repository<ExpertiseReason>, repairActionRepositry: Repository<RepairAction>, deviceRepositry: Repository<Device>, userRepositry: Repository<User>, stockPartRepositry: Repository<StockPart>, approveStockRepositry: Repository<ApproveStock>, customerRepositry: Repository<Customer>, historyRepairRepositry: Repository<HistoryRepair>, tracabilityRepositry: Repository<Tracability>);
+    create(createRepairDto: CreateRepairDto, userId: number): Promise<Repair>;
     findAll(): Promise<Repair[]>;
     findOne(id: number): Promise<Repair>;
     update(id: number, updateRepairDto: UpdateRepairDto): Promise<Repair>;

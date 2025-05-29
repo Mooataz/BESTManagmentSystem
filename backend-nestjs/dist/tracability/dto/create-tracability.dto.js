@@ -18,15 +18,15 @@ class CreateTracabilityDto {
 }
 exports.CreateTracabilityDto = CreateTracabilityDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: Number }),
+    (0, swagger_1.ApiProperty)({ type: Number, nullable: true }),
     __metadata("design:type", Number)
 ], CreateTracabilityDto.prototype, "historyRepair", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: Number }),
+    (0, swagger_1.ApiProperty)({ type: Number, nullable: true }),
     __metadata("design:type", Number)
 ], CreateTracabilityDto.prototype, "historyStockPart", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({ type: Number }),
+    (0, swagger_1.ApiProperty)({ type: Number, nullable: true }),
     __metadata("design:type", Number)
 ], CreateTracabilityDto.prototype, "user", void 0);
 //# sourceMappingURL=create-tracability.dto.js.map

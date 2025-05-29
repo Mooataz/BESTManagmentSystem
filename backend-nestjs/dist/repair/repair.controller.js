@@ -23,9 +23,10 @@ let RepairController = class RepairController {
     constructor(repairService) {
         this.repairService = repairService;
     }
-    async create(createRepairDto, res) {
+    async create(createRepairDto, req, res) {
         try {
-            const newCreate = await this.repairService.create(createRepairDto);
+            const userId = req.user.id;
+            const newCreate = await this.repairService.create(createRepairDto, userId);
             return res.status(common_1.HttpStatus.CREATED).json({
                 message: 'Created Successfully!',
                 status: common_1.HttpStatus.CREATED,
@@ -237,9 +238,10 @@ __decorate([
         },
     }),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Res)()),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_repair_dto_1.CreateRepairDto, Object]),
+    __metadata("design:paramtypes", [create_repair_dto_1.CreateRepairDto, Object, Object]),
     __metadata("design:returntype", Promise)
 ], RepairController.prototype, "create", null);
 __decorate([

@@ -23,12 +23,13 @@ const customer_request_entity_1 = require("../customer-request/entities/customer
 const notes_customer_entity_1 = require("../notes-customer/entities/notes-customer.entity");
 const expertise_reason_entity_1 = require("../expertise-reasons/entities/expertise-reason.entity");
 const repair_action_entity_1 = require("../repair-action/entities/repair-action.entity");
-const app_service_1 = require("../app.service");
 const device_entity_1 = require("../devices/entities/device.entity");
 const user_entity_1 = require("../users/entities/user.entity");
 const stock_part_entity_1 = require("../stock-parts/entities/stock-part.entity");
 const approve_stock_entity_1 = require("../approve-stock/entities/approve-stock.entity");
 const customer_entity_1 = require("../customers/entities/customer.entity");
+const history_repair_entity_1 = require("../history-repair/entities/history-repair.entity");
+const tracability_entity_1 = require("../tracability/entities/tracability.entity");
 let RepairService = class RepairService {
     repairRepositry;
     accessoryRepositry;
@@ -42,8 +43,9 @@ let RepairService = class RepairService {
     stockPartRepositry;
     approveStockRepositry;
     customerRepositry;
-    appService;
-    constructor(repairRepositry, accessoryRepositry, listFaultRepositry, customerRequestRepositry, notesCustomerRepositry, expertiseReasonRepositry, repairActionRepositry, deviceRepositry, userRepositry, stockPartRepositry, approveStockRepositry, customerRepositry, appService) {
+    historyRepairRepositry;
+    tracabilityRepositry;
+    constructor(repairRepositry, accessoryRepositry, listFaultRepositry, customerRequestRepositry, notesCustomerRepositry, expertiseReasonRepositry, repairActionRepositry, deviceRepositry, userRepositry, stockPartRepositry, approveStockRepositry, customerRepositry, historyRepairRepositry, tracabilityRepositry) {
         this.repairRepositry = repairRepositry;
         this.accessoryRepositry = accessoryRepositry;
         this.listFaultRepositry = listFaultRepositry;
@@ -56,9 +58,10 @@ let RepairService = class RepairService {
         this.stockPartRepositry = stockPartRepositry;
         this.approveStockRepositry = approveStockRepositry;
         this.customerRepositry = customerRepositry;
-        this.appService = appService;
+        this.historyRepairRepositry = historyRepairRepositry;
+        this.tracabilityRepositry = tracabilityRepositry;
     }
-    async create(createRepairDto) {
+    async create(createRepairDto, userId) {
         const accessory = await this.accessoryRepositry.find({
             where: { id: (0, typeorm_1.In)(createRepairDto.accessoryIds ?? []) }
         });
@@ -89,7 +92,19 @@ let RepairService = class RepairService {
             customer: { id: createRepairDto.customer },
         };
         const newCreate = this.repairRepositry.create(repairData);
-        return await this.repairRepositry.save(newCreate);
+        const savedRepair = await this.repairRepositry.save(newCreate);
+        const history = this.historyRepairRepositry.create({
+            date: new Date(),
+            step: 'Création',
+            repair: { id: savedRepair.id },
+        });
+        const savedHistory = await this.historyRepairRepositry.save(history);
+        const tracability = this.tracabilityRepositry.create({
+            historyRepair: { id: savedHistory.id },
+            user: { id: userId },
+        });
+        await this.tracabilityRepositry.save(tracability);
+        return savedRepair;
     }
     async findAll() {
         const allfind = await this.repairRepositry.find();
@@ -208,6 +223,8 @@ exports.RepairService = RepairService = __decorate([
     __param(9, (0, typeorm_2.InjectRepository)(stock_part_entity_1.StockPart)),
     __param(10, (0, typeorm_2.InjectRepository)(approve_stock_entity_1.ApproveStock)),
     __param(11, (0, typeorm_2.InjectRepository)(customer_entity_1.Customer)),
+    __param(12, (0, typeorm_2.InjectRepository)(history_repair_entity_1.HistoryRepair)),
+    __param(13, (0, typeorm_2.InjectRepository)(tracability_entity_1.Tracability)),
     __metadata("design:paramtypes", [typeorm_1.Repository,
         typeorm_1.Repository,
         typeorm_1.Repository,
@@ -220,6 +237,7 @@ exports.RepairService = RepairService = __decorate([
         typeorm_1.Repository,
         typeorm_1.Repository,
         typeorm_1.Repository,
-        app_service_1.AppService])
+        typeorm_1.Repository,
+        typeorm_1.Repository])
 ], RepairService);
 //# sourceMappingURL=repair.service.js.map

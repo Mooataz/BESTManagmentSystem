@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, Res, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { CreateLoginDTO } from './dto/create-login.dto';
 import * as argon2  from 'argon2';
@@ -36,6 +36,7 @@ export class AuthService {
         const token = await this.generateTokens(user.id, user.login)
 
         await this.updateRefreshToken(user.id, token.refreshToken)
+        
         return {user, token}
 
     }
@@ -49,7 +50,7 @@ export class AuthService {
         return user;
       }
          
-    async generateTokens(userId: number, login: string){
+    async generateTokens(userId: number, login: string,@Res() res){
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.signAsync(
                 {
@@ -72,6 +73,13 @@ export class AuthService {
                 }
             )
         ])
+    res.cookie('jwt', accessToken, {
+      httpOnly: true,
+      secure: this.configService.get<string>('NODE_ENV') !== 'development',
+      sameSite: 'strict',
+    });
+
+
         return {accessToken, refreshToken}
     }
 

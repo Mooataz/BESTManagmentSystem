@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseInterceptors, UploadedFiles, UseGuards, Req } from '@nestjs/common';
 import { RepairService } from './repair.service';
 import { CreateRepairDto } from './dto/create-repair.dto';
 import { UpdateRepairDto } from './dto/update-repair.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 
 @Controller('repair')
 export class RepairController {
@@ -73,14 +74,17 @@ export class RepairController {
       }),
     }),
   ) */
+  
   async create(
-    @Body() createRepairDto: CreateRepairDto,
+    @Body() createRepairDto: CreateRepairDto,  @Req() req, 
     //@UploadedFiles() files: Express.Multer.File[],
     @Res() res,
   ) {
     try {
+        // extraire depuis le token
       //createRepairDto.files = files?.map((file) => file.filename) || [];
-      const newCreate = await this.repairService.create(createRepairDto);
+       const userId = req.user.id; 
+      const newCreate = await this.repairService.create(createRepairDto ,userId);
       return res.status(HttpStatus.CREATED).json({
         message: 'Created Successfully!',
         status: HttpStatus.CREATED,

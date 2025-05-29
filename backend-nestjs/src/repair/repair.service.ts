@@ -17,6 +17,8 @@ import { User } from 'src/users/entities/user.entity';
 import { StockPart } from 'src/stock-parts/entities/stock-part.entity';
 import { ApproveStock } from 'src/approve-stock/entities/approve-stock.entity';
 import { Customer } from 'src/customers/entities/customer.entity';
+import { HistoryRepair } from 'src/history-repair/entities/history-repair.entity';
+import { Tracability } from 'src/tracability/entities/tracability.entity';
 
 @Injectable()
 export class RepairService {
@@ -33,10 +35,14 @@ export class RepairService {
     @InjectRepository(StockPart) private readonly stockPartRepositry: Repository<StockPart>,
     @InjectRepository(ApproveStock) private readonly approveStockRepositry: Repository<ApproveStock>,
     @InjectRepository(Customer) private readonly customerRepositry: Repository<Customer>,
-    private appService: AppService
+    @InjectRepository(HistoryRepair) private readonly historyRepairRepositry: Repository<HistoryRepair>,
+    @InjectRepository(Tracability) private readonly tracabilityRepositry: Repository<Tracability>,
+
+
+     
 
   ) { }
-  async create(createRepairDto: CreateRepairDto): Promise<Repair> {
+  async create(createRepairDto: CreateRepairDto,userId: number): Promise<Repair> {
  
     const accessory = await this.accessoryRepositry.find({
       where: { id: In(createRepairDto.accessoryIds?? []) }
@@ -72,10 +78,26 @@ export class RepairService {
       customer:{ id: createRepairDto.customer },
        
     };
- 
-
+  
+// await this.historyRepairRepositry.create({date:new Date(), step: 'Creation', repair    })
     const newCreate = this.repairRepositry.create(repairData);
-    return await this.repairRepositry.save(newCreate);
+    const savedRepair  = await this.repairRepositry.save(newCreate);
+
+         // 2. Créer l'historique
+    const history = this.historyRepairRepositry.create({
+    date: new Date(),
+    step: 'Création',
+    repair: { id: savedRepair .id },
+  });
+  const savedHistory = await this.historyRepairRepositry.save(history);
+
+  // 3. Créer la traçabilité
+  const tracability = this.tracabilityRepositry.create({
+    historyRepair: { id: savedHistory.id },
+    user: { id: userId },
+  });
+  await this.tracabilityRepositry.save(tracability);  
+     return savedRepair 
   }
 
 

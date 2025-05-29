@@ -14,7 +14,7 @@ export class PdfService {
     doc.on('data', buffers.push.bind(buffers));
     doc.on('end', () => {});
 
-    doc.fontSize(20).text('Fiche Réparation', { underline: true });
+    doc.fontSize(8).text('Fiche Réparation', { underline: true });
     doc.text(`Client: ${repair.customer?.name ?? 'N/A'}`);
     doc.text(`Appareil: ${repair.device?.serialenumber ?? 'N/A'}`);
     doc.text(`État reçu: ${repair.deviceStateReceive}`);

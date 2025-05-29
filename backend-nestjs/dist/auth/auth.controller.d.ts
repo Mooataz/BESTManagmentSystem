@@ -1,15 +1,12 @@
 import { AuthService } from './auth.service';
 import { CreateLoginDTO } from './dto/create-login.dto';
 import { Request } from 'express';
+import { Response } from 'express';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
-    sigIn(createLoginDTO: CreateLoginDTO): Promise<{
+    sigIn(createLoginDTO: CreateLoginDTO, res: Response): Promise<{
         user: import("../users/entities/user.entity").User;
-        token: {
-            accessToken: string;
-            refreshToken: string;
-        };
     }>;
     logout(req: Request): Promise<void>;
     getUserId(id: number, res: any): Promise<void>;

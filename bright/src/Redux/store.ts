@@ -1,14 +1,34 @@
 // src/store.ts
-import { configureStore } from '@reduxjs/toolkit';
 // Exemple : import de ton reducer
 import repairReducer from './repairSlice';
 import userReducer from './userSlice';
-export const store = configureStore({
-  reducer: {
-    repair: repairReducer,
-    user: userReducer, // Ajouter d'autres reducers ici si besoin
-  },
+import authReducer from './authSlice'
+import { combineReducers, configureStore } from '@reduxjs/toolkit'
+import {persistReducer, type PersistConfig} from 'redux-persist'
+import { persistStore } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+ 
+
+
+
+const rootReducer = combineReducers({
+   repair: repairReducer,
+    user: userReducer,
+    auth: authReducer,
 });
+const persistConfig: PersistConfig<ReturnType<typeof rootReducer>> = {
+  key: 'root',
+  storage,
+  version: 1,
+};
+const persistedReducer = persistReducer(persistConfig,rootReducer)
+export const store = configureStore({
+  reducer: persistedReducer,
+});
+export const persistor = persistStore(store);
+
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+
+

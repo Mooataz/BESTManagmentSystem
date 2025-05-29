@@ -15,9 +15,11 @@ import { Device } from 'src/devices/entities/device.entity';
 import { StockPart } from 'src/stock-parts/entities/stock-part.entity';
 import { ApproveStock } from 'src/approve-stock/entities/approve-stock.entity';
 import { Customer } from 'src/customers/entities/customer.entity';
+import { HistoryRepair } from 'src/history-repair/entities/history-repair.entity';
+import { Tracability } from 'src/tracability/entities/tracability.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Repair,Accessory,ListFault,CustomerRequest,NotesCustomer, ExpertiseReason, RepairAction, Device, User, StockPart, ApproveStock,Customer])],
+  imports: [TypeOrmModule.forFeature([Repair,HistoryRepair,Accessory,ListFault,CustomerRequest,NotesCustomer, ExpertiseReason, RepairAction, Device, User, StockPart, ApproveStock,Customer, Tracability])],
   controllers: [RepairController],
   providers: [RepairService,AppService],
   exports: [TypeOrmModule,RepairService],

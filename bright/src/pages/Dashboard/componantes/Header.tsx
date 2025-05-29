@@ -137,8 +137,8 @@ export default function Header() {
     fetchUsers();
   }, []);
 const handleNavigation = () => {
-  if (currentUser) {
-    navigate(`/dashboard/Updatepassword/${currentUser.id}`);
+  if (user) {
+    navigate(`/dashboard/Updatepassword/${user.id}`);
   }
 };
 
@@ -194,7 +194,7 @@ const handleNavigation = () => {
           alignItems: 'center',
         }}
       >     
-        {currentUser?.role.includes('Administrateur') ? (
+        {user?.role.includes('Administrateur') ? (
           <AgencieList
             agencies={agencies}
             onSelect={(agency) => {
@@ -206,7 +206,7 @@ const handleNavigation = () => {
 
         ) : (
           <Typography level="body-sm">
-            {t('Agence')} : {currentUser?.branch?.name || '-'}
+            {t('Agence')} : {user?.branch?.name || '-'}
           </Typography>
         )}
 
@@ -230,7 +230,7 @@ const handleNavigation = () => {
             sx={{ maxWidth: '32px', maxHeight: '32px', borderRadius: '9999999px' }}
           >
             <Avatar alt="Remy Sharp" src="/broken-image.jpg">
-              {currentUser?.name[0]}
+              {user?.name[0]}
             </Avatar>
           </MenuButton>
           <Menu
@@ -246,14 +246,14 @@ const handleNavigation = () => {
             <MenuItem>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Avatar alt="Remy Sharp" src="/broken-image.jpg">
-                  {currentUser?.name[0]}
+                  {user?.name[0]}
                 </Avatar>
                 <Box sx={{ ml: 1.5 }}>
                   <Typography level="title-sm" textColor="text.primary">
-                    {currentUser?.name}
+                    {user?.name}- 
                   </Typography>
                   <Typography level="body-xs" textColor="text.tertiary">
-                    {currentUser?.role.map((role: string) => (
+                    {user?.role.map((role: string) => (
                       <div className='flex flex-item'><VscStarEmpty color={roleColors[role]} /> {role}</div>
                     ))}
                   </Typography>

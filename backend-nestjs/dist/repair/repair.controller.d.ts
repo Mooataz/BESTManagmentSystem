@@ -4,7 +4,7 @@ import { UpdateRepairDto } from './dto/update-repair.dto';
 export declare class RepairController {
     private readonly repairService;
     constructor(repairService: RepairService);
-    create(createRepairDto: CreateRepairDto, res: any): Promise<any>;
+    create(createRepairDto: CreateRepairDto, req: any, res: any): Promise<any>;
     findAll(res: any): Promise<any>;
     findOne(id: number, res: any): Promise<any>;
     update(id: number, updateRepairDto: UpdateRepairDto, res: any): Promise<any>;

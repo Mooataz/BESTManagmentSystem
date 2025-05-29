@@ -4,6 +4,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { Logger } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
+
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: ['log', 'error', 'warn', 'debug', 'verbose'], // Active tous les niveaux de logs
@@ -22,7 +24,11 @@ async function bootstrap() {
     },
     'access-token',  )
   .build()
-
+app.enableCors({
+  origin: 'http://localhost:5173', // ton frontend
+  credentials: true,
+});
+app.use(cookieParser());
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup("api", app ,document)
     // ⚠️ ICI : activer le CORS pour que React puisse appeler l'API

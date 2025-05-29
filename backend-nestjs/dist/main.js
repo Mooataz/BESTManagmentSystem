@@ -5,6 +5,7 @@ const app_module_1 = require("./app.module");
 const swagger_1 = require("@nestjs/swagger");
 const path_1 = require("path");
 const common_1 = require("@nestjs/common");
+const cookieParser = require("cookie-parser");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule, {
         logger: ['log', 'error', 'warn', 'debug', 'verbose'],
@@ -21,6 +22,11 @@ async function bootstrap() {
         in: 'header',
     }, 'access-token')
         .build();
+    app.enableCors({
+        origin: 'http://localhost:5173',
+        credentials: true,
+    });
+    app.use(cookieParser());
     const document = swagger_1.SwaggerModule.createDocument(app, config);
     swagger_1.SwaggerModule.setup("api", app, document);
     app.enableCors({

@@ -1,10 +1,28 @@
 import axios from 'axios';
+import { store } from '../../Redux/store';
  
 const API = axios.create({
   baseURL: 'http://localhost:3000/',
   withCredentials: true, // utile si tu envoies des cookies / tokens
 });
-
+interface Agency {
+  id: number;
+  name: string;
+  phone: number;
+  email: string;
+  location: string;
+}
+type User = {
+  id: number;
+  name: string;
+  phone: number;
+  password: string;
+  createdDate: string;
+  status: string;
+  login: string;
+  role: string[];
+  branch: Agency
+};
 
 export const getCustomer = async () => {
   try {
@@ -46,16 +64,17 @@ export const getOneDevice = async (formData: any) => {
   }
 };
 
-export const addRepair = async (data: any) => {
+export const addRepair = async (data: any/* , user: number */) => {
   try {
-     
-    const response = await API.post('repair', data )
-     return response.data.data;
+    //const token = store.getState().auth.token;
+    const response = await API.post('repair', data );
+  
+    return response.data.data;
   } catch (error) {
     console.error(error);
     throw error;
   }
-}
+};
 
 export const getAccessory = async () => {
   try {
@@ -86,4 +105,26 @@ export const getCustomerRequest = async () => {
     throw error;
   }
 }
- 
+
+export const ajouteHistoryRepair = async (data:any) => {
+  try {
+    const response = await API.post('history-repair',data);
+    return response.data.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export const ajouteTracabilityRepair = async (data: { 
+  historyRepairId: number, 
+  userId: number 
+}) => {
+  try {
+    const response = await API.post('tracability', data);
+    return response.data.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};

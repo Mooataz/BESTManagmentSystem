@@ -15,16 +15,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HistoryRepairController = void 0;
 const common_1 = require("@nestjs/common");
 const history_repair_service_1 = require("./history-repair.service");
-const create_history_repair_dto_1 = require("./dto/create-history-repair.dto");
 const update_history_repair_dto_1 = require("./dto/update-history-repair.dto");
+const accessToken_guard_1 = require("../guards/accessToken.guard");
 let HistoryRepairController = class HistoryRepairController {
     historyRepairService;
     constructor(historyRepairService) {
         this.historyRepairService = historyRepairService;
     }
-    async create(createHistoryRepairDto, res) {
+    async create(date, step, repair, req, res) {
         try {
-            const newcreate = await this.historyRepairService.create(createHistoryRepairDto);
+            const userId = req.user.id;
+            const createHistory = {
+                date,
+                step,
+                repair,
+                user: userId,
+            };
+            const newcreate = await this.historyRepairService.create(createHistory);
             return res.status(common_1.HttpStatus.CREATED).json({
                 message: "Created Successfuly !",
                 status: common_1.HttpStatus.CREATED,
@@ -127,11 +134,12 @@ let HistoryRepairController = class HistoryRepairController {
 };
 exports.HistoryRepairController = HistoryRepairController;
 __decorate([
+    (0, common_1.UseGuards)(accessToken_guard_1.AccessTokenGuard),
     (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Res)()),
+    __param(3, (0, common_1.Req)()),
+    __param(4, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_history_repair_dto_1.CreateHistoryRepairDto, Object]),
+    __metadata("design:paramtypes", [Date, String, Number, Object, Object]),
     __metadata("design:returntype", Promise)
 ], HistoryRepairController.prototype, "create", null);
 __decorate([

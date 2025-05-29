@@ -23,8 +23,14 @@ let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    sigIn(createLoginDTO) {
-        return this.authService.signIn(createLoginDTO);
+    async sigIn(createLoginDTO, res) {
+        const { user, token } = await this.authService.signIn(createLoginDTO);
+        res.cookie('access_token', token.accessToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+        });
+        return { user };
     }
     logout(req) {
         const user = req.user;
@@ -59,9 +65,10 @@ exports.AuthController = AuthController;
 __decorate([
     (0, common_1.Post)('signIn'),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_login_dto_1.CreateLoginDTO]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [create_login_dto_1.CreateLoginDTO, Object]),
+    __metadata("design:returntype", Promise)
 ], AuthController.prototype, "sigIn", null);
 __decorate([
     (0, swagger_1.ApiBearerAuth)('access-token'),

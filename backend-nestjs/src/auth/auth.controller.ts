@@ -4,6 +4,8 @@ import { CreateLoginDTO } from './dto/create-login.dto';
 import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 import { Request } from 'express';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
+
 type JwtPayload = { sub: number,
   login: string
   }
@@ -14,9 +16,19 @@ export class AuthController {
   ) {}
 
   @Post('signIn')
-  sigIn(@Body() createLoginDTO: CreateLoginDTO){
-    return this.authService.signIn(createLoginDTO)
-  }
+  async sigIn(@Body() createLoginDTO: CreateLoginDTO,
+  @Res({ passthrough: true }) res: Response){
+     const { user, token } = await this.authService.signIn(createLoginDTO);
+  
+    res.cookie('access_token', token.accessToken, {
+    httpOnly: true,
+    secure: false, // true en production avec HTTPS
+    sameSite: 'lax',
+  });
+
+  return { user };
+  
+    }
   
   @ApiBearerAuth('access-token')
   @UseGuards(AccessTokenGuard)

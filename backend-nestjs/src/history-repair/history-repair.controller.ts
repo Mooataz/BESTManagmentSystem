@@ -1,17 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseGuards, Req } from '@nestjs/common';
 import { HistoryRepairService } from './history-repair.service';
 import { CreateHistoryRepairDto } from './dto/create-history-repair.dto';
 import { UpdateHistoryRepairDto } from './dto/update-history-repair.dto';
+import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 
 @Controller('history-repair')
 export class HistoryRepairController {
   constructor(private readonly historyRepairService: HistoryRepairService) { }
-
+@UseGuards(AccessTokenGuard)
   @Post()
-  async create(@Body() createHistoryRepairDto: CreateHistoryRepairDto,
+  async create(/*@Body()  createHistoryRepairDto: CreateHistoryRepairDto */date:Date,step: string,repair: number,   @Req() req,
     @Res() res) {
     try {
-      const newcreate = await this.historyRepairService.create(createHistoryRepairDto)
+       const userId = req.user.id; // extraire depuis le token
+      const createHistory={
+        date,
+        step,
+        repair,
+        user: userId,
+        
+      }
+      const newcreate = await this.historyRepairService.create(createHistory)
       return res.status(HttpStatus.CREATED).json({
         message:"Created Successfuly !",
         status:HttpStatus.CREATED,

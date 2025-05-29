@@ -18,7 +18,7 @@ export declare class AuthService {
         };
     }>;
     findUserById(id: number): Promise<User | null>;
-    generateTokens(userId: number, login: string): Promise<{
+    generateTokens(userId: number, login: string, res: any): Promise<{
         accessToken: string;
         refreshToken: string;
     }>;

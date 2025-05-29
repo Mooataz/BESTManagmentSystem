@@ -43,6 +43,8 @@ import { BiSolidShow } from "react-icons/bi";
 import { PiChartLineThin } from "react-icons/pi";
 import {Box} from '@mui/joy'
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../../Redux/store';
 interface NavigationProps {
   onSelectPage: (page: string) => void;
   selectedPage: string;
@@ -171,11 +173,11 @@ const menuItems: MenuItem[] = [
 
 ];
   const [filteredMenuItems, setFilteredMenuItems] = React.useState<MenuItem[]>([]);
- 
+   const user = useSelector((state: RootState) => state.user);
   React.useEffect(() => {
     const fetchUser = async () => {
       try {
-        const currentUser = await getCurrentUser();
+        //const currentUser = await getCurrentUser();
         // Appliquer le filtrage
         let tempFiltered: MenuItem[] = [];
 
@@ -183,18 +185,18 @@ const menuItems: MenuItem[] = [
  
 
 // ...
-        if (currentUser.role.includes('Reception')) { 
+        if (user.role.includes('Reception')) { 
           tempFiltered = [  menuItems[2], menuItems[4]];
         }
 
-        if (currentUser.role.includes('Technicien')) { tempFiltered =  [...tempFiltered, menuItems[5] ] }  
+        if (user.role.includes('Technicien')) { tempFiltered =  [...tempFiltered, menuItems[5] ] }  
 
-        if (currentUser.role.includes('Gestionnaire_de_stocks')) { tempFiltered = [...tempFiltered, menuItems[3] ]; } 
+        if (user.role.includes('Gestionnaire_de_stocks')) { tempFiltered = [...tempFiltered, menuItems[3] ]; } 
 
-        if (currentUser.role.includes('Coordinateur')) { tempFiltered = [...tempFiltered, menuItems[6]] } 
+        if (user.role.includes('Coordinateur')) { tempFiltered = [...tempFiltered, menuItems[6]] } 
 
         tempFiltered = [...tempFiltered,  menuItems[7],menuItems[8]];
-        if (currentUser.role.includes('Administrateur')) { tempFiltered = menuItems; }  
+        if (user.role.includes('Administrateur')) { tempFiltered = menuItems; }  
 
         setFilteredMenuItems(tempFiltered);
       } catch (error) {

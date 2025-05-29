@@ -1,14 +1,19 @@
 import axios from 'axios';
-
+import {store} from '../../Redux/store';
+ 
  const API = axios.create({
     baseURL: 'http://localhost:3000/',
     withCredentials: true, // utile si tu envoies des cookies / tokens
   }); 
-
+              //const result = await handleAuthen(data.login, data.password);          
+              //localStorage.setItem('accessToken', result.token.accessToken);
   export const handleAuthen = async (login: string, password:string) => {
     try {
         const response = await API.post(`auth/signIn`,{ login, password });
-        return response.data;
+        const user = response.data.user;
+        const token = response.data.token;
+        //store.dispatch(loginSuccess( {user , token }))
+        return { user, token };
     } catch (error: any) {
         if (error.response) {
             throw new Error(error.response.data.message); // message d'erreur propre
@@ -33,6 +38,9 @@ import axios from 'axios';
       throw error;
     }
   };
+
+
+
   export const getCurrentUser = async () => {
     const accessToken = localStorage.getItem('accessToken');
     const response = await API.get('auth/me', {

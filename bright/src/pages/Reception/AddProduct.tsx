@@ -33,7 +33,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../../Redux/store';
 import { PiEmptyThin } from "react-icons/pi";
 import {    CreateRepairPDF } from "../../api/PDF/Repair";
-
+import { store } from "../../Redux/store";
 
   export function AddProduct () {
   const [step, setStep] = React.useState(0);
@@ -66,20 +66,20 @@ import {    CreateRepairPDF } from "../../api/PDF/Repair";
     return(
         <div>
              <Box sx={{display:'flex', justifyContent:'space-around'}}>
-                <Card sx={{width:'40%', height:'750px',bgcolor: '#cfe8fc'}}>
+                <Card sx={{width:'40%', height:'750px',bgcolor: '#FAFAFA'}}>
                      <Typography level="title-md">Client sélectionné</Typography>
                         {customer ? (
                             <>
-                              <table style={{ border: '2px solid darkgray'  }}>                              
+                              <table style={{ border: '2px solid #E0E0E0'  }}>                              
                                 <tr>
-                                 <td  style={{ border: '2px solid darkgray', width:'200px'  }}>Nom</td>  <td style={{ border: '2px solid darkgray', width:'400px'   }}>{customer.name}</td>
+                                 <td  style={{ border: '2px solid #E0E0E0', width:'200px',backgroundColor: '#EEEEEE'  }}>Nom</td>  <td style={{ border: '2px solid #E0E0E0', width:'400px'   }}>{customer.name}</td>
                                 </tr>
                               <tr>
-                                <td style={{ border: '2px solid darkgray'  }}>Téléphone</td> <td style={{ border: '2px solid darkgray'  }}>{customer.phone}</td>
+                                <td style={{ border: '2px solid #E0E0E0' ,backgroundColor: '#EEEEEE' }}>Téléphone</td> <td style={{ border: '2px solid #E0E0E0'  }}>{customer.phone}</td>
                               </tr>
                               {customer.distributer && (
                                 <tr>
-                                  <td style={{ border: '2px solid darkgray'  }}>Distributeur</td> <td>{customer.distributer.name}</td>
+                                  <td style={{ border: '2px solid #E0E0E0' ,backgroundColor: '#EEEEEE' }}>Distributeur</td> <td style={{ border: '2px solid #E0E0E0'  }}>{customer.distributer.name}</td>
 
                                 </tr>
 
@@ -97,17 +97,17 @@ import {    CreateRepairPDF } from "../../api/PDF/Repair";
                          <Typography level="title-md">Appareille</Typography>
                          {
                           device ? (
-                            <table style={{ border: '2px solid darkgray'  }}>
+                            <table style={{ border: '2px solid #E0E0E0'  }}>
                               <tr>
-                                <td  style={{ border: '2px solid darkgray', width:'200px'  }}>Imei</td>  <td style={{ border: '2px solid darkgray' , width:'400px' }}>{device.serialenumber}</td>
+                                <td  style={{ border: '2px solid #E0E0E0', width:'200px',backgroundColor: '#EEEEEE'  }}>Imei</td>  <td style={{ border: '2px solid #E0E0E0' , width:'400px' }}>{device.serialenumber}</td>
 
                               </tr>
                               <tr>
-                                <td  style={{ border: '2px solid darkgray', width:'200px'  }}>Modéle</td>  <td style={{ border: '2px solid darkgray'  }}>{device.model?.name || ''}</td>
+                                <td  style={{ border: '2px solid #E0E0E0', width:'200px' ,backgroundColor: '#EEEEEE' }}>Modéle</td>  <td style={{ border: '2px solid #E0E0E0'  }}>{device.model?.name || ''}</td>
 
                               </tr>
                               <tr>
-                                <td  style={{ border: '2px solid darkgray', width:'200px'  }}>Date d'achat</td>  <td style={{ border: '2px solid darkgray'  }}>{device.purchaseDate ? new Date(device.purchaseDate).toISOString().split('T')[0] : 'Non précisée'}</td>
+                                <td  style={{ border: '2px solid #E0E0E0', width:'200px',backgroundColor: '#EEEEEE'  }}>Date d'achat</td>  <td style={{ border: '2px solid #E0E0E0'  }}>{device.purchaseDate ? new Date(device.purchaseDate).toISOString().split('T')[0] : 'Non précisée'}</td>
 
                               </tr>
  
@@ -124,14 +124,14 @@ import {    CreateRepairPDF } from "../../api/PDF/Repair";
                           repair ? (
                             
                             <div>
-                              <table style={{ border: '2px solid darkgray'  }}>
+                              <table style={{ border: '2px solid E0E0E0'  }}>
                                  <tr>
-                                  <td  style={{ border: '2px solid darkgray', width:'200px'  } }>Id</td>
+                                  <td  style={{ border: '2px solid E0E0E0', width:'200px'  } }>Id</td>
                                   <td>{repair.id}</td>
                                  </tr>
                                 <tr>
-                                  <td  style={{ border: '2px solid darkgray', width:'200px'  } }>Accessoire</td> 
-                                  <td style={{ border: '2px solid darkgray' , width:'400px' }}>
+                                  <td  style={{ border: '2px solid E0E0E0', width:'200px',backgroundColor: '#EEEEEE'  } }>Accessoire</td> 
+                                  <td style={{ border: '2px solid E0E0E0' , width:'400px' }}>
                                     {repair.accessory.map((item, idx) => (
                                       <div key={idx}>
                                         <Typography level="body-sm">• {item.name}</Typography>
@@ -141,8 +141,8 @@ import {    CreateRepairPDF } from "../../api/PDF/Repair";
                                   </td>
                                 </tr>
                                 <tr>
-                                  <td  style={{ border: '2px solid darkgray', width:'200px'  } }>Liste des probléme</td>
-                                  <td style={{ border: '2px solid darkgray'  }}>
+                                  <td  style={{ border: '2px solid E0E0E0', width:'200px' ,backgroundColor: '#EEEEEE' } }>Liste des probléme</td>
+                                  <td style={{ border: '2px solid E0E0E0'  }}>
                                     {repair.listFault.map((item, idx) => (
                                             <div key={idx}>
                                               <Typography level="body-sm">• {item.name}</Typography>
@@ -152,8 +152,8 @@ import {    CreateRepairPDF } from "../../api/PDF/Repair";
                                   </td>
                                 </tr>
                                 <tr>
-                                  <td  style={{ border: '2px solid darkgray', width:'200px'  } }>Demandes client</td>
-                                  <td style={{ border: '2px solid darkgray'  }}>
+                                  <td  style={{ border: '2px solid E0E0E0', width:'200px' ,backgroundColor: '#EEEEEE' } }>Demandes client</td>
+                                  <td style={{ border: '2px solid E0E0E0'  }}>
                                     {repair.customerRequest.map((item, idx) => (
                                     <div key={idx}>
                                       <Typography level="body-sm">• {item.name}</Typography>
@@ -163,12 +163,12 @@ import {    CreateRepairPDF } from "../../api/PDF/Repair";
                                   </td>
                                 </tr>
                                 <tr>
-                                  <td  style={{ border: '2px solid darkgray', width:'200px'  } }>Etat de l'appareille</td>
-                                  <td style={{ border: '2px solid darkgray'  }}>{repair.deviceStateReceive}</td>
+                                  <td  style={{ border: '2px solid E0E0E0', width:'200px',backgroundColor: '#EEEEEE' } }>Etat de l'appareille</td>
+                                  <td style={{ border: '2px solid E0E0E0'  }}>{repair.deviceStateReceive}</td>
                                 </tr>
                                 <tr>
-                                  <td  style={{ border: '2px solid darkgray', width:'200px'  } }>Remarque</td>
-                                  <td style={{ border: '2px solid darkgray'  }}>{repair.remark}</td>
+                                  <td  style={{ border: '2px solid E0E0E0', width:'200px',backgroundColor: '#EEEEEE'  } }>Remarque</td>
+                                  <td style={{ border: '2px solid E0E0E0'  }}>{repair.remark}</td>
                                 </tr>
                               </table>
  
@@ -473,6 +473,7 @@ const [accessory,setAccessory] = React.useState<TypeUnique[]>([]);
 const [listFault,setListFault] = React.useState<TypeUnique[]>([]);
 const [customerRequest,setCustomerRequest] = React.useState<TypeUnique[]>([]);
 const user = useSelector((state: RootState) => state.user);
+const userr = useSelector((state: RootState) => state.auth.user);
   const { notify } = useNotification();
 
 const [formData, setFormData] = React.useState<TypeForm> ({
@@ -537,14 +538,22 @@ const body = {
   remark: formData.remark ?? ' ',
   actuellyBranch: user.branch?.name ?? ' ',
   device: devicee?.id ?? null,
-  customer: customerr?.id ?? null
+  customer: customerr?.id ?? null,
+   
 };
 if (!body.listFaultIds.length) {
   return notify("Veuillez sélectionner au moins un défaut.", "danger");
 }
+ 
+/* if (user.id !== null) {
+  addRepair(body, user.id)
+    .then((data) => {
+      onChange(data);
+      CreateRepairPDF(data.id);
+    })} */
    addRepair(body)
     .then((data) => {onChange(data) ,CreateRepairPDF(data.id)} ); 
- 
+  
      
 };
     return(
