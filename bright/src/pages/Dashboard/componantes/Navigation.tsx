@@ -173,8 +173,8 @@ const menuItems: MenuItem[] = [
 
 ];
   const [filteredMenuItems, setFilteredMenuItems] = React.useState<MenuItem[]>([]);
-   const user = useSelector((state: RootState) => state.user);
-  React.useEffect(() => {
+   const userr = useSelector((state: RootState) => state.user);
+   React.useEffect(() => {
     const fetchUser = async () => {
       try {
         //const currentUser = await getCurrentUser();
@@ -185,18 +185,18 @@ const menuItems: MenuItem[] = [
  
 
 // ...
-        if (user.role.includes('Reception')) { 
+        if (userr.role.includes('Reception')) { 
           tempFiltered = [  menuItems[2], menuItems[4]];
         }
 
-        if (user.role.includes('Technicien')) { tempFiltered =  [...tempFiltered, menuItems[5] ] }  
+        if (userr.role.includes('Technicien')) { tempFiltered =  [...tempFiltered, menuItems[5] ] }  
 
-        if (user.role.includes('Gestionnaire_de_stocks')) { tempFiltered = [...tempFiltered, menuItems[3] ]; } 
+        if (userr.role.includes('Gestionnaire_de_stocks')) { tempFiltered = [...tempFiltered, menuItems[3] ]; } 
 
-        if (user.role.includes('Coordinateur')) { tempFiltered = [...tempFiltered, menuItems[6]] } 
+        if (userr.role.includes('Coordinateur')) { tempFiltered = [...tempFiltered, menuItems[6]] } 
 
         tempFiltered = [...tempFiltered,  menuItems[7],menuItems[8]];
-        if (user.role.includes('Administrateur')) { tempFiltered = menuItems; }  
+        if (userr.role.includes('Administrateur')) { tempFiltered = menuItems; }  
 
         setFilteredMenuItems(tempFiltered);
       } catch (error) {

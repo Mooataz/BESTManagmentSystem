@@ -16,14 +16,21 @@ const rootReducer = combineReducers({
     user: userReducer,
     auth: authReducer,
 });
-const persistConfig: PersistConfig<ReturnType<typeof rootReducer>> = {
+const persistConfig = {
   key: 'root',
   storage,
-  version: 1,
-};
+  whitelist: ['auth'] // Seulement persister l'auth si nécessaire
+}
 const persistedReducer = persistReducer(persistConfig,rootReducer)
+
 export const store = configureStore({
   reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['persist/PERSIST'],
+      },
+    }),
 });
 export const persistor = persistStore(store);
 

@@ -32,6 +32,8 @@ async function bootstrap() {
     app.enableCors({
         origin: 'http://localhost:5173',
         credentials: true,
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     });
     const uploadPath = process.env.NODE_ENV === 'production'
         ? (0, path_1.join)(__dirname, '..', 'upload')

@@ -18,17 +18,23 @@ const auth_service_1 = require("./auth.service");
 const create_login_dto_1 = require("./dto/create-login.dto");
 const accessToken_guard_1 = require("../guards/accessToken.guard");
 const swagger_1 = require("@nestjs/swagger");
+const config_1 = require("@nestjs/config");
 let AuthController = class AuthController {
     authService;
-    constructor(authService) {
+    configService;
+    constructor(authService, configService) {
         this.authService = authService;
+        this.configService = configService;
     }
     async sigIn(createLoginDTO, res) {
         const { user, token } = await this.authService.signIn(createLoginDTO);
         res.cookie('access_token', token.accessToken, {
             httpOnly: true,
-            secure: false,
+            secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
+            maxAge: 24 * 60 * 60 * 1000,
+            path: '/',
+            domain: 'localhost'
         });
         return { user };
     }
@@ -120,6 +126,7 @@ __decorate([
 ], AuthController.prototype, "updatePassword", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
-    __metadata("design:paramtypes", [auth_service_1.AuthService])
+    __metadata("design:paramtypes", [auth_service_1.AuthService,
+        config_1.ConfigService])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map

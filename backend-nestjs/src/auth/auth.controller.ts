@@ -5,6 +5,7 @@ import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 import { Request } from 'express';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 type JwtPayload = { sub: number,
   login: string
@@ -12,6 +13,7 @@ type JwtPayload = { sub: number,
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService,
+    private configService: ConfigService
               
   ) {}
 
@@ -20,11 +22,15 @@ export class AuthController {
   @Res({ passthrough: true }) res: Response){
      const { user, token } = await this.authService.signIn(createLoginDTO);
   
-    res.cookie('access_token', token.accessToken, {
-    httpOnly: true,
-    secure: false, // true en production avec HTTPS
-    sameSite: 'lax',
-  });
+ // AuthController - signIn
+res.cookie('access_token', token.accessToken, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax', // Plus flexible que 'strict'
+  maxAge: 24 * 60 * 60 * 1000, // 1 jour
+  path: '/',
+  domain: 'localhost' // Spécifiez en développement
+});
 
   return { user };
   

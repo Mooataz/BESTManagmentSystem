@@ -1,22 +1,54 @@
 import { createSlice   } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
+import { addRepair } from './Actions/repairAction';
+ 
 interface RepairState {
-  remark: string;
+  repair: any | null;
+  loading: boolean;
+  success: boolean;
+  error: string | null;
 }
-
-const initialState: RepairState = {
-  remark: '',
+const initialState:RepairState  = {
+  repair: null,
+  loading: false,
+  success: false,
+  error: null,
 };
 
-const repairSlice = createSlice({
+
+const authSlice = createSlice({
   name: 'repair',
   initialState,
   reducers: {
-    setRemark: (state, action: PayloadAction<string>) => {
-      state.remark = action.payload;
-    },
+    // Définition corrigée avec la syntaxe action creator
+    
+clearError: (state: RepairState) => {
+  state.error = null;
+}
+
+
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(addRepair.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addRepair.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.repair = action.payload;
+         
+      })
+      .addCase(addRepair.rejected, (state, action: PayloadAction<string | undefined>) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload || 'Unknown error';
+      })
+       
   },
 });
 
-export const { setRemark } = repairSlice.actions;
+export const { clearError } = authSlice.actions;
+ 
 export default repairSlice.reducer;

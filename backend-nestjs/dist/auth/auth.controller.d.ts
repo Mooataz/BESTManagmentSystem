@@ -2,9 +2,11 @@ import { AuthService } from './auth.service';
 import { CreateLoginDTO } from './dto/create-login.dto';
 import { Request } from 'express';
 import { Response } from 'express';
+import { ConfigService } from '@nestjs/config';
 export declare class AuthController {
     private readonly authService;
-    constructor(authService: AuthService);
+    private configService;
+    constructor(authService: AuthService, configService: ConfigService);
     sigIn(createLoginDTO: CreateLoginDTO, res: Response): Promise<{
         user: import("../users/entities/user.entity").User;
     }>;

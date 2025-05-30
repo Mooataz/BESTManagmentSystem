@@ -23,10 +23,10 @@ export class AuthService {
         const user = await this.userService.findUserByLogin(createLoginDTO.login);
         if(!user){ throw new BadRequestException('User not found by this login')};
 
-        if (user.status !== 'Autoriser') {
+       /*  if (user.status !== 'Autoriser') {
             throw new UnauthorizedException("Compte a été désactivé");
         }
-
+ */
         //Check password
         const passwordMatches = await argon2.verify(user.password, createLoginDTO.password);
         if(!passwordMatches){ throw new BadRequestException('Incorrect password')};
@@ -50,7 +50,7 @@ export class AuthService {
         return user;
       }
          
-    async generateTokens(userId: number, login: string,@Res() res){
+    async generateTokens(userId: number, login: string ){
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.signAsync(
                 {
@@ -73,11 +73,6 @@ export class AuthService {
                 }
             )
         ])
-    res.cookie('jwt', accessToken, {
-      httpOnly: true,
-      secure: this.configService.get<string>('NODE_ENV') !== 'development',
-      sameSite: 'strict',
-    });
 
 
         return {accessToken, refreshToken}
