@@ -173,7 +173,7 @@ const menuItems: MenuItem[] = [
 
 ];
   const [filteredMenuItems, setFilteredMenuItems] = React.useState<MenuItem[]>([]);
-   const userr = useSelector((state: RootState) => state.user);
+   const userr = useSelector((state: RootState) => state.auth.user);
    React.useEffect(() => {
     const fetchUser = async () => {
       try {

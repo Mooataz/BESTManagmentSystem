@@ -40,4 +40,6 @@ export declare class RepairService {
     filterRepairByUser(userId: number): Promise<Repair[]>;
     filterByNewSerialNumber(newSerialNumber: number): Promise<Repair[]>;
     filterByActuellyBranch(actuellyBranch: number): Promise<Repair[]>;
+    findByBranchAndStep(branchId: number, step: string): Promise<Repair[]>;
+    updateRepairWithParts(repairId: number, updateData: UpdateRepairDto): Promise<Repair>;
 }

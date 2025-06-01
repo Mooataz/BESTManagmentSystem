@@ -47,7 +47,7 @@ export class Repair {
     @Column()
     deviceStateReceive: string;
 
-    @ManyToMany ( () => Accessory, (accessory) =>accessory.repair , { cascade : true}, )
+    @ManyToMany ( () => Accessory, (accessory) =>accessory.repair , { cascade : true, nullable: true }, )
     @JoinTable()
     accessory : Accessory[];
     
@@ -55,43 +55,43 @@ export class Repair {
     @JoinTable()
     listFault : ListFault[];
 
-    @ManyToMany ( () => CustomerRequest, (customerRequest) =>customerRequest.repair , { cascade : true})
+    @ManyToMany ( () => CustomerRequest, (customerRequest) =>customerRequest.repair , { cascade : true, nullable: true })
     @JoinTable()
     customerRequest : CustomerRequest[];
 
-    @ManyToMany ( () => NotesCustomer, (notesCustomer) =>notesCustomer.repair , { cascade : true})
+    @ManyToMany ( () => NotesCustomer, (notesCustomer) =>notesCustomer.repair , { cascade : true, nullable: true })
     @JoinTable()
     notesCustomer : NotesCustomer[];
 
-    @ManyToMany ( () => ExpertiseReason, (expertiseReason) =>expertiseReason.repair , { cascade : true})
+    @ManyToMany ( () => ExpertiseReason, (expertiseReason) =>expertiseReason.repair , { cascade : true, nullable: true })
     @JoinTable()
     expertiseReason : ExpertiseReason[];
 
-    @ManyToMany ( () => RepairAction, (repairAction) =>repairAction.repair , { cascade : true})
+    @ManyToMany ( () => RepairAction, (repairAction) =>repairAction.repair , { cascade : true, nullable: true })
     @JoinTable()
     repairAction : RepairAction[];
 
     @ManyToOne( () => Device, device => device.repair)
     device :Device;
 
-    @ManyToOne( () => User,user => user.repair)
+    @ManyToOne( () => User,user => user.repair, { nullable: true })
     user : User;
 
-    @OneToMany( () => ApproveStock, approveStock => approveStock.repair)
+    @OneToMany( () => ApproveStock, approveStock => approveStock.repair, { nullable: true })
     approveStock : ApproveStock[];
 
-    @OneToMany( () => HistoryRepair, historyRepair => historyRepair.repair)
+    @OneToMany( () => HistoryRepair, historyRepair => historyRepair.repair, { nullable: true })
     historyRepair : HistoryRepair[]; 
 
-    @ManyToOne( () => OutputList, (outputList) => outputList.repair)
+    @ManyToOne( () => OutputList, (outputList) => outputList.repair, { nullable: true })
     outputList : OutputList;
     
-    @ManyToMany( () => Transfert, transfert => transfert.repair)
+    @ManyToMany( () => Transfert, transfert => transfert.repair, { nullable: true })
     transfert : Transfert[]; 
 
-    @OneToOne( () => Invoice, (invoice) => invoice.repair)
+    @OneToOne( () => Invoice, (invoice) => invoice.repair, { nullable: true })
     invoice: Invoice;
 
-    @ManyToOne( () => Customer, customer => customer.repair)
+    @ManyToOne( () => Customer, customer => customer.repair, { nullable: true })
     customer: Customer;
 }

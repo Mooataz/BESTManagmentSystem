@@ -5,19 +5,21 @@ import { HistoryRepair } from './entities/history-repair.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repair } from 'src/repair/entities/repair.entity';
+import { Tracability } from 'src/tracability/entities/tracability.entity';
 
 @Injectable()
 export class HistoryRepairService {
   constructor ( @InjectRepository(HistoryRepair) private readonly  historyRepairRepositry:Repository<HistoryRepair>,
-                @InjectRepository(Repair) private readonly  repairRepositry:Repository<Repair>){}
+                @InjectRepository(Repair) private readonly  repairRepositry:Repository<Repair>,
+               ){}
 
-  async create(createHistoryRepairDto: CreateHistoryRepairDto):Promise<HistoryRepair> {
+  async create(createHistoryRepairDto: CreateHistoryRepairDto ):Promise<HistoryRepair> {
     const repair = await this.repairRepositry.findOne({ where: {id: createHistoryRepairDto.repair}})
     if (!repair) throw new NotFoundException('repair not found');
    
     const newCreate = this.historyRepairRepositry.create({...createHistoryRepairDto, repair});
 
-    return await this.historyRepairRepositry.save(newCreate);
+    return  await this.historyRepairRepositry.save(newCreate);
   }
 
   async findAll():Promise<HistoryRepair[]> {

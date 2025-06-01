@@ -93,7 +93,7 @@ __decorate([
     __metadata("design:type", String)
 ], Repair.prototype, "deviceStateReceive", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => accessory_entity_1.Accessory, (accessory) => accessory.repair, { cascade: true }),
+    (0, typeorm_1.ManyToMany)(() => accessory_entity_1.Accessory, (accessory) => accessory.repair, { cascade: true, nullable: true }),
     (0, typeorm_1.JoinTable)(),
     __metadata("design:type", Array)
 ], Repair.prototype, "accessory", void 0);
@@ -103,22 +103,22 @@ __decorate([
     __metadata("design:type", Array)
 ], Repair.prototype, "listFault", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => customer_request_entity_1.CustomerRequest, (customerRequest) => customerRequest.repair, { cascade: true }),
+    (0, typeorm_1.ManyToMany)(() => customer_request_entity_1.CustomerRequest, (customerRequest) => customerRequest.repair, { cascade: true, nullable: true }),
     (0, typeorm_1.JoinTable)(),
     __metadata("design:type", Array)
 ], Repair.prototype, "customerRequest", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => notes_customer_entity_1.NotesCustomer, (notesCustomer) => notesCustomer.repair, { cascade: true }),
+    (0, typeorm_1.ManyToMany)(() => notes_customer_entity_1.NotesCustomer, (notesCustomer) => notesCustomer.repair, { cascade: true, nullable: true }),
     (0, typeorm_1.JoinTable)(),
     __metadata("design:type", Array)
 ], Repair.prototype, "notesCustomer", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => expertise_reason_entity_1.ExpertiseReason, (expertiseReason) => expertiseReason.repair, { cascade: true }),
+    (0, typeorm_1.ManyToMany)(() => expertise_reason_entity_1.ExpertiseReason, (expertiseReason) => expertiseReason.repair, { cascade: true, nullable: true }),
     (0, typeorm_1.JoinTable)(),
     __metadata("design:type", Array)
 ], Repair.prototype, "expertiseReason", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => repair_action_entity_1.RepairAction, (repairAction) => repairAction.repair, { cascade: true }),
+    (0, typeorm_1.ManyToMany)(() => repair_action_entity_1.RepairAction, (repairAction) => repairAction.repair, { cascade: true, nullable: true }),
     (0, typeorm_1.JoinTable)(),
     __metadata("design:type", Array)
 ], Repair.prototype, "repairAction", void 0);
@@ -127,31 +127,31 @@ __decorate([
     __metadata("design:type", device_entity_1.Device)
 ], Repair.prototype, "device", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, user => user.repair),
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, user => user.repair, { nullable: true }),
     __metadata("design:type", user_entity_1.User)
 ], Repair.prototype, "user", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => approve_stock_entity_1.ApproveStock, approveStock => approveStock.repair),
+    (0, typeorm_1.OneToMany)(() => approve_stock_entity_1.ApproveStock, approveStock => approveStock.repair, { nullable: true }),
     __metadata("design:type", Array)
 ], Repair.prototype, "approveStock", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => history_repair_entity_1.HistoryRepair, historyRepair => historyRepair.repair),
+    (0, typeorm_1.OneToMany)(() => history_repair_entity_1.HistoryRepair, historyRepair => historyRepair.repair, { nullable: true }),
     __metadata("design:type", Array)
 ], Repair.prototype, "historyRepair", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => output_list_entity_1.OutputList, (outputList) => outputList.repair),
+    (0, typeorm_1.ManyToOne)(() => output_list_entity_1.OutputList, (outputList) => outputList.repair, { nullable: true }),
     __metadata("design:type", output_list_entity_1.OutputList)
 ], Repair.prototype, "outputList", void 0);
 __decorate([
-    (0, typeorm_1.ManyToMany)(() => transfert_entity_1.Transfert, transfert => transfert.repair),
+    (0, typeorm_1.ManyToMany)(() => transfert_entity_1.Transfert, transfert => transfert.repair, { nullable: true }),
     __metadata("design:type", Array)
 ], Repair.prototype, "transfert", void 0);
 __decorate([
-    (0, typeorm_1.OneToOne)(() => invoice_entity_1.Invoice, (invoice) => invoice.repair),
+    (0, typeorm_1.OneToOne)(() => invoice_entity_1.Invoice, (invoice) => invoice.repair, { nullable: true }),
     __metadata("design:type", invoice_entity_1.Invoice)
 ], Repair.prototype, "invoice", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => customer_entity_1.Customer, customer => customer.repair),
+    (0, typeorm_1.ManyToOne)(() => customer_entity_1.Customer, customer => customer.repair, { nullable: true }),
     __metadata("design:type", customer_entity_1.Customer)
 ], Repair.prototype, "customer", void 0);
 exports.Repair = Repair = __decorate([

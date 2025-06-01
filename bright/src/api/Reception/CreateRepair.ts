@@ -64,7 +64,7 @@ export const getOneDevice = async (formData: any) => {
   }
 };
 
-export const addRepair = async (data: any/* , user: number */) => {
+export const addRepairs = async (data: any/* , user: number */) => {
   try {
     //const token = store.getState().auth.token;
     const response = await API.post('repair', data );

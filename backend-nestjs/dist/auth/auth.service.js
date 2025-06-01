@@ -38,6 +38,9 @@ let AuthService = class AuthService {
             throw new common_1.BadRequestException('User not found by this login');
         }
         ;
+        if (user.status !== 'Autoriser') {
+            throw new common_1.UnauthorizedException("Compte a été désactivé");
+        }
         const passwordMatches = await argon2.verify(user.password, createLoginDTO.password);
         if (!passwordMatches) {
             throw new common_1.BadRequestException('Incorrect password');

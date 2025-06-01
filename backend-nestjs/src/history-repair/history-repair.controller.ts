@@ -20,7 +20,7 @@ export class HistoryRepairController {
         user: userId,
         
       }
-      const newcreate = await this.historyRepairService.create(createHistory)
+      const newcreate = await this.historyRepairService.create(createHistory  )
       return res.status(HttpStatus.CREATED).json({
         message:"Created Successfuly !",
         status:HttpStatus.CREATED,

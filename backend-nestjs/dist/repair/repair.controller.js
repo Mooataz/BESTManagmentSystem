@@ -16,16 +16,15 @@ exports.RepairController = void 0;
 const common_1 = require("@nestjs/common");
 const repair_service_1 = require("./repair.service");
 const create_repair_dto_1 = require("./dto/create-repair.dto");
-const update_repair_dto_1 = require("./dto/update-repair.dto");
 const swagger_1 = require("@nestjs/swagger");
 let RepairController = class RepairController {
     repairService;
     constructor(repairService) {
         this.repairService = repairService;
     }
-    async create(createRepairDto, req, res) {
+    async create(body, createRepairDto, res) {
         try {
-            const userId = req.user.id;
+            const { userId, ...createRepairDto } = body;
             const newCreate = await this.repairService.create(createRepairDto, userId);
             return res.status(common_1.HttpStatus.CREATED).json({
                 message: 'Created Successfully!',
@@ -38,6 +37,23 @@ let RepairController = class RepairController {
                 message: error.message,
                 status: common_1.HttpStatus.BAD_REQUEST,
                 data: null,
+            });
+        }
+    }
+    async findByBranchAndStep(branchId, step, res) {
+        try {
+            const allfind = await this.repairService.findByBranchAndStep(branchId, step);
+            return res.status(common_1.HttpStatus.OK).json({
+                message: " founded Successfuly !",
+                status: common_1.HttpStatus.OK,
+                data: allfind
+            });
+        }
+        catch (error) {
+            return res.status(common_1.HttpStatus.BAD_REQUEST).json({
+                message: error.message,
+                status: common_1.HttpStatus.BAD_REQUEST,
+                data: null
             });
         }
     }
@@ -65,23 +81,6 @@ let RepairController = class RepairController {
                 message: "One  founded Successfuly !",
                 status: common_1.HttpStatus.OK,
                 data: onefind
-            });
-        }
-        catch (error) {
-            return res.status(common_1.HttpStatus.BAD_REQUEST).json({
-                message: error.message,
-                status: common_1.HttpStatus.BAD_REQUEST,
-                data: null
-            });
-        }
-    }
-    async update(id, updateRepairDto, res) {
-        try {
-            const updatedata = await this.repairService.update(+id, updateRepairDto);
-            return res.status(common_1.HttpStatus.OK).json({
-                message: " updated Successfuly !",
-                status: common_1.HttpStatus.OK,
-                data: updatedata
             });
         }
         catch (error) {
@@ -189,47 +188,16 @@ let RepairController = class RepairController {
 exports.RepairController = RepairController;
 __decorate([
     (0, common_1.Post)(),
+    (0, swagger_1.ApiConsumes)('multipart/form-data'),
     (0, swagger_1.ApiBody)({
         schema: {
             type: 'object',
             properties: {
-                warrenty: { type: 'boolean' },
-                approveRepair: { type: 'boolean' },
-                newSerialNumber: { type: 'number' },
-                files: { type: 'array', items: { type: 'string', format: 'binary' } },
-                advancePayment: { type: 'number' },
                 actuellyBranch: { type: 'number' },
                 remark: { type: 'string' },
                 deviceStateReceive: { type: 'string' },
                 device: { type: 'number' },
-                user: { type: 'number' },
-                'partsNeed[0]': { type: 'number' },
-                'accessoryIds[0]': {
-                    type: 'number',
-                    description: 'First permission',
-                    example: 1,
-                },
                 'listFaultIds[0]': {
-                    type: 'number',
-                    description: 'First permission',
-                    example: 1,
-                },
-                'customerRequestIds[0]': {
-                    type: 'number',
-                    description: 'First permission',
-                    example: 1,
-                },
-                'notesCustomerIds[0]': {
-                    type: 'number',
-                    description: 'First permission',
-                    example: 1,
-                },
-                'expertiseReasonsIds[0]': {
-                    type: 'number',
-                    description: 'First permission',
-                    example: 1,
-                },
-                'repairActionIds[0]': {
                     type: 'number',
                     description: 'First permission',
                     example: 1,
@@ -238,12 +206,20 @@ __decorate([
         },
     }),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Req)()),
     __param(2, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_repair_dto_1.CreateRepairDto, Object, Object]),
+    __metadata("design:paramtypes", [Object, create_repair_dto_1.CreateRepairDto, Object]),
     __metadata("design:returntype", Promise)
 ], RepairController.prototype, "create", null);
+__decorate([
+    (0, common_1.Get)('byBranchAndStep'),
+    __param(0, (0, common_1.Query)('branchId')),
+    __param(1, (0, common_1.Query)('step')),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, String, Object]),
+    __metadata("design:returntype", Promise)
+], RepairController.prototype, "findByBranchAndStep", null);
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Res)()),
@@ -259,15 +235,6 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], RepairController.prototype, "findOne", null);
-__decorate([
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
-    __param(2, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, update_repair_dto_1.UpdateRepairDto, Object]),
-    __metadata("design:returntype", Promise)
-], RepairController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),

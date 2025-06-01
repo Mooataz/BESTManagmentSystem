@@ -1,3 +1,5 @@
+import type { AppDispatch } from "../store";
+
 export interface Customer {
   id?: number;
   name: string;
@@ -56,17 +58,41 @@ export type TypeForm = {
   device: Device;
   customer: Customer
 }
-
+export interface Accessory {
+    id: number; name: string;
+}
+export interface ListFault {
+    id: number; name: string;
+}
+export interface CustomerRequest {
+    id: number; name: string;
+}
 // types.ts
+// types/repairTypes.ts
 export interface RepairForm {
+  id?: number;
+  customer: number;
+  device: number;
+  remark: string;
+  deviceStateReceive: string;
+  actuellyBranch: string;
   accessoryIds: number[];
   listFaultIds: number[];
   customerRequestIds: number[];
-  deviceStateReceive: string;
-  remark?: string;
-  actuellyBranch: string;
-  device: number;
-  customer: number;
+  userId: number;
+}
+
+
+export interface RepairFormInput {
+  accessoryIds: number[];
+  listFaultIds: number[];
+  customerRequestIds: number[];
+  deviceStateReceive: string;
+  remark: string;
+  actuellyBranch: string;
+  device: number;
+  customer: number;
+  userId: number;
 }
 
 export interface AsyncThunkConfig {
@@ -75,3 +101,5 @@ export interface AsyncThunkConfig {
   extra?: unknown;
   rejectValue: string;
 }
+
+ 

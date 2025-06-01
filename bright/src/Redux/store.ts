@@ -1,6 +1,6 @@
 // src/store.ts
 // Exemple : import de ton reducer
-import repairReducer from './repairSlice';
+import repairReducer from './recptionSlices/addRepairSlice';
 import userReducer from './userSlice';
 import authReducer from './authSlice'
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
@@ -12,7 +12,7 @@ import storage from 'redux-persist/lib/storage';
 
 
 const rootReducer = combineReducers({
-   repair: repairReducer,
+    repair: repairReducer,
     user: userReducer,
     auth: authReducer,
 });

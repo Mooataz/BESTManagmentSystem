@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseInterceptors, UploadedFiles, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseInterceptors, UploadedFiles, UseGuards, Req, Query } from '@nestjs/common';
 import { RepairService } from './repair.service';
 import { CreateRepairDto } from './dto/create-repair.dto';
 import { UpdateRepairDto } from './dto/update-repair.dto';
@@ -6,51 +6,51 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { AccessTokenGuard } from 'src/guards/accessToken.guard';
-
+ import { AuthGuard } from '@nestjs/passport';
 @Controller('repair')
 export class RepairController {
   constructor(private readonly repairService: RepairService) { }
   @Post()
- // @ApiConsumes('multipart/form-data')
+ @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        warrenty: { type: 'boolean' },
+        /* warrenty: { type: 'boolean' },
         approveRepair: { type: 'boolean' },
         newSerialNumber: { type: 'number' },
         files: { type: 'array', items: { type: 'string', format: 'binary' } },
-        advancePayment: { type: 'number' },
+        advancePayment: { type: 'number' }, */
         actuellyBranch: { type: 'number' },
         remark: { type: 'string' },
         deviceStateReceive: { type: 'string' },
         device: { type: 'number' },
-        user: { type: 'number' },
-        'partsNeed[0]':{ type: 'number' },
-        'accessoryIds[0]': {
+       /*  user: { type: 'number' }, */
+        /* 'partsNeed[0]':{ type: 'number' }, */
+        /* 'accessoryIds[0]': {
           type: 'number',
           description: 'First permission',
           example: 1,
-        },
+        }, */
         'listFaultIds[0]': {
           type: 'number',
           description: 'First permission',
           example: 1,
         },
         
-        'customerRequestIds[0]': {
+       /*  'customerRequestIds[0]': {
           type: 'number',
           description: 'First permission',
           example: 1,
-        },
+        }, */
        
-        'notesCustomerIds[0]': {
+        /* 'notesCustomerIds[0]': {
           type: 'number',
           description: 'First permission',
           example: 1,
-        },
+        }, */
         
-        'expertiseReasonsIds[0]': {
+       /*  'expertiseReasonsIds[0]': {
           type: 'number',
           description: 'First permission',
           example: 1,
@@ -60,7 +60,7 @@ export class RepairController {
           type: 'number',
           description: 'First permission',
           example: 1,
-        },
+        }, */
         
       },
     },
@@ -74,17 +74,18 @@ export class RepairController {
       }),
     }),
   ) */
-  
-  async create(
-    @Body() createRepairDto: CreateRepairDto,  @Req() req, 
+   
+  async create(  
+    @Body()  body: any, createRepairDto:   CreateRepairDto  ,  
     //@UploadedFiles() files: Express.Multer.File[],
     @Res() res,
   ) {
     try {
-        // extraire depuis le token
+       
+           const {userId, ...createRepairDto} = body; 
       //createRepairDto.files = files?.map((file) => file.filename) || [];
-       const userId = req.user.id; 
-      const newCreate = await this.repairService.create(createRepairDto ,userId);
+       //const userId = req.user.id; 
+      const newCreate = await this.repairService.create(createRepairDto  ,userId );
       return res.status(HttpStatus.CREATED).json({
         message: 'Created Successfully!',
         status: HttpStatus.CREATED,
@@ -98,7 +99,30 @@ export class RepairController {
       });
     }
   }
+@Get('byBranchAndStep')
+async findByBranchAndStep(
+  @Query('branchId') branchId: number,
+  @Query('step') step: string,
+  @Res() res
+) {
 
+try {
+      const allfind = await  this.repairService.findByBranchAndStep(branchId, step);
+      return res.status(HttpStatus.OK).json({
+        message:" founded Successfuly !",
+        status:HttpStatus.OK,
+        data:allfind
+      })
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message:error.message,
+        status:HttpStatus.BAD_REQUEST,
+        data:null
+      })
+    }
+
+  
+}
   @Get()
   async findAll(@Res() res) {
     try {
@@ -146,7 +170,7 @@ export class RepairController {
       data: updatedRepair,
     };
   } */
-   @Patch(':id')
+  /*  @Patch(':id')
   async update(@Param('id') id: number,
     @Body() updateRepairDto: UpdateRepairDto,
     @Res() res) {
@@ -164,7 +188,7 @@ export class RepairController {
         data:null
       })
     }
-  } 
+  }  */
 
   @Delete(':id')
   async remove(@Param('id') id: number,

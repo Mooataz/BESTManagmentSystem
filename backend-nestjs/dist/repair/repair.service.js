@@ -122,7 +122,7 @@ let RepairService = class RepairService {
         return onefind;
     }
     async update(id, updateRepairDto) {
-        const existingRepair = await this.repairRepositry.findOne({ where: { id } });
+        const existingRepair = await this.repairRepositry.findOne({ where: { id }, });
         if (!existingRepair) {
             throw new common_1.NotFoundException('Repair not found');
         }
@@ -156,9 +156,9 @@ let RepairService = class RepairService {
             user: user ?? existingRepair.user,
             customer: customer ?? existingRepair.customer
         };
-        delete updateData.device;
-        delete updateData.user;
-        delete updateData.customer;
+        delete updateData.deviceId;
+        delete updateData.userId;
+        delete updateData.customerId;
         await this.repairRepositry.update(id, updateData);
         return this.repairRepositry.findOneOrFail({
             where: { id },
@@ -206,6 +206,55 @@ let RepairService = class RepairService {
             throw new common_1.NotFoundException("There is no data Available");
         }
         return findAll;
+    }
+    async findByBranchAndStep(branchId, step) {
+        return this.repairRepositry
+            .createQueryBuilder('repair')
+            .innerJoin('repair.historyRepair', 'history')
+            .where('repair.actuellyBranch = :branchId', { branchId })
+            .andWhere('history.step = :step', { step })
+            .getMany();
+    }
+    async updateRepairWithParts(repairId, updateData) {
+        const repair = await this.repairRepositry.findOne({
+            where: { id: repairId },
+            relations: ['approveStock'],
+        });
+        if (!repair) {
+            throw new common_1.NotFoundException('Repair not found');
+        }
+        if (updateData.device && typeof updateData.device === 'number') {
+            const device = await this.deviceRepositry.findOneBy({ id: updateData.device });
+            if (!device)
+                throw new common_1.NotFoundException('Device not found');
+            repair.device = device;
+        }
+        if (updateData.user && typeof updateData.user === 'number') {
+            const user = await this.userRepositry.findOneBy({ id: updateData.user });
+            if (!user)
+                throw new common_1.NotFoundException('User not found');
+            repair.user = user;
+        }
+        const addedParts = repair.partsNeed || [];
+        const { device, user, ...restData } = updateData;
+        Object.assign(repair, restData);
+        const updatedRepair = await this.repairRepositry.save(repair);
+        if (repair.approveRepair === true) {
+            for (const partId of addedParts) {
+                const stockPart = await this.stockPartRepositry.findOneBy({ id: partId });
+                if (!stockPart)
+                    continue;
+                const approveStock = this.approveStockRepositry.create({
+                    type: 'Repair',
+                    date: new Date(),
+                    state: 'pending',
+                    idPartRepair: partId,
+                    repair: updatedRepair,
+                });
+                await this.approveStockRepositry.save(approveStock);
+            }
+        }
+        return updatedRepair;
     }
 };
 exports.RepairService = RepairService;

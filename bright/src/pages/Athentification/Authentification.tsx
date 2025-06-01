@@ -100,19 +100,11 @@ React.useEffect(() => {
         }}
       >
         <form onSubmit={handleSubmit(onSubmit)}
-          /*  onSubmit={async (event: React.FormEvent<SignInFormElement>) => {
-             event.preventDefault();
-             const formElements = event.currentTarget.elements;
-             const data = {
-               login: formElements.email.value,
-               password: formElements.password.value,
-             };
-             
-           }} */
+ 
           style={{
             width: '80%',
             maxWidth: '600px',
-            height: '400px',
+            height: '500px',
             padding: '30px',
             borderRadius: '40px',
             boxShadow: '0 0 10px rgba(0,0,0,0.1)',
@@ -124,8 +116,7 @@ React.useEffect(() => {
             <Typography style={{ marginRight: '80%', marginTop: '5%', color: '#03719C' }} >Identifiant</Typography>
             <Input id="login" variant="soft" style={{ borderRadius: '15px', height: '40px' }} required
               {...register('login')}
-              /* error={Boolean(errors.login)}
-              helperText={errors.login?.message} */
+               
               color={errors.login ? 'danger' : 'neutral'}
             />
             {errors.login && (
@@ -141,13 +132,13 @@ React.useEffect(() => {
               {...register('password')} />
           </Stack>
 
-          <Button type="submit" fullWidth style={{ marginTop: '5%', borderRadius: '30px' }}
+          <Button type="submit" fullWidth style={{ marginTop: '10%', borderRadius: '30px' }}
 
           >
             Se connecter
           </Button>
 
-          <div style={{ marginTop: '30px', textAlign: 'center', fontSize: '0.9rem' }}>
+          <div style={{ marginTop: '10%', textAlign: 'center', fontSize: '0.9rem' }}>
             ©Copyright <span style={{ color: '#03719C' }}>BEST</span> {new Date().getFullYear()}
           </div>
         </form>

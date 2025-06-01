@@ -2,7 +2,7 @@ import { Card,Typography ,Button, ListItemContent, Option,  TextField, Input } f
 import { Box } from "@mui/material";
 import React from "react";
 import Autocomplete from '@mui/joy/Autocomplete';
-import { addRepair, getAccessory, getCustomer, getCustomerRequest, getDevices, getListFault, getOneCustomer, getOneDevice  } from "../../api/Reception/CreateRepair";
+import {     getAccessory, getCustomer, getCustomerRequest, getDevices, getListFault, getOneCustomer, getOneDevice  } from "../../api/Reception/CreateRepair";
 import FormControl from '@mui/joy/FormControl';
 import FormLabel from '@mui/joy/FormLabel';
 import { useTranslation } from 'react-i18next';
@@ -30,11 +30,14 @@ import Done from '@mui/icons-material/Done';
 import Select from '@mui/joy/Select';
  import Textarea from '@mui/joy/Textarea';
 import { useDispatch, useSelector } from 'react-redux';
-import type { RootState } from '../../Redux/store';
+import type { AppDispatch, RootState } from '../../Redux/store';
 import { PiEmptyThin } from "react-icons/pi";
 import {    CreateRepairPDF } from "../../api/PDF/Repair";
 import { store } from "../../Redux/store";
-
+import { addRepair } from "../../Redux/Actions/receptionAction";
+import { clearError } from "../../Redux/recptionSlices/addRepairSlice";
+import type { Customer, Device, Distributor, Marque, Model, RepairForm, RepairFormInput, TypeForm, TypeUnique } from "../../Redux/Types/repairTypes";
+import {CreateRepairDto} from '../../../../backend-nestjs/src/repair/dto/create-repair.dto'
   export function AddProduct () {
   const [step, setStep] = React.useState(0);
 
@@ -198,20 +201,7 @@ import { store } from "../../Redux/store";
     )
 }
  
-interface Customer {
-  id?: number;
-  name: string;
-  phone: number;
-   distributer?: Distributor | null;
-}
-interface Distributor {
-    id: number; 
-    name: string; 
-    phone: number; 
-    email: string; 
-    location: string; 
-    taxRegisterNumber: string;
-}
+ 
  
 function AddCustomer({ onChange }: {onChange: (c: Customer) => void }) {
   const [customers, setCustomers] = React.useState<Customer[]>([]);
@@ -311,33 +301,7 @@ const { t } = useTranslation();
   );
 }
 
-interface Device {
-id?: number;
-serialenumber? : string;
-purchaseDate? : Date ;
-model : Model ;
-}
-interface Model{
-    id?:number;
-    name: string;
-    brand: Marque;
-    picture: string | File;
-    typeModel:TypeModel;
-    allpart: number[]
-    
-}
-interface Marque {
-
-  id?: number;
-  name: string;
-  logo: string;
-  status: string;
-
-}
-interface TypeModel {
-    id?: number;
-    description: string;
-}
+ 
 function AddDevice ({ onChange }: { onChange: (c: Device) => void }) {
   const [devices, setDevices] = React.useState<Device[]>([]);
   const [models, setModels] = React.useState<Model[]>([])
@@ -452,31 +416,19 @@ const handleModelSelected = (model: Model) => {
     )
 }
 
-interface TypeUnique{
-  id?:number;
-  name:string;
-}
-
-type TypeForm = {
-  id?: number;
-  accessory:TypeUnique[];
-  listFault:TypeUnique[];
-  customerRequest:TypeUnique[];
-  deviceStateReceive: string;
-  remark: string;
-  actuellyBranch: string;
-  device: Device;
-  customer: Customer
-}
+ 
+ 
+  
 function AddRepair({devicee,customerr, onChange }: {devicee:Device, customerr:Customer, onChange: (c: TypeForm) => void }) {
+const { notify } = useNotification();
 const [accessory,setAccessory] = React.useState<TypeUnique[]>([]);
 const [listFault,setListFault] = React.useState<TypeUnique[]>([]);
 const [customerRequest,setCustomerRequest] = React.useState<TypeUnique[]>([]);
 const user = useSelector((state: RootState) => state.user);
-const userr = useSelector((state: RootState) => state.auth.user);
-  const { notify } = useNotification();
+const dispatch = useDispatch<AppDispatch>();
+const { currentRepair, repairs, loading, error } = useSelector((state: RootState) => state.repair);   
 
-const [formData, setFormData] = React.useState<TypeForm> ({
+ const [formData, setFormData] = React.useState<TypeForm> ({
   accessory: [],
   listFault: [],           // obligatoire, donc initialisé à un tableau vide
   customerRequest: [],
@@ -510,7 +462,7 @@ const [formData, setFormData] = React.useState<TypeForm> ({
     phone: 0,
     distributer: null,
   }
-});
+});  
  
     React.useEffect(() => {
     getAccessory().then((data) => setAccessory(data));
@@ -519,18 +471,30 @@ const [formData, setFormData] = React.useState<TypeForm> ({
 
   }, []);
 
-   const handelSubmit = () => {
-   if (!formData) {
-    console.log("Aucun appareil renseigné.");
+   const handelSubmit = async () => {
+ if (!formData || !devicee?.id || !customerr?.id) {
+    notify("Appareil et client sont requis", "danger");
     return;
   }
-  
-  // Convert arrays to IDs
-  const accessoryIds = formData.accessory.map(a => a.id);
-  const listFaultIds = formData.listFault.map(f => f.id);
-  const customerRequestIds = formData.customerRequest.map(r => r.id);
 
-const body = {
+  if (!formData.listFault.length) {
+    notify("Veuillez sélectionner au moins un défaut.", "danger");
+    return;
+  }
+   const accessoryIds: number[] = formData.accessory
+  .map(a => a.id)
+  .filter((id): id is number => id !== undefined);
+
+const listFaultIds: number[] = formData.listFault
+  .map(f => f.id)
+  .filter((id): id is number => id !== undefined);
+
+const customerRequestIds: number[] = formData.customerRequest
+  .map(r => r.id)
+  .filter((id): id is number => id !== undefined);
+   
+ 
+const body  = {
   accessoryIds: accessoryIds?.length ? accessoryIds : [],
   listFaultIds: listFaultIds?.length ? listFaultIds : [],
   customerRequestIds: customerRequestIds?.length ? customerRequestIds : [],
@@ -539,23 +503,53 @@ const body = {
   actuellyBranch: user.branch?.name ?? ' ',
   device: devicee?.id ?? null,
   customer: customerr?.id ?? null,
-   
+  userId: user.id || 0
 };
+
+ 
 if (!body.listFaultIds.length) {
   return notify("Veuillez sélectionner au moins un défaut.", "danger");
-}
+}    
  
-/* if (user.id !== null) {
-  addRepair(body, user.id)
-    .then((data) => {
-      onChange(data);
-      CreateRepairPDF(data.id);
-    })} */
-   addRepair(body)
-    .then((data) => {onChange(data) ,CreateRepairPDF(data.id)} ); 
-  
+
+   try {
+ 
+   const resultAction = await dispatch(addRepair(body));
+ 
+    if (addRepair.fulfilled.match(resultAction)) {
+      const createdRepair = resultAction.payload;
+ 
+      
+      if (createdRepair.id !== undefined) {
+          const typeFormData: TypeForm = {
+            ...formData,
+            device: devicee,
+            customer: customerr
+          }; 
+
+           onChange(typeFormData);
+          CreateRepairPDF(createdRepair.id); 
+          notify("Réparation créée avec succès!", "success");
+       }
+      else {
+          notify("ID de réparation manquant dans la réponse.", "danger");
+        }
+
+
+          }  
+        } catch (err) {
+          const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
+            notify(errorMessage, "danger");
+        }
      
 };
+  // Gestion des erreurs globales
+  React.useEffect(() => {
+    if (error) {
+      notify(error, "danger");
+      dispatch(clearError());
+    }
+  }, [error, notify, dispatch]);
     return(
         <div>
             <Typography>Information Nécessaire</Typography>
@@ -847,6 +841,12 @@ export default function ExampleChoiceChipCheckbox({
   const toggleSelection = (item: TypeUnique) => {
     setValue((prev) => {
       const exists = prev.find((v) => v.id === item.id);
+      
+return exists
+        ? prev.filter((v) => v.id !== item.id)
+        : [...prev, item];
+
+      
       const updated = exists
         ? prev.filter((v) => v.id !== item.id)
         : [...prev, item];

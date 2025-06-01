@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRepairDto } from './dto/create-repair.dto';
 import { UpdateRepairDto } from './dto/update-repair.dto';
 import { In, Repository } from 'typeorm';
@@ -42,7 +42,7 @@ export class RepairService {
      
 
   ) { }
-  async create(createRepairDto: CreateRepairDto,userId: number): Promise<Repair> {
+  async create(createRepairDto: CreateRepairDto ,userId: number ): Promise<Repair> {
  
     const accessory = await this.accessoryRepositry.find({
       where: { id: In(createRepairDto.accessoryIds?? []) }
@@ -79,24 +79,25 @@ export class RepairService {
        
     };
   
-// await this.historyRepairRepositry.create({date:new Date(), step: 'Creation', repair    })
+ 
     const newCreate = this.repairRepositry.create(repairData);
     const savedRepair  = await this.repairRepositry.save(newCreate);
 
-         // 2. Créer l'historique
+    
+            // 2. Créer l'historique
     const history = this.historyRepairRepositry.create({
     date: new Date(),
     step: 'Création',
     repair: { id: savedRepair .id },
   });
-  const savedHistory = await this.historyRepairRepositry.save(history);
+  const savedHistory = await this.historyRepairRepositry.save(history);   
 
   // 3. Créer la traçabilité
-  const tracability = this.tracabilityRepositry.create({
+    const tracability = this.tracabilityRepositry.create({
     historyRepair: { id: savedHistory.id },
     user: { id: userId },
   });
-  await this.tracabilityRepositry.save(tracability);  
+  await this.tracabilityRepositry.save(tracability);     
      return savedRepair 
   }
 
@@ -119,8 +120,8 @@ export class RepairService {
   }
 
 
-  async update(id: number, updateRepairDto: UpdateRepairDto): Promise<Repair> {
-    const existingRepair = await this.repairRepositry.findOne({ where: { id } });
+    async update(id: number, updateRepairDto: UpdateRepairDto): Promise<Repair> {
+    const existingRepair = await this.repairRepositry.findOne({ where: { id },  });
     if (!existingRepair) { throw new NotFoundException('Repair not found'); }
 
     // Handle device relation
@@ -153,16 +154,20 @@ if (updateRepairDto.customer !== undefined) {
     };
 
     // Remove the ID fields if they exist in the DTO
-    delete updateData.device; // Remove the number ID
-    delete updateData.user;   // Remove the number ID
-  delete updateData.customer;
+   
+delete (updateData as any).deviceId;
+delete (updateData as any).userId;
+delete (updateData as any).customerId;
+
+ 
+
     await this.repairRepositry.update(id, updateData);
 
     return this.repairRepositry.findOneOrFail({
       where: { id },
       relations: ['device', 'user'] // Include relations in the response
     });
-  }
+  }  
 
 
   async remove(id: number): Promise<Repair> {
@@ -212,9 +217,17 @@ if (updateRepairDto.customer !== undefined) {
     }
     return findAll
   }
+async findByBranchAndStep(branchId: number, step: string): Promise<Repair[]> {
+  return this.repairRepositry
+    .createQueryBuilder('repair')
+    .innerJoin('repair.historyRepair', 'history')
+    .where('repair.actuellyBranch = :branchId', { branchId })
+    .andWhere('history.step = :step', { step })
+    .getMany();
+}
 
 
-  /* async updateRepairWithParts(
+   async updateRepairWithParts(
       repairId: number,
       updateData: UpdateRepairDto, // <-- Garde bien ici le type UpdateRepairDto
     ): Promise<Repair> {
@@ -240,11 +253,11 @@ if (updateRepairDto.customer !== undefined) {
         repair.user = user;
       }
     
-      const previousParts = repair.partsNeed || [];
-      const newParts = updateData.partsNeed || [];
+      const addedParts = repair.partsNeed || [];
+      //const addedParts = updateData.partsNeed || [];
     
       // Filtrer les nouvelles pièces
-      const addedParts = newParts.filter(p => !previousParts.includes(p));
+      //const addedParts = newParts.filter(p => !previousParts.includes(p));
     
       // Supprimer `device` et `user` du DTO pour éviter la collision de type
       const { device, user, ...restData } = updateData;
@@ -257,10 +270,10 @@ if (updateRepairDto.customer !== undefined) {
       if(repair.approveRepair === true){
           // Ajout des nouveaux éléments dans ApproveStock
           for (const partId of addedParts) {
-            /*  const stockPart = await this.stockPartRepositry.findOneBy({ id: partId });
-            if (!stockPart) continue; */
+               const stockPart = await this.stockPartRepositry.findOneBy({ id: partId });
+            if (!stockPart) continue;  
         
-            /* const approveStock = this.approveStockRepositry.create({
+              const approveStock = this.approveStockRepositry.create({
               type: 'Repair',
               date: new Date(),
               state: 'pending',
@@ -274,6 +287,6 @@ if (updateRepairDto.customer !== undefined) {
 
     
       return updatedRepair;
-    } */
+    }   
      
 }

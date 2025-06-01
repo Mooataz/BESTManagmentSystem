@@ -101,7 +101,7 @@ export default function Header() {
    const [company, setCompany] = React.useState<Company>();
   const [agencies, setAgencies] = React.useState<Agency[]>([]);
     
-  const user = useSelector((state: RootState) => state.user);
+  const user = useSelector((state: RootState) => state.auth.user);
   const dispatch = useDispatch();
 
   React.useEffect(() => {
