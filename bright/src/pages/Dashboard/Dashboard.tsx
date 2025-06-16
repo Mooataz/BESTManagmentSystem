@@ -15,27 +15,32 @@ import DemandeClient from '../../pages/Administration/DemandeClient';
 import NoteToCustomers from '../../pages/Administration/NotesPourClient';
 import RaisonsExpertise from '../../pages/Administration/RaisonsExpertise';
 import { Agencies } from '../../pages/Administration/Agencies';
-import  Employees  from '../Administration/Users/Employees';
+import Employees from '../Administration/Users/Employees';
 import { Marques } from '../../pages/Administration/Marques';
 import { Entreprise } from '../../pages/Administration/Entreprise';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import Updatepassword from '../Componants/Updatepassword';
+import Updatepassword from '../../Componants/Updatepassword';
 import { ListAllParts } from '../Administration/ListAllParts';
 import { LevelRepair } from '../Administration/LevelRepair';
 import { OthersCoast } from '../Administration/OthersCoast';
 import { TypeModel } from '../ModelAccessory/TypeModel';
 import { Model } from '../ModelAccessory/Model';
- import imgAcceuille from '../../assets/imgAcceuille.jpg'
- import Card from '@mui/joy/Card';
+import imgAcceuille from '../../assets/imgAcceuille.jpg'
+import Card from '@mui/joy/Card';
 import { AddProduct } from '../Reception/AddProduct';
 import { getCurrentUser } from '../../api/administration/login';
- import { useDispatch, useSelector } from 'react-redux';
- import type{ RootState } from '../../Redux/store';
- import {setUser} from '../../Redux/userSlice'
- export default function Dashboard() {
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState } from '../../Redux/store';
+import { setUser } from '../../Redux/auth/userSlice'
+import ListRepair from '../Reception/ListRepair';
+import Legislation from '../Administration/Legislation';
+import SendToAssign from '../Reception/SendToAssign';
+export default function Dashboard() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
+
+  const NAVBAR_HEIGHT = 60;
   const dispatch = useDispatch();
-     React.useEffect(() => {
+  React.useEffect(() => {
     const fetchUser = async () => {
       try {
         const user = await getCurrentUser();
@@ -47,13 +52,13 @@ import { getCurrentUser } from '../../api/administration/login';
 
     fetchUser();
   }, [dispatch]);
-  
+
   return (
     <CssVarsProvider disableTransitionOnChange>
       <CssBaseline />
-       
-      
-       
+
+
+
       <Stack
         id="tab-bar"
         direction="row"
@@ -96,15 +101,15 @@ import { getCurrentUser } from '../../api/administration/login';
         <Layout.Header>
           <Header />
         </Layout.Header>
-        
+
         <Box sx={{ display: 'flex' }}>
           <Layout.SideNav>
-            <Box    >
-                <Navigation  />
-            </Box>
-           
+           {/*  <Box sx={{ height: `calc(100vh - ${NAVBAR_HEIGHT}px)` }}  > */}
+              <Navigation />
+            {/* </Box> */}
+
           </Layout.SideNav>
-          
+
           {/* Contenu principal */}
           <Layout.Main
             sx={{
@@ -115,35 +120,38 @@ import { getCurrentUser } from '../../api/administration/login';
               minWidth: 1510, // Important pour éviter les débordements
             }}
           >
-           <Card component="main"  sx={{ flexGrow: 1, p: 2 ,width:'1555px', height:'800px'}}>
-   
-            
-            <Routes>
-              <Route path="/" element={<img src={imgAcceuille}/>}/>
-              <Route path="distributeurs" element={<Distributeurs />} />
-              <Route path="accessoires" element={<Accessoires />} />
-              <Route path="Entreprise" element={ <Entreprise />} />
-              <Route path="Agencies" element={ <Agencies  />} />
-              <Route path="Employees" element={ <Employees  />} />
-              <Route path="Marques" element={ <Marques  />} />
-              <Route path="RaisonsExpertise" element={ <RaisonsExpertise  />} />
-              <Route path="ListProblemes" element={ <ListProblemes  />} />
-              <Route path="DemandeClient" element={ <DemandeClient  />} />
-              <Route path="NoteToCustomers" element={ <NoteToCustomers  />} />
-              <Route path="Updatepassword/:userId" element={ <Updatepassword />} />
-              <Route path="listePiécesTotal" element={ <ListAllParts />} />
-              <Route path='NiveauRéparation' element={ <LevelRepair />} />
-              <Route path="AutresFrais" element={<OthersCoast />} />
-              <Route path='TypeModéle' element={<TypeModel />} />
-              <Route path='Modéles' element={<Model />} />
-              <Route path="Reçoiproduit" element={<AddProduct />}/>
-            </Routes>
-                
-              
+            <Card component="main" sx={{ flexGrow: 1, p: 2, width: '1555px', minHeigh: '800px' }}>
+
+
+              <Routes>
+                <Route path="/" element={<img src={imgAcceuille} />} />
+                <Route path="distributeurs" element={<Distributeurs />} />
+                <Route path="accessoires" element={<Accessoires />} />
+                <Route path="Entreprise" element={<Entreprise />} />
+                <Route path="Agencies" element={<Agencies />} />
+                <Route path="Employees" element={<Employees />} />
+                <Route path="Marques" element={<Marques />} />
+                <Route path="RaisonsExpertise" element={<RaisonsExpertise />} />
+                <Route path="ListProblemes" element={<ListProblemes />} />
+                <Route path="DemandeClient" element={<DemandeClient />} />
+                <Route path="NoteToCustomers" element={<NoteToCustomers />} />
+                <Route path="Updatepassword/:userId" element={<Updatepassword />} />
+                <Route path="listePiécesTotal" element={<ListAllParts />} />
+                <Route path='NiveauRéparation' element={<LevelRepair />} />
+                <Route path="AutresFrais" element={<OthersCoast />} />
+                <Route path='TypeModéle' element={<TypeModel />} />
+                <Route path='Modéles' element={<Model />} />
+                <Route path="Reçoiproduit" element={<AddProduct />} />
+                <Route path="ListRepair" element={<ListRepair />} />
+                <Route path="Legislation" element={<Legislation />}/>
+                <Route path="EnvoyeAffectation" element={<SendToAssign />} />
+              </Routes>
 
 
 
-          </Card>
+
+
+            </Card>
 
           </Layout.Main>
         </Box>
@@ -151,4 +159,3 @@ import { getCurrentUser } from '../../api/administration/login';
     </CssVarsProvider>
   );
 }
- 

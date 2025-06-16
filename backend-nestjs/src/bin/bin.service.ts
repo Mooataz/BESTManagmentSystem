@@ -51,7 +51,7 @@ export class BinService {
   const updatedBin = await this.binRepositry.findOne({ where: { id }, relations: ['branch'] });
 
     if (!updatedBin) {
-        throw new NotFoundException('Reference not found to update');
+        throw new NotFoundException('  not found to update');
     }
 
     return updatedBin;
@@ -66,13 +66,18 @@ export class BinService {
     return deletedata;   }
 
 
-    async findByBranchId(branchId: number): Promise<Bin[]> {
-      return this.binRepositry
-          .createQueryBuilder('bin')
-          .leftJoinAndSelect('bin.branch', 'branch')
-          .where('branch.id = :branchId', { branchId }) 
-          .getMany();
-  }
+async findByBranchId(branchId: number): Promise<Bin[]> {
+  
+ const filtred = await this.binRepositry.find({
+    where: {
+      branch: { id: branchId },
+    },
+    relations: ['branch'],
+  });
+ 
+   return filtred
+}
+
 
   async findByBranchIdAndType(branchId: number, type: string): Promise<Bin[]> {
     return this.binRepositry

@@ -9,7 +9,7 @@ import Typography from '@mui/joy/Typography';
 import { FormLabel, Input, Stack } from '@mui/joy';
 import { addDistributeur, fetchDistributeur, updateDistributeur } from '../../api/administration/Administration';
 import Add from '@mui/icons-material/Add';
-import { useNotification } from '../Componants/NotificationContext';
+import { useNotification } from '../../Componants/NotificationContext';
 
 interface Distributor {
     id: number; name: string; phone: number; email: string; location: string; taxRegisterNumber: string;

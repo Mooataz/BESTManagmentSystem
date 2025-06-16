@@ -22,16 +22,9 @@ let HistoryRepairController = class HistoryRepairController {
     constructor(historyRepairService) {
         this.historyRepairService = historyRepairService;
     }
-    async create(date, step, repair, req, res) {
+    async create(data, req, res) {
         try {
-            const userId = req.user.id;
-            const createHistory = {
-                date,
-                step,
-                repair,
-                user: userId,
-            };
-            const newcreate = await this.historyRepairService.create(createHistory);
+            const newcreate = await this.historyRepairService.create(data);
             return res.status(common_1.HttpStatus.CREATED).json({
                 message: "Created Successfuly !",
                 status: common_1.HttpStatus.CREATED,
@@ -136,10 +129,11 @@ exports.HistoryRepairController = HistoryRepairController;
 __decorate([
     (0, common_1.UseGuards)(accessToken_guard_1.AccessTokenGuard),
     (0, common_1.Post)(),
-    __param(3, (0, common_1.Req)()),
-    __param(4, (0, common_1.Res)()),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Date, String, Number, Object, Object]),
+    __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], HistoryRepairController.prototype, "create", null);
 __decorate([

@@ -32,20 +32,25 @@ let TracabilityService = class TracabilityService {
         this.userRepositry = userRepositry;
     }
     async create(createTracabilityDto) {
-        const historyRepair = await this.historyRepairRepositry.findOne({ where: { id: createTracabilityDto.historyRepair } });
-        const historyStockPart = await this.historyStockPartRepositry.findOne({ where: { id: createTracabilityDto.historyStockPart } });
         const user = await this.userRepositry.findOne({ where: { id: createTracabilityDto.user } });
-        if (!historyRepair) {
-            throw new common_1.NotFoundException('HistoryRepair not found');
+        if (!user)
+            throw new common_1.NotFoundException('User not found');
+        let historyRepair = undefined;
+        if (createTracabilityDto.historyRepair) {
+            const historyRepair = await this.historyRepairRepositry.findOne({ where: { id: createTracabilityDto.historyRepair } });
+            if (!historyRepair)
+                throw new common_1.NotFoundException('HistoryRepair not found');
         }
-        if (!historyStockPart) {
-            throw new common_1.NotFoundException('historyStockPart not found');
-        }
-        if (!user) {
-            throw new common_1.NotFoundException('user not found');
+        let historyStockPart = undefined;
+        if (createTracabilityDto.historyStockPart) {
+            const historyStockPart = await this.historyStockPartRepositry.findOne({ where: { id: createTracabilityDto.historyStockPart } });
+            if (!historyStockPart)
+                throw new common_1.NotFoundException('HistoryStockPart not found');
         }
         const tracabilityData = {
-            historyRepair, historyStockPart, user
+            user,
+            historyRepair,
+            historyStockPart,
         };
         const newCreate = this.tracabilityRepositry.create(tracabilityData);
         return await this.tracabilityRepositry.save(newCreate);
@@ -58,7 +63,8 @@ let TracabilityService = class TracabilityService {
         return findAll;
     }
     async findOne(id) {
-        const findOne = await this.tracabilityRepositry.findOne({ where: { id } });
+        const findOne = await this.tracabilityRepositry.findOne({ where: { id },
+            relations: ['user', 'historyRepair'] });
         if (!findOne) {
             throw new common_1.NotFoundException("There is no data Available");
         }
@@ -114,8 +120,6 @@ let TracabilityService = class TracabilityService {
         const tracability = await this.tracabilityRepositry
             .createQueryBuilder('tracability')
             .leftJoinAndSelect('tracability.historyRepair', 'historyRepair')
-            .leftJoinAndSelect('tracability.historyStockPart', 'historyStockPart')
-            .leftJoinAndSelect('tracability.user', 'user')
             .where('historyRepair.id = :historyRepairId', { historyRepairId })
             .getOne();
         if (!tracability) {

@@ -21,7 +21,7 @@ import Done from '@mui/icons-material/Done';
 import Checkbox from '@mui/joy/Checkbox';
 import Sheet from '@mui/joy/Sheet';
 import { updateEmployee } from '../../../api/administration/user';
-import { useNotification } from '../../Componants/NotificationContext';
+import { useNotification } from '../../../Componants/NotificationContext';
 
 
 interface Agency {

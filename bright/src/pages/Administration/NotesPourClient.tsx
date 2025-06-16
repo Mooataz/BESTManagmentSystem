@@ -18,7 +18,7 @@ import AdjustIcon from '@mui/icons-material/Adjust';
 import Add from '@mui/icons-material/Add';
 
 import { addNoteToCustomer, deleteNoteToCustomer, fetchNoteToCustomer, updatenoteToCustomer } from '../../api/administration/Administration';
-import { useNotification } from '../Componants/NotificationContext';
+import { useNotification } from '../../Componants/NotificationContext';
 interface NoteToCustomer {
     id: number; name: string;
 }

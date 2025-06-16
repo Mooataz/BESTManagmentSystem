@@ -6,20 +6,41 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repair } from 'src/repair/entities/repair.entity';
 import { Tracability } from 'src/tracability/entities/tracability.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class HistoryRepairService {
   constructor ( @InjectRepository(HistoryRepair) private readonly  historyRepairRepositry:Repository<HistoryRepair>,
                 @InjectRepository(Repair) private readonly  repairRepositry:Repository<Repair>,
+                @InjectRepository(Tracability) private readonly tracabilityRepositry:Repository<Tracability>,
+                @InjectRepository(User) private readonly userRepositry:Repository<User>,
                ){}
 
-  async create(createHistoryRepairDto: CreateHistoryRepairDto ):Promise<HistoryRepair> {
-    const repair = await this.repairRepositry.findOne({ where: {id: createHistoryRepairDto.repair}})
+  async create(/* createHistoryRepairDto: CreateHistoryRepairDto  */ data:any):Promise<HistoryRepair> {
+    
+    
+    const repair = await this.repairRepositry.findOne({ where: {id: data.repair}})
     if (!repair) throw new NotFoundException('repair not found');
+ 
+    const user = await this.userRepositry.findOne({ where: { id: data.user?.id } }); // ⬅️ AJOUTER CECI
+  if (!user) throw new NotFoundException('user not found');
    
-    const newCreate = this.historyRepairRepositry.create({...createHistoryRepairDto, repair});
-
-    return  await this.historyRepairRepositry.save(newCreate);
+   
+  const createHistoryRepairDto ={
+      step: data.step,
+      date: data.date,
+      repair: data.repair
+   }
+    const newCreate = this.historyRepairRepositry.create(createHistoryRepairDto );
+ 
+    const saveHist = await this.historyRepairRepositry.save(newCreate);
+    const tracData ={
+      user: user,
+      historyRepair:saveHist
+    }
+    const newTrac =  await this.tracabilityRepositry.create(tracData)
+    await this.tracabilityRepositry.save(newTrac);
+    return saveHist
   }
 
   async findAll():Promise<HistoryRepair[]> {

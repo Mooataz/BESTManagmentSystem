@@ -16,21 +16,32 @@ export class TracabilityService {
                 @InjectRepository(User) private readonly  userRepositry:Repository<User>,
 ){}
   
-  async create(createTracabilityDto: CreateTracabilityDto):Promise<Tracability> {
-    const historyRepair = await this.historyRepairRepositry.findOne({where: { id: createTracabilityDto.historyRepair}})
-    const historyStockPart = await this.historyStockPartRepositry.findOne({where: { id: createTracabilityDto.historyStockPart}})
-    const user = await this.userRepositry.findOne({where: { id: createTracabilityDto.user}})
-    if (!historyRepair) {throw new NotFoundException('HistoryRepair not found');}
-    if (!historyStockPart) {throw new NotFoundException('historyStockPart not found');}
-    if (!user) { throw new NotFoundException('user not found');}
+async create(createTracabilityDto: CreateTracabilityDto): Promise<Tracability> {
+  const user = await this.userRepositry.findOne({ where: { id: createTracabilityDto.user } });
+  if (!user) throw new NotFoundException('User not found');
 
-    const tracabilityData : DeepPartial<Tracability> =  {
-      historyRepair, historyStockPart, user
-    }
-  
-    const newCreate = this.tracabilityRepositry.create(tracabilityData);
-    return await this.tracabilityRepositry.save(newCreate);
+  let historyRepair: HistoryRepair | undefined = undefined;
+  if (createTracabilityDto.historyRepair) {
+   const  historyRepair = await this.historyRepairRepositry.findOne({ where: { id: createTracabilityDto.historyRepair } });
+    if (!historyRepair) throw new NotFoundException('HistoryRepair not found');
   }
+
+  let historyStockPart: HistoryStockPart | undefined = undefined;
+  if (createTracabilityDto.historyStockPart) {
+    const historyStockPart = await this.historyStockPartRepositry.findOne({ where: { id: createTracabilityDto.historyStockPart } });
+    if (!historyStockPart) throw new NotFoundException('HistoryStockPart not found');
+  }
+
+  const tracabilityData: DeepPartial<Tracability> = {
+    user,
+    historyRepair,
+    historyStockPart,
+  };
+
+  const newCreate = this.tracabilityRepositry.create(tracabilityData);
+  return await this.tracabilityRepositry.save(newCreate);
+}
+
 
   async findAll():Promise<Tracability[]> {
      const findAll= await this.tracabilityRepositry.find()
@@ -41,7 +52,8 @@ export class TracabilityService {
   }
 
   async findOne(id: number):Promise<Tracability> {
-    const findOne= await this.tracabilityRepositry.findOne({ where: { id } })
+    const findOne= await this.tracabilityRepositry.findOne({ where: { id } ,
+      relations: ['user','historyRepair']})
     if ( !findOne){
       throw new NotFoundException("There is no data Available")
     }
@@ -117,8 +129,8 @@ export class TracabilityService {
       const tracability = await this.tracabilityRepositry
         .createQueryBuilder('tracability')
         .leftJoinAndSelect('tracability.historyRepair', 'historyRepair')
-        .leftJoinAndSelect('tracability.historyStockPart', 'historyStockPart')
-        .leftJoinAndSelect('tracability.user', 'user')
+       //.leftJoinAndSelect('tracability.historyStockPart', 'historyStockPart')
+        //.leftJoinAndSelect('tracability.user', 'user')
         .where('historyRepair.id = :historyRepairId', { historyRepairId })
         .getOne();
     

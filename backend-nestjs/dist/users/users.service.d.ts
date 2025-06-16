@@ -19,6 +19,7 @@ export declare class UsersService {
     findByBranchId(branchId: number): Promise<User[]>;
     findByStatus(status: string): Promise<User[]>;
     findUserByLogin(login: string): Promise<User>;
+    findToAssign(branchId: number, admin: boolean): Promise<User[]>;
     getUsersByRole(role: string): Promise<User[]>;
     getAllUsersSortedByRole(): Promise<User[]>;
 }

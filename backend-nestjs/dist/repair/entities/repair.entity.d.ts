@@ -17,8 +17,7 @@ export declare class Repair {
     warrenty: boolean;
     approveRepair: boolean;
     newSerialNumber: string;
-    advancePayment: number;
-    actuellyBranch: string;
+    actuellybranch: number;
     files: string[];
     partsNeed: number[];
     remark: string;

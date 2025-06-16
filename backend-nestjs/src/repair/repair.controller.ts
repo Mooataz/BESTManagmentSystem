@@ -101,13 +101,14 @@ export class RepairController {
   }
 @Get('byBranchAndStep')
 async findByBranchAndStep(
-  @Query('branchId') branchId: number,
-  @Query('step') step: string,
+   @Query('branchId') branchId: number,
+  @Query('step') step: string,   
   @Res() res
 ) {
-
+  
 try {
       const allfind = await  this.repairService.findByBranchAndStep(branchId, step);
+       
       return res.status(HttpStatus.OK).json({
         message:" founded Successfuly !",
         status:HttpStatus.OK,
@@ -170,7 +171,7 @@ try {
       data: updatedRepair,
     };
   } */
-  /*  @Patch(':id')
+    @Patch(':id')
   async update(@Param('id') id: number,
     @Body() updateRepairDto: UpdateRepairDto,
     @Res() res) {
@@ -188,7 +189,7 @@ try {
         data:null
       })
     }
-  }  */
+  }   
 
   @Delete(':id')
   async remove(@Param('id') id: number,
@@ -286,5 +287,25 @@ try {
         data: null,
       });
     }
+  }
+
+  @Get('FilterByUserStep')
+  async getByUserStep ( @Param() userId: number,
+                        @Param() steps: string,
+                        @Res() res){
+      try {
+        const user = await this.repairService.FiltreByUserStep(userId,steps);
+      return res.status(HttpStatus.OK).json({
+        message: 'Repairs found successfully!',
+        status: HttpStatus.OK,
+        data: user,
+      });
+      } catch (error) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+        data: null,
+      });
+      }
   }
 }

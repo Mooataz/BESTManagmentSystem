@@ -26,6 +26,8 @@ const users_module_1 = require("../users/users.module");
 const stock_parts_module_1 = require("../stock-parts/stock-parts.module");
 const approve_stock_module_1 = require("../approve-stock/approve-stock.module");
 const core_module_1 = require("../core/core.module");
+const legislation_entity_1 = require("../legislation/entities/legislation.entity");
+const branch_entity_1 = require("../branches/entities/branch.entity");
 let PdfModule = class PdfModule {
 };
 exports.PdfModule = PdfModule;
@@ -43,7 +45,7 @@ exports.PdfModule = PdfModule = __decorate([
             (0, common_1.forwardRef)(() => notes_customer_module_1.NotesCustomerModule),
             (0, common_1.forwardRef)(() => accessory_module_1.AccessoryModule),
             core_module_1.CoreModule,
-            typeorm_1.TypeOrmModule.forFeature([repair_entity_1.Repair, customer_entity_1.Customer, device_entity_1.Device]),
+            typeorm_1.TypeOrmModule.forFeature([repair_entity_1.Repair, customer_entity_1.Customer, device_entity_1.Device, legislation_entity_1.Legislation, branch_entity_1.Branch]),
         ],
         controllers: [pdf_controller_1.PdfController],
         providers: [pdf_service_1.PdfService, repair_service_1.RepairService],

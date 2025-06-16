@@ -1,15 +1,6 @@
 import * as React from 'react';
-import List from '@mui/joy/List';
-import ListSubheader from '@mui/joy/ListSubheader';
-import ListItem from '@mui/joy/ListItem';
-import ListItemButton from '@mui/joy/ListItemButton';
-import ListItemDecorator from '@mui/joy/ListItemDecorator';
-import ListItemContent from '@mui/joy/ListItemContent';
-import {  AiOutlineUser, AiOutlineSetting,   } from "react-icons/ai";
-import Accordion from '@mui/joy/Accordion';
-import AccordionDetails from '@mui/joy/AccordionDetails';
-import AccordionSummary from '@mui/joy/AccordionSummary';
-import { getCurrentUser } from '../../../api/administration/login';
+    import {  AiOutlineUser, AiOutlineSetting,   } from "react-icons/ai";
+ import { getCurrentUser } from '../../../api/administration/login';
 import { useNavigate } from 'react-router-dom';
 import { LuTabletSmartphone } from "react-icons/lu";
 import { BsEarbuds } from "react-icons/bs";
@@ -41,10 +32,16 @@ import HubOutlinedIcon from '@mui/icons-material/HubOutlined';
 import { BiShowAlt } from "react-icons/bi";
 import { BiSolidShow } from "react-icons/bi";
 import { PiChartLineThin } from "react-icons/pi";
-import {Box} from '@mui/joy'
-import { useTranslation } from 'react-i18next';
+import { GoLaw } from "react-icons/go";
+ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../../Redux/store';
+ import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import { Accordion, AccordionDetails, AccordionSummary, Box } from '@mui/material';
 interface NavigationProps {
   onSelectPage: (page: string) => void;
   selectedPage: string;
@@ -90,6 +87,7 @@ const menuItems: MenuItem[] = [
       { label: 'ListAllPart', page: 'listePiécesTotal', icon: <PiListBullets />      },
       { label: 'LevelRepair', page: 'NiveauRéparation', icon: <SiLevelsdotfyi />      },
       { label: 'OthersCoast', page: 'AutresFrais', icon: <GrMoney />},
+      { label: 'Legislation', page: 'Legislation', icon: <GoLaw />}, 
     ],
   },
   {
@@ -130,7 +128,7 @@ const menuItems: MenuItem[] = [
     icon: <FaPersonDotsFromLine />    ,
     children: [
       { label: 'Reçoiproduit', page: 'ReçoiProduit', icon: <BsEarbuds /> }, 
-      { label: 'Etatproduit', page: 'EtatProduit', icon: <BsEarbuds /> },
+      { label: 'Etatproduit', page: 'ListRepair', icon: <BsEarbuds /> },
       { label: 'Envoyeraffectation', page: 'EnvoyeAffectation', icon: <BsEarbuds /> },
       { label: 'ReciveQC', page: 'RecevoireQC', icon: <BsEarbuds /> },
       { label: 'Récupererproduit', page: 'RécupererProduit', icon: <BsEarbuds /> },
@@ -208,11 +206,11 @@ const menuItems: MenuItem[] = [
     fetchUser();
   }, []);
   return (
-    <List
-      size="sm"
+    <List  
+       
       sx={{ '--ListItem-radius': 'var(--joy-radius-sm)', '--List-gap': '4px' }}
     >
-      <ListItem nested>
+      <ListItem sx={{ borderBottom: '1px solid #ccc' }}>
  
         <List
           aria-labelledby="nav-list-browse"
@@ -227,8 +225,8 @@ const menuItems: MenuItem[] = [
               <Accordion>
                 <AccordionSummary>
                   <ListItemButton>
-                    <ListItemDecorator>{item.icon}</ListItemDecorator>
-                    <ListItemContent>{t(item.label)}</ListItemContent>
+                    <ListItemIcon>{item.icon}</ListItemIcon>
+                    <ListItemText>{t(item.label)}</ListItemText>
                   </ListItemButton>
                 </AccordionSummary>
                 <AccordionDetails>
@@ -238,8 +236,8 @@ const menuItems: MenuItem[] = [
                         key={subIndex}
                         onClick={() => handleNavigation(subItem.page)}
                       >
-                        <ListItemDecorator>{subItem.icon}</ListItemDecorator>
-                        <ListItemContent>{t(subItem.label)}</ListItemContent>
+                        <ListItemIcon>{subItem.icon}</ListItemIcon>
+                        <ListItemText>{t(subItem.label)}</ListItemText>
                       </ListItemButton>
                     ))}
                   </List>
@@ -247,8 +245,8 @@ const menuItems: MenuItem[] = [
               </Accordion>
             ) : (
               <ListItemButton onClick={() => handleNavigation(item.page)}>
-                <ListItemDecorator>{item.icon}</ListItemDecorator>
-                <ListItemContent>{t(item.label)}</ListItemContent>
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText>{t(item.label)}</ListItemText>
               </ListItemButton>
             )}
           </Box>

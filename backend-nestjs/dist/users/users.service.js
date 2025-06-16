@@ -50,7 +50,7 @@ let UsersService = class UsersService {
         return allUsers;
     }
     async findOne(id) {
-        const OneUser = await this.userRepositry.findOne({ where: { id } });
+        const OneUser = await this.userRepositry.findOne({ relations: ['branch'], where: { id } });
         if (!OneUser) {
             throw new common_1.NotFoundException("There is no user data Available");
         }
@@ -104,12 +104,27 @@ let UsersService = class UsersService {
         return findAll;
     }
     async findUserByLogin(login) {
-        const userByLogin = await this.userRepositry.findOne({ where: { login } });
+        const userByLogin = await this.userRepositry.findOne({ where: { login }, relations: ['branch'] });
         if (!userByLogin) {
             throw new common_1.NotFoundException('User not found');
         }
         ;
         return userByLogin;
+    }
+    async findToAssign(branchId, admin) {
+        const allowedRoles = admin ? ['Technicien', 'Administrateur'] : ['Technicien'];
+        const users = await this.userRepositry.find({
+            where: [
+                ...(admin ? [
+                    { status: 'Autoriser', role: 'Technicien', branch: { id: branchId } },
+                    { status: 'Autoriser', role: 'Administrateur' },
+                ] : [
+                    { status: 'Autoriser', role: 'Technicien', branch: { id: branchId } },
+                ]),
+            ],
+            relations: ['branch'],
+        });
+        return users;
     }
     async getUsersByRole(role) {
         return this.userRepositry.find({ where: { role } });

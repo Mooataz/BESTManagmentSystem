@@ -11,9 +11,9 @@ import Typography from '@mui/joy/Typography';
 import Button from '@mui/joy/Button';
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
 import { useParams } from 'react-router-dom';
-import {  updatePassword } from '../../api/administration/user';
-import { useNotification } from './NotificationContext';
-export default function Updatepassword(){
+import { useNotification } from '../../Componants/NotificationContext';
+import { updatePassword } from '../../api/administration/user';
+ export default function Updatepassword(){
     const { userId } = useParams<{ userId: string }>();
 const [currentPassword, setCurrentPassword] = React.useState('');
 const [newPassword, setNewPassword] = React.useState('');

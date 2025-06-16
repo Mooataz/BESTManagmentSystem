@@ -65,7 +65,7 @@ let BinService = class BinService {
         await this.binRepositry.update(id, updateData);
         const updatedBin = await this.binRepositry.findOne({ where: { id }, relations: ['branch'] });
         if (!updatedBin) {
-            throw new common_1.NotFoundException('Reference not found to update');
+            throw new common_1.NotFoundException('  not found to update');
         }
         return updatedBin;
     }
@@ -78,11 +78,13 @@ let BinService = class BinService {
         return deletedata;
     }
     async findByBranchId(branchId) {
-        return this.binRepositry
-            .createQueryBuilder('bin')
-            .leftJoinAndSelect('bin.branch', 'branch')
-            .where('branch.id = :branchId', { branchId })
-            .getMany();
+        const filtred = await this.binRepositry.find({
+            where: {
+                branch: { id: branchId },
+            },
+            relations: ['branch'],
+        });
+        return filtred;
     }
     async findByBranchIdAndType(branchId, type) {
         return this.binRepositry

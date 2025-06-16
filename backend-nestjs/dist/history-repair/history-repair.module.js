@@ -14,12 +14,13 @@ const typeorm_1 = require("@nestjs/typeorm");
 const history_repair_entity_1 = require("./entities/history-repair.entity");
 const repair_entity_1 = require("../repair/entities/repair.entity");
 const tracability_entity_1 = require("../tracability/entities/tracability.entity");
+const user_entity_1 = require("../users/entities/user.entity");
 let HistoryRepairModule = class HistoryRepairModule {
 };
 exports.HistoryRepairModule = HistoryRepairModule;
 exports.HistoryRepairModule = HistoryRepairModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([history_repair_entity_1.HistoryRepair, repair_entity_1.Repair, tracability_entity_1.Tracability])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([history_repair_entity_1.HistoryRepair, repair_entity_1.Repair, tracability_entity_1.Tracability, user_entity_1.User])],
         controllers: [history_repair_controller_1.HistoryRepairController],
         providers: [history_repair_service_1.HistoryRepairService],
     })

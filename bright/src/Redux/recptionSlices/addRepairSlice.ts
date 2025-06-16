@@ -1,6 +1,6 @@
 import { createSlice   } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { addRepair } from '../Actions/receptionAction';
+import { addRepair } from '../Actions/Reception/receptionAction';
 import type {RepairForm} from '../Types/repairTypes'
 // repairSlice.ts
 interface RepairState {

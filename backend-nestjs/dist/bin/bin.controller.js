@@ -33,7 +33,7 @@ let BinController = class BinController {
         }
         catch (error) {
             if (error.code === '23505') {
-                throw new common_1.ConflictException('Bin already exists');
+                throw new common_1.ConflictException('Case déja utilisé');
             }
             return res.status(common_1.HttpStatus.BAD_REQUEST).json({
                 message: error.message,
@@ -120,6 +120,9 @@ let BinController = class BinController {
             });
         }
         catch (error) {
+            if (error.code === '23505') {
+                throw new common_1.ConflictException('Case déja utilisé');
+            }
             return res.status(common_1.HttpStatus.BAD_REQUEST).json({
                 message: error.message,
                 status: common_1.HttpStatus.BAD_REQUEST,

@@ -29,11 +29,10 @@ export class Repair {
     @Column({ nullable: true })
     newSerialNumber: string;
 
-    @Column({ nullable: true })
-    advancePayment: number;
+   
 
     @Column()
-    actuellyBranch: string;
+    actuellybranch: number;
 
     @Column('jsonb', { nullable: true })
     files: string[]; 

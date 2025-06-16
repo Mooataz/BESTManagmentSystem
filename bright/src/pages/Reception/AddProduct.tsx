@@ -1,44 +1,45 @@
-import { Card,Typography ,Button, ListItemContent, Option,  TextField, Input } from "@mui/joy";
 import { Box } from "@mui/material";
 import React from "react";
-import Autocomplete from '@mui/joy/Autocomplete';
-import {     getAccessory, getCustomer, getCustomerRequest, getDevices, getListFault, getOneCustomer, getOneDevice  } from "../../api/Reception/CreateRepair";
-import FormControl from '@mui/joy/FormControl';
-import FormLabel from '@mui/joy/FormLabel';
+import { getAccessory, getCustomer, getCustomerRequest, getDevices, getListFault, getOneCustomer, getOneDevice  } from "../../api/Reception/CreateRepair";
 import { useTranslation } from 'react-i18next';
 import { fetchDistributeur } from "../../api/administration/Administration";
 import { getModels } from "../../api/ModelAccessory/Models";
-import { InputDate } from "../Componants/InputDate";
-import ModalDialog from '@mui/joy/ModalDialog';
-import DialogTitle from '@mui/joy/DialogTitle';
-import DialogContent from '@mui/joy/DialogContent';
-import Stack from '@mui/joy/Stack';
+import { InputDate } from "../../Componants/InputDate";
 import { useNavigate } from 'react-router-dom';
-import Modal from '@mui/joy/Modal';
-import CardCover from '@mui/joy/CardCover';
-import AspectRatio from '@mui/joy/AspectRatio';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import { getMarque } from "../../api/administration/Marque";
-import { useNotification } from "../Componants/NotificationContext";
+import { useNotification } from "../../Componants/NotificationContext";
 import BurstModeIcon from '@mui/icons-material/BurstMode';
-import Checkbox from '@mui/joy/Checkbox';
-import List from '@mui/joy/List';
-import ListItem from '@mui/joy/ListItem';
- import Sheet from '@mui/joy/Sheet';
 import Done from '@mui/icons-material/Done';
-import Select from '@mui/joy/Select';
- import Textarea from '@mui/joy/Textarea';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '../../Redux/store';
 import { PiEmptyThin } from "react-icons/pi";
 import {    CreateRepairPDF } from "../../api/PDF/Repair";
-import { store } from "../../Redux/store";
-import { addRepair } from "../../Redux/Actions/receptionAction";
+ import { addRepair } from "../../Redux/Actions/Reception/receptionAction";
 import { clearError } from "../../Redux/recptionSlices/addRepairSlice";
-import type { Customer, Device, Distributor, Marque, Model, RepairForm, RepairFormInput, TypeForm, TypeUnique } from "../../Redux/Types/repairTypes";
-import {CreateRepairDto} from '../../../../backend-nestjs/src/repair/dto/create-repair.dto'
-  export function AddProduct () {
+import type { Customer, Device, Distributor, Marque, Model,  TypeForm, TypeUnique } from "../../Redux/Types/repairTypes";
+   
+
+import FormControl from '@mui/joy/FormControl';
+import FormLabel from '@mui/joy/FormLabel';
+import Select from '@mui/joy/Select';
+import Textarea from '@mui/joy/Textarea';
+import { Card,Typography ,Button,  Option,  Input } from "@mui/joy";
+import Checkbox from '@mui/joy/Checkbox';
+import List from '@mui/joy/List';
+import ListItem from '@mui/joy/ListItem';
+import Sheet from '@mui/joy/Sheet';
+import Modal from '@mui/joy/Modal';
+import CardCover from '@mui/joy/CardCover';
+import AspectRatio from '@mui/joy/AspectRatio';
+import ModalDialog from '@mui/joy/ModalDialog';
+import DialogTitle from '@mui/joy/DialogTitle';
+import DialogContent from '@mui/joy/DialogContent';
+import Stack from '@mui/joy/Stack';
+import Autocomplete from '@mui/joy/Autocomplete';
+
+export function AddProduct () {
   const [step, setStep] = React.useState(0);
 
   const next = () => setStep((prev) => prev + 1);
@@ -129,7 +130,7 @@ import {CreateRepairDto} from '../../../../backend-nestjs/src/repair/dto/create-
                             <div>
                               <table style={{ border: '2px solid E0E0E0'  }}>
                                  <tr>
-                                  <td  style={{ border: '2px solid E0E0E0', width:'200px'  } }>Id</td>
+                                  <td  style={{ border: '2px solid E0E0E0', width:'200px' ,backgroundColor: '#EEEEEE' } }>Id</td>
                                   <td>{repair.id}</td>
                                  </tr>
                                 <tr>
@@ -206,6 +207,7 @@ import {CreateRepairDto} from '../../../../backend-nestjs/src/repair/dto/create-
 function AddCustomer({ onChange }: {onChange: (c: Customer) => void }) {
   const [customers, setCustomers] = React.useState<Customer[]>([]);
   const [valuecustomers, setValueCustomers] = React.useState<Customer | null>({name:'',phone:0,distributer: null});
+  const { notify } = useNotification();
 
     const [distributor, setDistributor] = React.useState<Distributor[]>([]);
      
@@ -264,7 +266,10 @@ const { t } = useTranslation();
                     type="number"
                     sx={underlineInputStyles}
                     value={valuecustomers?.phone ?? ''}
+
                     onChange={(e) => {
+                      
+                      
                         if (valuecustomers) {
                             setValueCustomers({
                             ...valuecustomers,
@@ -272,6 +277,21 @@ const { t } = useTranslation();
                             });
                         }
                         }}
+                        onBlur={
+                          (e) =>{
+                            const newValue = Number(e.target.value);
+                          if (newValue < 20000000 || newValue > 99999999) {
+                                      if (valuecustomers) {
+                                          setValueCustomers({
+                                              ...valuecustomers,
+                                              phone: 0,
+                                          });
+                                      }
+                                          notify("Le numéro de télephone doit comporte 8 chiffre ","danger");
+
+                                  }  
+                          }
+                        }
                     />
         </FormControl>
         <FormControl>
@@ -361,7 +381,7 @@ const handleModelSelected = (model: Model) => {
                   <Typography sx={{marginBottom:'5%', marginTop:'5%'}}>Ajouter un Appareille</Typography>
                       <FormControl  sx={{marginBottom:'5%'}}>
                         <FormLabel>Imei</FormLabel>
-                            <Input
+                            {/* <Input
                                 required
                                 variant="soft"
                                 sx={underlineInputStyles}
@@ -374,8 +394,44 @@ const handleModelSelected = (model: Model) => {
                                     serialenumber: alphanumeric,
                                   });
                                 }}
-                              />
-       
+                              /> */}
+  <Input
+  required
+  variant="soft"
+  sx={underlineInputStyles}
+  value={valueDevice?.serialenumber ?? ""}
+  onChange={(e) => {
+    const input = e.target.value;
+    const clean = input.replace(/[^a-zA-Z0-9]/g, '');
+
+    const isAllDigits = /^\d+$/.test(clean);
+
+    if (
+      (isAllDigits && clean.length <= 15) ||
+      (!isAllDigits && clean.length <= 12)
+    ) {
+      setValueDevice({
+        ...valueDevice!,
+        serialenumber: clean,
+      });
+    }
+  }}
+  onBlur={(e) => {
+    const value = e.target.value;
+    const isAllDigits = /^\d{15}$/.test(value);
+    const isAlphaNum = /^[a-zA-Z0-9]{12}$/.test(value);
+
+    if (!(isAllDigits || isAlphaNum)) {
+      setValueDevice({
+        ...valueDevice!,
+        serialenumber: '',
+      });
+      notify("Le numéro de série doit contenir exactement 15 chiffres OU 12 caractères alphanumériques.","danger");
+    }
+  }}
+/>
+
+
                           </FormControl>
                           <FormControl sx={{marginTop:'5%'}}>
                             <FormLabel>Date d'achat</FormLabel>
@@ -434,7 +490,7 @@ const { currentRepair, repairs, loading, error } = useSelector((state: RootState
   customerRequest: [],
   deviceStateReceive: '',   // obligatoire, donc initialisé à une chaîne vide
   remark: '',
-  actuellyBranch:user.branch?.name || '',
+  actuellyBranch:user.branch?.id || 0,
   device: {
     id: undefined,
     serialenumber: '',
@@ -493,14 +549,14 @@ const customerRequestIds: number[] = formData.customerRequest
   .map(r => r.id)
   .filter((id): id is number => id !== undefined);
    
- 
+   
 const body  = {
   accessoryIds: accessoryIds?.length ? accessoryIds : [],
   listFaultIds: listFaultIds?.length ? listFaultIds : [],
   customerRequestIds: customerRequestIds?.length ? customerRequestIds : [],
   deviceStateReceive: formData.deviceStateReceive ?? '',
   remark: formData.remark ?? ' ',
-  actuellyBranch: user.branch?.name ?? ' ',
+  actuellyBranch: user.branch?.id || 0 ,
   device: devicee?.id ?? null,
   customer: customerr?.id ?? null,
   userId: user.id || 0
@@ -542,7 +598,7 @@ if (!body.listFaultIds.length) {
             notify(errorMessage, "danger");
         }
      
-};
+  };
   // Gestion des erreurs globales
   React.useEffect(() => {
     if (error) {
@@ -842,19 +898,12 @@ export default function ExampleChoiceChipCheckbox({
     setValue((prev) => {
       const exists = prev.find((v) => v.id === item.id);
       
-return exists
-        ? prev.filter((v) => v.id !== item.id)
-        : [...prev, item];
-
-      
-      const updated = exists
+const updated = exists
         ? prev.filter((v) => v.id !== item.id)
         : [...prev, item];
     onChange(updated)
-      return updated;
-    });
-
-    
+      return updated;  
+    }); 
   };
 
   return (

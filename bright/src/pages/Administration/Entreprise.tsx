@@ -26,7 +26,7 @@ import DialogTitle from '@mui/joy/DialogTitle';
 import DialogContent from '@mui/joy/DialogContent';
 import Stack from '@mui/joy/Stack';
 import { MdOutlineModeEditOutline } from "react-icons/md";
-import { useNotification } from '../Componants/NotificationContext';
+import { useNotification } from '../../Componants/NotificationContext';
  
 interface Agency {
     id: number;

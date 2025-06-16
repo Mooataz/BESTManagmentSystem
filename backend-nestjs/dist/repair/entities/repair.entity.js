@@ -30,8 +30,7 @@ let Repair = class Repair {
     warrenty;
     approveRepair;
     newSerialNumber;
-    advancePayment;
-    actuellyBranch;
+    actuellybranch;
     files;
     partsNeed;
     remark;
@@ -69,13 +68,9 @@ __decorate([
     __metadata("design:type", String)
 ], Repair.prototype, "newSerialNumber", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
-    __metadata("design:type", Number)
-], Repair.prototype, "advancePayment", void 0);
-__decorate([
     (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], Repair.prototype, "actuellyBranch", void 0);
+    __metadata("design:type", Number)
+], Repair.prototype, "actuellybranch", void 0);
 __decorate([
     (0, typeorm_1.Column)('jsonb', { nullable: true }),
     __metadata("design:type", Array)

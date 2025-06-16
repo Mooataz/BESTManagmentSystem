@@ -7,7 +7,7 @@ import ModalDialog from '@mui/joy/ModalDialog';
 import Typography from '@mui/joy/Typography';
 import { addAccessoire, fetchAccessoire, updateAccessoire } from "../../api/administration/Administration";
 import { FormLabel, Input, Stack } from '@mui/joy';
-import { useNotification } from "../Componants/NotificationContext";
+import { useNotification } from "../../Componants/NotificationContext";
 import Add from '@mui/icons-material/Add';
 
 interface Accessoire {

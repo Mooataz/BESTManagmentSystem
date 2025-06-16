@@ -16,6 +16,7 @@ exports.RepairController = void 0;
 const common_1 = require("@nestjs/common");
 const repair_service_1 = require("./repair.service");
 const create_repair_dto_1 = require("./dto/create-repair.dto");
+const update_repair_dto_1 = require("./dto/update-repair.dto");
 const swagger_1 = require("@nestjs/swagger");
 let RepairController = class RepairController {
     repairService;
@@ -81,6 +82,23 @@ let RepairController = class RepairController {
                 message: "One  founded Successfuly !",
                 status: common_1.HttpStatus.OK,
                 data: onefind
+            });
+        }
+        catch (error) {
+            return res.status(common_1.HttpStatus.BAD_REQUEST).json({
+                message: error.message,
+                status: common_1.HttpStatus.BAD_REQUEST,
+                data: null
+            });
+        }
+    }
+    async update(id, updateRepairDto, res) {
+        try {
+            const updatedata = await this.repairService.update(+id, updateRepairDto);
+            return res.status(common_1.HttpStatus.OK).json({
+                message: " updated Successfuly !",
+                status: common_1.HttpStatus.OK,
+                data: updatedata
             });
         }
         catch (error) {
@@ -184,6 +202,23 @@ let RepairController = class RepairController {
             });
         }
     }
+    async getByUserStep(userId, steps, res) {
+        try {
+            const user = await this.repairService.FiltreByUserStep(userId, steps);
+            return res.status(common_1.HttpStatus.OK).json({
+                message: 'Repairs found successfully!',
+                status: common_1.HttpStatus.OK,
+                data: user,
+            });
+        }
+        catch (error) {
+            return res.status(common_1.HttpStatus.BAD_REQUEST).json({
+                message: error.message,
+                status: common_1.HttpStatus.BAD_REQUEST,
+                data: null,
+            });
+        }
+    }
 };
 exports.RepairController = RepairController;
 __decorate([
@@ -236,6 +271,15 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], RepairController.prototype, "findOne", null);
 __decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, update_repair_dto_1.UpdateRepairDto, Object]),
+    __metadata("design:returntype", Promise)
+], RepairController.prototype, "update", null);
+__decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Res)()),
@@ -275,6 +319,15 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], RepairController.prototype, "getRepairByUser", null);
+__decorate([
+    (0, common_1.Get)('FilterByUserStep'),
+    __param(0, (0, common_1.Param)()),
+    __param(1, (0, common_1.Param)()),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, String, Object]),
+    __metadata("design:returntype", Promise)
+], RepairController.prototype, "getByUserStep", null);
 exports.RepairController = RepairController = __decorate([
     (0, common_1.Controller)('repair'),
     __metadata("design:paramtypes", [repair_service_1.RepairService])

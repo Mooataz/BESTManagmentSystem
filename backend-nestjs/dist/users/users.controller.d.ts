@@ -12,6 +12,10 @@ export declare class UsersController {
     findOne(id: number, res: any): Promise<any>;
     update(id: number, updateUserDto: UpdateUserDto, res: any): Promise<any>;
     remove(id: number, res: any): Promise<any>;
+    getUsersAssign(body: {
+        branchId: number;
+        admin: boolean;
+    }, res: any): Promise<any>;
     getByRole(role: string): Promise<import("./entities/user.entity").User[]>;
     getAllSorted(): Promise<import("./entities/user.entity").User[]>;
 }

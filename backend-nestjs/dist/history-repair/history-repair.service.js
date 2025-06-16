@@ -18,19 +18,40 @@ const history_repair_entity_1 = require("./entities/history-repair.entity");
 const typeorm_1 = require("typeorm");
 const typeorm_2 = require("@nestjs/typeorm");
 const repair_entity_1 = require("../repair/entities/repair.entity");
+const tracability_entity_1 = require("../tracability/entities/tracability.entity");
+const user_entity_1 = require("../users/entities/user.entity");
 let HistoryRepairService = class HistoryRepairService {
     historyRepairRepositry;
     repairRepositry;
-    constructor(historyRepairRepositry, repairRepositry) {
+    tracabilityRepositry;
+    userRepositry;
+    constructor(historyRepairRepositry, repairRepositry, tracabilityRepositry, userRepositry) {
         this.historyRepairRepositry = historyRepairRepositry;
         this.repairRepositry = repairRepositry;
+        this.tracabilityRepositry = tracabilityRepositry;
+        this.userRepositry = userRepositry;
     }
-    async create(createHistoryRepairDto) {
-        const repair = await this.repairRepositry.findOne({ where: { id: createHistoryRepairDto.repair } });
+    async create(data) {
+        const repair = await this.repairRepositry.findOne({ where: { id: data.repair } });
         if (!repair)
             throw new common_1.NotFoundException('repair not found');
-        const newCreate = this.historyRepairRepositry.create({ ...createHistoryRepairDto, repair });
-        return await this.historyRepairRepositry.save(newCreate);
+        const user = await this.userRepositry.findOne({ where: { id: data.user?.id } });
+        if (!user)
+            throw new common_1.NotFoundException('user not found');
+        const createHistoryRepairDto = {
+            step: data.step,
+            date: data.date,
+            repair: data.repair
+        };
+        const newCreate = this.historyRepairRepositry.create(createHistoryRepairDto);
+        const saveHist = await this.historyRepairRepositry.save(newCreate);
+        const tracData = {
+            user: user,
+            historyRepair: saveHist
+        };
+        const newTrac = await this.tracabilityRepositry.create(tracData);
+        await this.tracabilityRepositry.save(newTrac);
+        return saveHist;
     }
     async findAll() {
         const allfind = await this.historyRepairRepositry.find();
@@ -87,7 +108,11 @@ exports.HistoryRepairService = HistoryRepairService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_2.InjectRepository)(history_repair_entity_1.HistoryRepair)),
     __param(1, (0, typeorm_2.InjectRepository)(repair_entity_1.Repair)),
+    __param(2, (0, typeorm_2.InjectRepository)(tracability_entity_1.Tracability)),
+    __param(3, (0, typeorm_2.InjectRepository)(user_entity_1.User)),
     __metadata("design:paramtypes", [typeorm_1.Repository,
+        typeorm_1.Repository,
+        typeorm_1.Repository,
         typeorm_1.Repository])
 ], HistoryRepairService);
 //# sourceMappingURL=history-repair.service.js.map

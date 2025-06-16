@@ -1,5 +1,7 @@
 import type { AppDispatch } from "../store";
-
+export interface DataGetBranchStep  {
+    branch: number | undefined;
+    step:string}
 export interface Customer {
   id?: number;
   name: string;
@@ -54,7 +56,7 @@ export type TypeForm = {
   customerRequest:TypeUnique[];
   deviceStateReceive: string;
   remark: string;
-  actuellyBranch: string;
+  actuellyBranch: number;
   device: Device;
   customer: Customer
 }
@@ -75,7 +77,7 @@ export interface RepairForm {
   device: number;
   remark: string;
   deviceStateReceive: string;
-  actuellyBranch: string;
+  actuellyBranch: number;
   accessoryIds: number[];
   listFaultIds: number[];
   customerRequestIds: number[];
@@ -89,7 +91,7 @@ export interface RepairFormInput {
   customerRequestIds: number[];
   deviceStateReceive: string;
   remark: string;
-  actuellyBranch: string;
+  actuellyBranch: number;
   device: number;
   customer: number;
   userId: number;
@@ -102,4 +104,22 @@ export interface AsyncThunkConfig {
   rejectValue: string;
 }
 
+ export interface FormHistoryRepair {
+  date: Date;
+  step: string;
+  repair: number;
+  userId: number;
+ }
+
+
+ export type TableAction = {
+   icon: React.ReactNode;
+   onClick: (row: Record<string, any>) => void;
+ };
  
+ export type TableProps = { 
+   rows: Record<string, any>[];
+   columnsToShow?: string[];
+   columnLabels?: Record<string, string>;
+   actions?: TableAction[];
+ };

@@ -7,7 +7,7 @@ import Typography from '@mui/joy/Typography';
 import Modal from '@mui/joy/Modal';
 import ModalDialog from '@mui/joy/ModalDialog';
 import Add from '@mui/icons-material/Add';
-import { useNotification } from '../Componants/NotificationContext';
+import { useNotification } from '../../Componants/NotificationContext';
 import { addLevelRepair, getLevelRepair, updatePrice } from '../../api/administration/LevelRepair';
 import FormControl from '@mui/joy/FormControl';
 interface Price {

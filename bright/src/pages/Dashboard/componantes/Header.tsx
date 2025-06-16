@@ -9,10 +9,9 @@ import Button from '@mui/joy/Button';
 import Tooltip from '@mui/joy/Tooltip';
 import Dropdown from '@mui/joy/Dropdown';
 import Menu from '@mui/joy/Menu';
-import MenuButton from '@mui/joy/MenuButton';
-import MenuItem from '@mui/joy/MenuItem';
-import ListDivider from '@mui/joy/ListDivider';
-import { VscStarEmpty } from "react-icons/vsc";
+ 
+import MenuItem from '@mui/material/MenuItem';
+ import { VscStarEmpty } from "react-icons/vsc";
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
@@ -24,10 +23,14 @@ import { getCompany } from '../../../api/administration/Company';
 import { getAgencies } from '../../../api/administration/Agencies';
 import { AgencieList } from '../../Administration/Users/Employees';
 import { useTranslation } from 'react-i18next';
-import Switch from '@mui/joy/Switch';
+ 
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../../../Redux/store';
-import { setBranch } from '../../../Redux/userSlice';
+import { setBranch } from '../../../Redux/auth/userSlice';
+import SelectAgencie from '../../../Componants/getAgence';
+import { Divider, Switch } from '@mui/material';
+import { MenuButton } from '@mui/joy';
+
  interface Company {
   id: number;
   name: string;
@@ -98,12 +101,14 @@ export default function Header() {
   };
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = React.useState<User | null>(null);
-   const [company, setCompany] = React.useState<Company>();
+  const [company, setCompany] = React.useState<Company>();
   const [agencies, setAgencies] = React.useState<Agency[]>([]);
     
   const user = useSelector((state: RootState) => state.auth.user);
-  const dispatch = useDispatch();
+  const userr = useSelector((state: RootState) => state.user);
 
+  const dispatch = useDispatch();
+ 
   React.useEffect(() => {
     const fetchUser = async () => {
       const user = await getCurrentUser();
@@ -195,9 +200,11 @@ const handleNavigation = () => {
         }}
       >     
         {user?.role.includes('Administrateur') ? (
-          <AgencieList
+         
+          <SelectAgencie 
+           
             agencies={agencies}
-            onSelect={(agency) => {
+            onSelect={(agency: any) => {
               if (agency) {
                 dispatch(setBranch(agency)); // Met à jour Redux avec la nouvelle agence
               }
@@ -206,7 +213,7 @@ const handleNavigation = () => {
 
         ) : (
           <Typography level="body-sm">
-            {t('Agence')} : {user?.branch?.name || '-'}
+            {t('Agence')} : {userr?.branch?.name || '-'}
           </Typography>
         )}
 
@@ -250,7 +257,7 @@ const handleNavigation = () => {
                 </Avatar>
                 <Box sx={{ ml: 1.5 }}>
                   <Typography level="title-sm" textColor="text.primary">
-                    {user?.name}- 
+                    {user?.name}
                   </Typography>
                   <Typography level="body-xs" textColor="text.tertiary">
                     {user?.role.map((role: string) => (
@@ -260,21 +267,20 @@ const handleNavigation = () => {
                 </Box>
               </Box>
             </MenuItem>
-            <ListDivider />
+            <Divider />
             <MenuItem  onClick={handleNavigation}>
 
 
-              <TbPassword />
-              {t('Upassword')}
+              <TbPassword /> {t('Upassword')}
 
 
 
             </MenuItem>
 
-            <ListDivider />
+            < Divider />
 
 
-            <ListDivider />
+            <Divider />
             <MenuItem onClick={onLogoutClick}>
               <div style={{ color: 'red' }}>
                 <LogoutRoundedIcon />
@@ -288,3 +294,4 @@ const handleNavigation = () => {
     </Box>
   );
 }
+ 

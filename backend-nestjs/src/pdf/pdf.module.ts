@@ -20,6 +20,8 @@ import { ApproveStockModule } from 'src/approve-stock/approve-stock.module';
 import { AppModule } from 'src/app.module';
 import { AppService } from 'src/app.service';
 import { CoreModule } from 'src/core/core.module';
+import { Legislation } from 'src/legislation/entities/legislation.entity';
+import { Branch } from 'src/branches/entities/branch.entity';
 
 @Module({
   imports:[
@@ -34,7 +36,7 @@ import { CoreModule } from 'src/core/core.module';
      forwardRef(() => NotesCustomerModule),
      forwardRef(() => AccessoryModule),
     CoreModule,
-    TypeOrmModule.forFeature([Repair, Customer, Device])    ,       ], 
+    TypeOrmModule.forFeature([Repair, Customer, Device,Legislation, Branch])    ,       ], 
   controllers: [PdfController],
   providers: [PdfService, RepairService ],
   exports:[PdfService]

@@ -7,7 +7,7 @@ import ModalDialog from '@mui/joy/ModalDialog';
 import Typography from '@mui/joy/Typography';
 import { FormLabel, Input, Stack } from '@mui/joy';
 import Add from '@mui/icons-material/Add';
-import { useNotification } from "../Componants/NotificationContext";
+import { useNotification } from "../../Componants/NotificationContext";
 import { addTypeModel, fetchTypeModel, updateTypeModel } from '../../api/ModelAccessory/TypeModel';
 
 interface Type {

@@ -23,5 +23,14 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true, // optionnel, seulement si tu veux des erreurs dans les .js
+    
+  },
+  "include": [
+    "src/**/*",      // ou adapte au dossier source de ton projet
+    "**/*.js"        // assure l'inclusion des fichiers JS
+  ]
 }

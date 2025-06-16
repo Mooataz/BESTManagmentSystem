@@ -1,5 +1,5 @@
 export declare class CreateRepairDto {
-    actuellyBranch: string;
+    actuellybranch: number;
     customer: number;
     device: number;
     remark: string;

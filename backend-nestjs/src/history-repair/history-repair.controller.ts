@@ -9,18 +9,11 @@ export class HistoryRepairController {
   constructor(private readonly historyRepairService: HistoryRepairService) { }
 @UseGuards(AccessTokenGuard)
   @Post()
-  async create(/*@Body()  createHistoryRepairDto: CreateHistoryRepairDto */date:Date,step: string,repair: number,   @Req() req,
+  async create(/*@Body()  createHistoryRepairDto: CreateHistoryRepairDto date:Date,step: string,repair: number,*/@Body() data:any , @Req() req,
     @Res() res) {
     try {
-       const userId = req.user.id; // extraire depuis le token
-      const createHistory={
-        date,
-        step,
-        repair,
-        user: userId,
-        
-      }
-      const newcreate = await this.historyRepairService.create(createHistory  )
+      
+      const newcreate = await this.historyRepairService.create(data  )
       return res.status(HttpStatus.CREATED).json({
         message:"Created Successfuly !",
         status:HttpStatus.CREATED,

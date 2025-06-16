@@ -167,6 +167,32 @@ let UsersController = class UsersController {
             });
         }
     }
+    async getUsersAssign(body, res) {
+        const { branchId, admin } = body;
+        try {
+            const userTech = await this.usersService.findToAssign(branchId, admin);
+            if (userTech.length === 0) {
+                return res.status(common_1.HttpStatus.NOT_FOUND).json({
+                    message: "Aucun technicien trouvé pour cette branche.",
+                    status: common_1.HttpStatus.NOT_FOUND,
+                    data: null,
+                });
+            }
+            return res.status(common_1.HttpStatus.OK).json({
+                message: "Techniciens trouvés !",
+                status: common_1.HttpStatus.OK,
+                data: userTech,
+            });
+        }
+        catch (error) {
+            console.error('Erreur backend:', error);
+            return res.status(common_1.HttpStatus.INTERNAL_SERVER_ERROR).json({
+                message: JSON.stringify(error) || 'Erreur interne du serveur',
+                status: common_1.HttpStatus.INTERNAL_SERVER_ERROR,
+                data: null,
+            });
+        }
+    }
     async getByRole(role) {
         return this.usersService.getUsersByRole(role);
     }
@@ -239,6 +265,14 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Post)('userAssign'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "getUsersAssign", null);
 __decorate([
     (0, common_1.Get)('by-role/:role'),
     __param(0, (0, common_1.Param)('role')),

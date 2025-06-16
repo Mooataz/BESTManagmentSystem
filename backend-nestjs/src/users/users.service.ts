@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -41,7 +41,7 @@ export class UsersService {
   }
 
   async findOne(id: number):Promise<User> {
-    const OneUser= await this.userRepositry.findOne({ where: { id } })
+    const OneUser= await this.userRepositry.findOne({relations: ['branch'], where: { id } })
     if ( !OneUser){
       throw new NotFoundException("There is no user data Available")
     }
@@ -106,10 +106,37 @@ async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
   }
 
   async findUserByLogin( login: string): Promise<User> {
-    const userByLogin = await this.userRepositry.findOne({ where: {login}});
+    const userByLogin = await this.userRepositry.findOne({ where: {login},relations: ['branch']});
     if(!userByLogin) { throw new NotFoundException('User not found')};
     return userByLogin;
   }
+
+
+async findToAssign( branchId: number, admin: boolean ): Promise<User[]> {
+  // Vérification que branchId est un nombre valide
+  
+ 
+ 
+  const allowedRoles = admin ? ['Technicien', 'Administrateur'] : ['Technicien'];
+  const users = await this.userRepositry.find({
+    where: [
+      // Cas où admin = true : filtre "Technicien" par branchId et "Administrateur" sans branche
+      ...(admin ? [
+        // Les techniciens filtrés par branchId
+        { status: 'Autoriser', role: 'Technicien', branch: { id: branchId } },
+        // Les administrateurs sans restriction de branche
+        { status: 'Autoriser', role: 'Administrateur' },
+      ] : [
+        // Cas où admin = false : uniquement les techniciens dans la bonne branche
+        { status: 'Autoriser', role: 'Technicien', branch: { id: branchId } },
+      ]),
+    ],
+    relations: ['branch'],
+  }); 
+
+  return users
+}
+
 
 
   async getUsersByRole(role: string):Promise<User[]>{

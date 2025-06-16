@@ -231,7 +231,7 @@ export   function AddAgence() {
 }
 import { MdOutlineModeEdit } from "react-icons/md";
 import { getCompany } from '../../api/administration/Company';
-import { useNotification } from '../Componants/NotificationContext';
+import { useNotification } from '../../Componants/NotificationContext';
 
 export   function UpdateAgence({agencie}:Agencies) {
    const { notify } = useNotification();

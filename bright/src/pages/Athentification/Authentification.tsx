@@ -7,17 +7,17 @@ import Button from '@mui/joy/Button';
 import * as React from 'react';
 import Snackbar from '@mui/joy/Snackbar';
 import SnackbarProps from '@mui/joy/Snackbar';
-import { useNotification } from '../Componants/NotificationContext';
+import { useNotification } from '../../Componants/NotificationContext';
 import { FormHelperText, Typography } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUser } from '../../Redux/userSlice';
-import { loginUser } from '../../Redux/Actions/authAction'; 
+import { setUser } from '../../Redux/auth/userSlice';
+import { loginUser } from '../../Redux/Actions/authAction';
 import * as Yup from 'yup';
 import { useForm } from 'react-hook-form';
 import type { AppDispatch, RootState } from '../../Redux/store';
 import { yupResolver } from '@hookform/resolvers/yup';
- import  {clearError} from '../../Redux/authSlice'
- import { useAppDispatch } from '../../Redux/hooks'
+import { clearError } from '../../Redux/auth/authSlice'
+import { useAppDispatch } from '../../Redux/hooks'
 interface FormElements extends HTMLFormControlsCollection {
   email: HTMLInputElement;
   password: HTMLInputElement;
@@ -32,25 +32,25 @@ interface SignInFormElement extends HTMLFormElement {
 }
 
 function Authentification() {
- 
+
   const [open, setOpen] = React.useState(false);
   const { notify } = useNotification();
- // const dispatch = useDispatch<AppDispatch>();
- 
-const dispatch = useAppDispatch();
+  // const dispatch = useDispatch<AppDispatch>();
 
-   const navigate = useNavigate();
-    const { error  } = useSelector((state: RootState) => state.auth);
-  // Initialisation du formulaire
+  const dispatch = useAppDispatch();
+
+  const navigate = useNavigate();
+  const { error } = useSelector((state: RootState) => state.auth);
+
 
 
   // Effet pour gérer les erreurs globales
 
-React.useEffect(() => {
-  if (error) {
-    dispatch(clearError()); // ✅ Cela doit fonctionner maintenant
-  }
-}, [error, dispatch]);
+  React.useEffect(() => {
+    if (error) {
+      dispatch(clearError());
+    }
+  }, [error, dispatch]);
 
   const validationSchema = Yup.object().shape({
     login: Yup.string().required('Login requis'),
@@ -67,26 +67,25 @@ React.useEffect(() => {
   });
   const onSubmit = async (formData: LoginFormData) => {
     try {
-          const resultAction = await dispatch(loginUser(formData))
+      const resultAction = await dispatch(loginUser(formData))
 
-          if (loginUser.fulfilled.match(resultAction)) {
-            notify('Connexion réussie!', 'success');
-             reset(); // Réinitialise le formulaire
-            navigate('/dashboard');
-          } else if (loginUser.rejected.match(resultAction)) {
+      if (loginUser.fulfilled.match(resultAction)) {
+        notify('Connexion réussie!', 'success');
+        reset(); // Réinitialise le formulaire
+        navigate('/dashboard');
+      } else if (loginUser.rejected.match(resultAction)) {
         // La notification est déjà gérée par l'effet sur 'error'
         setOpen(true);
       }
-          
-          /* console.log('user: ', resultAction)
-          navigate('/dashboard'); */
+
+       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
       notify(errorMessage, "danger");
       setOpen(true);
     }
   }
-   
+
   return (
     <div style={{ display: 'flex', width: '100vw', height: '100vh', margin: 0, padding: 0 }}>
       {/* Bloc de login */}
@@ -100,7 +99,7 @@ React.useEffect(() => {
         }}
       >
         <form onSubmit={handleSubmit(onSubmit)}
- 
+
           style={{
             width: '80%',
             maxWidth: '600px',
@@ -116,7 +115,7 @@ React.useEffect(() => {
             <Typography style={{ marginRight: '80%', marginTop: '5%', color: '#03719C' }} >Identifiant</Typography>
             <Input id="login" variant="soft" style={{ borderRadius: '15px', height: '40px' }} required
               {...register('login')}
-               
+
               color={errors.login ? 'danger' : 'neutral'}
             />
             {errors.login && (
@@ -132,9 +131,7 @@ React.useEffect(() => {
               {...register('password')} />
           </Stack>
 
-          <Button type="submit" fullWidth style={{ marginTop: '10%', borderRadius: '30px' }}
-
-          >
+          <Button type="submit" fullWidth style={{ marginTop: '10%', borderRadius: '30px' }}>
             Se connecter
           </Button>
 
@@ -156,11 +153,7 @@ React.useEffect(() => {
         />
 
       </div>
-      <Stack spacing={2} sx={{ alignItems: 'center' }}>
-
-
-
-      </Stack>
+       
     </div>
   );
 }

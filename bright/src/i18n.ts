@@ -79,10 +79,15 @@ i18n
           Coordinateur:'Coordinateur',
           Technicien:'Technicien',
           Gestionnaire_de_stocks:'Gestionnaire_de_stocks',
+          NoData:'Aucune donnée à afficher.',
+          Legislation:"Législation"
+          
         },
       },
       en: {
         translation: {
+          Legislation:"Law",
+          NoData:'No data available.',
           Gestionnaire_de_stocks:'Inventory Manager',
           Technicien:'Technician',
           Coordinateur:'Coordinate',

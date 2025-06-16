@@ -82,7 +82,7 @@ let RepairService = class RepairService {
         if (!device)
             throw new common_1.NotFoundException('Device not found');
         const repairData = {
-            actuellyBranch: createRepairDto.actuellyBranch,
+            actuellyBranch: createRepairDto.actuellybranch,
             remark: createRepairDto.remark,
             deviceStateReceive: createRepairDto.deviceStateReceive,
             accessory,
@@ -107,15 +107,24 @@ let RepairService = class RepairService {
         return savedRepair;
     }
     async findAll() {
-        const allfind = await this.repairRepositry.find();
+        const allfind = await this.repairRepositry.find({
+            relations: ['device', 'device.model', 'device.model.brand', 'customer'],
+        });
         if (!allfind || allfind.length === 0) {
             throw new common_1.NotFoundException('There is no data available');
         }
         return allfind;
     }
     async findOne(id) {
-        const onefind = await this.repairRepositry.findOne({ where: { id },
-            relations: ['customer', 'device'], });
+        const onefind = await this.repairRepositry.findOne({
+            where: { id },
+            relations: ['customer', 'customer.distributer',
+                'device', 'device.model', 'device.model.brand',
+                'accessory',
+                'listFault',
+                'customerRequest',
+                'historyRepair', 'historyRepair.tracability', 'historyRepair.tracability.user', 'historyRepair.tracability.user.branch', 'historyRepair.tracability.user.branch.company'],
+        });
         if (!onefind) {
             throw new common_1.NotFoundException('No data available');
         }
@@ -198,22 +207,62 @@ let RepairService = class RepairService {
         return findAll;
     }
     async filterByActuellyBranch(actuellyBranch) {
-        const findAll = await this.repairRepositry
-            .createQueryBuilder('repair')
-            .where('actuellyBranch = :actuellyBranch', { actuellyBranch })
-            .getMany();
+        const findAll = await this.repairRepositry.find({
+            where: {
+                actuellybranch: actuellyBranch,
+            },
+            relations: [
+                'customer', 'customer.distributer',
+                'device', 'device.model', 'device.model.brand',
+                'accessory',
+                'listFault',
+                'customerRequest',
+                'historyRepair',
+                'historyRepair.tracability',
+                'historyRepair.tracability.user',
+                'historyRepair.tracability.user.branch',
+                'historyRepair.tracability.user.branch.company'
+            ], order: {
+                id: 'DESC'
+            }
+        });
         if (!findAll || findAll.length === 0) {
             throw new common_1.NotFoundException("There is no data Available");
         }
         return findAll;
     }
     async findByBranchAndStep(branchId, step) {
-        return this.repairRepositry
-            .createQueryBuilder('repair')
-            .innerJoin('repair.historyRepair', 'history')
-            .where('repair.actuellyBranch = :branchId', { branchId })
-            .andWhere('history.step = :step', { step })
-            .getMany();
+        const allRepairs = await this.repairRepositry.find({
+            where: {
+                actuellybranch: branchId
+            },
+            relations: [
+                'customer', 'customer.distributer',
+                'device', 'device.model', 'device.model.brand',
+                'accessory',
+                'listFault',
+                'customerRequest',
+                'historyRepair',
+                'historyRepair.tracability',
+                'historyRepair.tracability.user',
+                'historyRepair.tracability.user.branch',
+                'historyRepair.tracability.user.branch.company',
+                'user'
+            ],
+            order: {
+                historyRepair: {
+                    date: 'DESC'
+                }
+            }
+        });
+        const filtered = allRepairs.filter(repair => {
+            const history = repair.historyRepair;
+            if (!history || history.length === 0)
+                return false;
+            const lastStep = history[0].step;
+            return lastStep === step;
+        });
+        return filtered;
     }
     async updateRepairWithParts(repairId, updateData) {
         const repair = await this.repairRepositry.findOne({
@@ -255,6 +304,39 @@ let RepairService = class RepairService {
             }
         }
         return updatedRepair;
+    }
+    async FiltreByUserStep(userId, steps) {
+        const filtreuserId = await this.repairRepositry.find({
+            where: {
+                user: { id: userId },
+            },
+            relations: [
+                'customer', 'customer.distributer',
+                'device', 'device.model', 'device.model.brand',
+                'accessory',
+                'listFault',
+                'customerRequest',
+                'historyRepair',
+                'historyRepair.tracability',
+                'historyRepair.tracability.user',
+                'historyRepair.tracability.user.branch',
+                'historyRepair.tracability.user.branch.company',
+                'user'
+            ],
+            order: {
+                historyRepair: {
+                    date: 'DESC'
+                }
+            }
+        });
+        const filtered = filtreuserId.filter(repair => {
+            const history = repair.historyRepair;
+            if (!history || history.length === 0)
+                return false;
+            const lastStep = history[0].step;
+            return lastStep === steps;
+        });
+        return filtered;
     }
 };
 exports.RepairService = RepairService;

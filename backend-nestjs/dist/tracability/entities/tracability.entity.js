@@ -26,11 +26,11 @@ __decorate([
     __metadata("design:type", Number)
 ], Tracability.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => history_repair_entity_1.HistoryRepair, (historyRepair) => historyRepair.repair, { cascade: true, eager: true }),
+    (0, typeorm_1.ManyToOne)(() => history_repair_entity_1.HistoryRepair, (historyRepair) => historyRepair.repair, { cascade: true, eager: true, nullable: true }),
     __metadata("design:type", history_repair_entity_1.HistoryRepair)
 ], Tracability.prototype, "historyRepair", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => history_stock_part_entity_1.HistoryStockPart, (historyStockPart) => historyStockPart.tracability),
+    (0, typeorm_1.ManyToOne)(() => history_stock_part_entity_1.HistoryStockPart, (historyStockPart) => historyStockPart.tracability, { nullable: true }),
     __metadata("design:type", history_stock_part_entity_1.HistoryStockPart)
 ], Tracability.prototype, "historyStockPart", void 0);
 __decorate([

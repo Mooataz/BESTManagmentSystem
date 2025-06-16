@@ -19,7 +19,7 @@ export class BinController {
       })
     } catch (error) {
       if (error.code === '23505') {
-              throw new ConflictException('Bin already exists');
+              throw new ConflictException('Case déja utilisé');
             }
       return res.status(HttpStatus.BAD_REQUEST).json({
         message:error.message,
@@ -33,6 +33,7 @@ export class BinController {
     @Res() res) {
     try {
       const allfind = await this.binService.findByBranchId(branchId)
+       
       return res.status(HttpStatus.OK).json({
         message:"Founded Successfuly !",
         status:HttpStatus.OK,
@@ -115,6 +116,9 @@ export class BinController {
         data:updateType
       })
     } catch (error) {
+      if (error.code === '23505') {
+              throw new ConflictException('Case déja utilisé');
+            }
       return res.status(HttpStatus.BAD_REQUEST).json({
         message:error.message,
         status:HttpStatus.BAD_REQUEST,

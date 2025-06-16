@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, ConflictException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, ConflictException, Query, ParseIntPipe, BadRequestException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -179,6 +179,45 @@ export class UsersController {
       
     }
   }
+@Post('userAssign')
+async getUsersAssign(
+  @Body() body: {   branchId: number, admin: boolean }, 
+  @Res() res
+) {
+   const {  branchId,  admin } = body; 
+
+  try {
+    const userTech = await this.usersService.findToAssign( branchId, admin );
+
+    if (userTech.length === 0) {
+      return res.status(HttpStatus.NOT_FOUND).json({
+        message: "Aucun technicien trouvé pour cette branche.",
+        status: HttpStatus.NOT_FOUND,
+        data: null,
+      });
+    }
+
+    return res.status(HttpStatus.OK).json({
+      message: "Techniciens trouvés !",
+      status: HttpStatus.OK,
+      data: userTech,
+    });
+  } catch (error) {
+    console.error('Erreur backend:', error);  // Log pour examiner l'erreur
+
+    // Si erreur est un objet, vous pouvez renvoyer sa chaîne
+    return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      message: JSON.stringify(error) || 'Erreur interne du serveur',
+      status: HttpStatus.INTERNAL_SERVER_ERROR,
+      data: null,
+    });
+  }
+}
+
+
+
+
+
 
   @Get('by-role/:role')
   async getByRole(@Param('role') role: string) {

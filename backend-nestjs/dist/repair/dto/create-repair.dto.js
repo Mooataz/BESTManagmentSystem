@@ -13,7 +13,7 @@ exports.CreateRepairDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class CreateRepairDto {
-    actuellyBranch;
+    actuellybranch;
     customer;
     device;
     remark;
@@ -26,8 +26,8 @@ exports.CreateRepairDto = CreateRepairDto;
 __decorate([
     (0, swagger_1.ApiProperty)({ type: String }),
     (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
-], CreateRepairDto.prototype, "actuellyBranch", void 0);
+    __metadata("design:type", Number)
+], CreateRepairDto.prototype, "actuellybranch", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: Number, }),
     (0, class_validator_1.IsNumber)(),

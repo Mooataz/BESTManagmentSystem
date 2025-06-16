@@ -1,7 +1,6 @@
 import * as React from 'react';
-import Box  from '@mui/joy/Box';
-import type { BoxProps } from '@mui/joy/Box';
-import Sheet from '@mui/joy/Sheet';
+  import Sheet from '@mui/joy/Sheet';
+import { Box, type BoxProps } from '@mui/material';
 
 function Root(props: BoxProps) {
   return (
