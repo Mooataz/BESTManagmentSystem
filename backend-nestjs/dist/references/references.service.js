@@ -48,7 +48,7 @@ let ReferencesService = class ReferencesService {
         return await this.referenceRepositry.save(createNew);
     }
     async findAll() {
-        const findAll = await this.referenceRepositry.find();
+        const findAll = await this.referenceRepositry.find({ relations: ['allpart', 'model'] });
         if (!findAll || findAll.length === 0) {
             throw new common_1.NotFoundException('No Reference found');
         }

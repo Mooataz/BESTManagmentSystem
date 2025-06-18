@@ -136,5 +136,15 @@ export class ModelsService {
           throw new NotFoundException("There is no data Available") }
       return findAll
   }
+
+  async findByBrandAuthorised () : Promise<Model[]> {
+const allModels = await this.modelRepositry.find({
+  relations: ['brand', 'typeModel','allpart']
+});
+
+const filtered = allModels.filter(model => model.brand?.status === 'Autoriser');
+
+    return filtered
+  }
 }
 

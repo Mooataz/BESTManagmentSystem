@@ -136,6 +136,13 @@ let ModelsService = class ModelsService {
         }
         return findAll;
     }
+    async findByBrandAuthorised() {
+        const allModels = await this.modelRepositry.find({
+            relations: ['brand', 'typeModel', 'allpart']
+        });
+        const filtered = allModels.filter(model => model.brand?.status === 'Autoriser');
+        return filtered;
+    }
 };
 exports.ModelsService = ModelsService;
 exports.ModelsService = ModelsService = __decorate([

@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
- import type { Model } from "../../Types/repairTypes";
-const API = axios.create({
+import type {FormAllParts} from '../../Types/administrationTypes'
+ const API = axios.create({
   baseURL: 'http://localhost:3000/',
   withCredentials: true, // utile si tu envoies des cookies / tokens
 });
@@ -9,16 +9,16 @@ const API = axios.create({
 
  
 
-  export const getModelsAuthorised = createAsyncThunk< 
-  Model[],   
+  export const getAllPart = createAsyncThunk< 
+  FormAllParts[],   
  
   void 
 >(
-  'models/findByBrandAuthorised',
+  'all-parts/getAll',
   async (  _ ,{rejectWithValue}  ) => {
     try {
-      const response = await API.get(`models/findByBrandAuthorised`);
-      console.log(response.data.data);
+      const response = await API.get(`all-parts`);
+     
       return response.data.data;  
     } catch (error: any) {
       return rejectWithValue(

@@ -32,7 +32,7 @@ export class ReferencesService {
   }
 
   async findAll(): Promise<Reference[]> {
-    const findAll = await this.referenceRepositry.find()
+    const findAll = await this.referenceRepositry.find({  relations: ['allpart','model']})
     if (!findAll || findAll.length === 0) {
       throw new NotFoundException('No Reference found')
     }

@@ -9,7 +9,7 @@ import { GiRaiseSkeleton } from "react-icons/gi";
 import { SiProbot } from "react-icons/si";
 import { GoGitPullRequestDraft } from "react-icons/go";
 import { TbBrandAndroid } from "react-icons/tb";
-import { MdHorizontalDistribute } from "react-icons/md";
+import { MdExpandLess, MdHorizontalDistribute } from "react-icons/md";
 import { SlScreenSmartphone } from "react-icons/sl";
 import { FcMultipleSmartphones } from "react-icons/fc";
 import { LiaDatabaseSolid } from "react-icons/lia";
@@ -46,9 +46,11 @@ import Typography from '@mui/material/Typography';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { useTheme } from '@mui/material/styles';
 
  import type { RootState } from '../../Redux/store';
-import { Box, Fade } from '@mui/material';
+import { Box, Collapse, Fade, Toolbar, Tooltip } from '@mui/material';
 import theme from '../../Theme/theme';
 interface NavigationProps {
   onSelectPage: (page: string) => void;
@@ -76,6 +78,8 @@ export default function Navigation() {
   const handleNavigation = (page: string) => {
     navigate(`/dashboard/${page}`);   
   };
+const theme = useTheme();
+const isSmallScreen = useMediaQuery(theme.breakpoints.down('lg')); // ou 'md' selon ce que tu veux sm
 
   const menuItems: MenuItem[] = [
   {
@@ -212,149 +216,104 @@ const [filteredMenuItems, setFilteredMenuItems] = React.useState<MenuItem[]>([])
 
     fetchUser();
   }, []);
-  const [expanded, setExpanded] = React.useState(false);
-
+ 
+   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
   
-  const [expandedPanel, setExpandedPanel] = React.useState<string | false>(false);
+  const handleToggle = (label: string) => {
+    setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
+  };
+   const renderMenuItem = (item: MenuItems, level: number = 0) => {
+    const hasChildren = 'children' in item && Array.isArray(item.children);
 
-const handleExpansion = (panelId: string) => (
-  event: React.SyntheticEvent,
-  isExpanded: boolean
-) => {
-  setExpandedPanel(isExpanded ? panelId : false);
-};
-
-  return (
-    <div>
-   <List
-      sx={{padding:'0px',
-    borderRadius: (theme) => theme.shape.borderRadius, // équivalent à un radius standard
-    '& .MuiListItem-root': {
-      borderRadius: 4, // ou utiliser theme.shape.borderRadius
-      
-    },
-    }}>
-      <ListItem sx={{ borderBottom: '1px solid #ccc', width:'100%',padding:'0px' }}>
-        <List
-            aria-labelledby="nav-list-browse"
-            sx={{padding:'0px',
-              '& .MuiListItemButton-root': {
-                //p: '1px', // padding équivalent
-              },
-            }}
-          >
-            {filteredMenuItems.map((item, index) => (
-              <Box key={index}>
-                {hasChildren(item) ? (
-                  <Accordion
-                          expanded={expandedPanel === item.label}
-                          onChange={handleExpansion(item.label)}
-                          slots={{ transition: Fade as AccordionSlots['transition'] }}
-                          slotProps={{ transition: { timeout: 400 } }}
-                          sx={[
-                            expandedPanel === item.label
-                              ? {
-                                  [`& .${accordionClasses.region}`]: {
-                                    height: 'auto',margin:0
-                                  },
-                                  [`& .${accordionDetailsClasses.root}`]: {
-                                    display: 'block',borderRadius: 4, backgroundColor:theme.palette.info.main
-                                  },
-                                }
-                              : {
-                                  [`& .${accordionClasses.region}`]: {
-                                    height: 0,margin:0
-                                  },
-                                  [`& .${accordionDetailsClasses.root}`]: {
-                                    display: 'none',
-                                  },
-                                },
-                          ]}>
-                          <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
-                            aria-controls="panel1-content"
-                            id={item.label}
-                            sx={{ backgroundColor:theme.palette.info.main}}
-                          >
-                             
-                                <ListItemButton sx={{height:'30px', backgroundColor:theme.palette.info.main}}>
-                                    <ListItemIcon>{item.icon}</ListItemIcon>
-                                    <ListItemText><h5>{t(item.label)} </h5></ListItemText>
-                                </ListItemButton>
-                             
-                          </AccordionSummary>
-                          <AccordionDetails>
-                  <List sx={{ pl: 2 , width:'100%'}}>
-                    {item.children.map((subItem, subIndex) => (
-                      <ListItemButton
-                      sx={{height:'40px', backgroundColor:theme.palette.info.main}}
-                        key={subIndex}
-                        onClick={() => handleNavigation(subItem.page)}
-                      >
-                        <ListItemIcon>{subItem.icon}</ListItemIcon>
-                        <ListItemText> <h6>{t(subItem.label)}</h6></ListItemText>
-                      </ListItemButton>
-                    ))}
-                  </List>
-                </AccordionDetails>
-                  </Accordion>
-
-                ):( <Accordion
-                          expanded={expandedPanel === item.label}
-                          onChange={handleExpansion(item.label)}
-                          slots={{ transition: Fade as AccordionSlots['transition'] }}
-                          slotProps={{ transition: { timeout: 400 } }}
-                          sx={[
-                            expandedPanel === item.label
-                              ? {
-                                  [`& .${accordionClasses.region}`]: {
-                                    height: 'auto',margin:0
-                                  },
-                                  [`& .${accordionDetailsClasses.root}`]: {
-                                    display: 'block',borderRadius: 4, backgroundColor:theme.palette.info.main
-                                  },
-                                }
-                              : {
-                                  [`& .${accordionClasses.region}`]: {
-                                    height: 0,margin:0
-                                  },
-                                  [`& .${accordionDetailsClasses.root}`]: {
-                                    display: 'none',
-                                  },
-                                },
-                          ]}>
-                  <AccordionSummary
-                            
-                            aria-controls="panel1-content"
-                            id={item.label}
-                            sx={{ backgroundColor:theme.palette.info.main}}
-                          >
-                  <ListItemButton onClick={() => handleNavigation(item.page)}>
-                      <ListItemIcon>{item.icon}</ListItemIcon>
-                      <ListItemText>{t(item.label)}</ListItemText>
-
-                  </ListItemButton>
-                  </AccordionSummary>
-                  </Accordion>
-
-                ) }
-
-
-              </Box>
-
-
-              ))}
-
-
-          </List>
-
+    if (hasChildren) {
+      return (
+        <React.Fragment key={item.label}>
+          <ListItem disablePadding>
+            <ListItemButton onClick={() => handleToggle(item.label)} sx={{ pl: 2 + level * 2 }}>
+              <ListItemIcon> {openMenus[item.label] ? <MdExpandLess /> : <ExpandMoreIcon />} </ListItemIcon>
+              <ListItemIcon>{item.icon}</ListItemIcon>
+               {!isSmallScreen && (
+                <>
+              <ListItemText
+                secondary={
+                  <Typography variant="body2" fontSize={12}>
+                    {t(item.label)}
+                  </Typography>
+                }
+              />
+              
+              </>
+            )}
+               
+              
+            </ListItemButton>
+          </ListItem>
+          <Collapse in={openMenus[item.label]} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              {item.children!.map((subItem) => renderMenuItem(subItem, level + 1))}
+            </List>
+          </Collapse>
+        </React.Fragment>
+      );
+    }
+ if ('page' in item) {
+    return (
+      <ListItem disablePadding key={item.label}>
+        <Tooltip title={t(item.label)} placement="right" disableHoverListener={!isSmallScreen}>
+          <ListItemButton onClick={() => handleNavigation(item.page)} sx={{ pl: 2 + level * 2 }}>
+            <ListItemIcon>{item.icon}</ListItemIcon>
+            {!isSmallScreen && (
+              <ListItemText
+                secondary={
+                  <Typography variant="body2" fontSize={12}>
+                    {t(item.label)}
+                  </Typography>
+                }
+              />
+            )}
+          </ListItemButton>
+        </Tooltip>
 
       </ListItem>
+    ); }
+  };
 
-   </List>
+  
+  return (
+    <div>
+  <Box sx={{ width: '100%'  , height: '100vh' }}>
+      <List>
+        {filteredMenuItems.map((item) => renderMenuItem(item))}
+      </List>
+    </Box>
+ 
+
     </div>
   )
 }
-function hasChildren(item: MenuItem): item is Extract<MenuItem, { children: unknown }> {
-  return 'children' in item;
-}
+ 
+
+//---------------------------------------------------------------------------------------------------
+import  { useState } from 'react';
+ 
+
+ type MenuItems  =
+  | {
+    label: string;
+    icon: React.ReactNode;
+    page: string;
+    content?: React.ReactNode;
+  }
+  | {
+    label: string;
+    icon: React.ReactNode;
+    children: {
+      label: string;
+      icon: React.ReactNode;
+      page: string;
+    }[];
+  }
+
+ 
+ 
+ 

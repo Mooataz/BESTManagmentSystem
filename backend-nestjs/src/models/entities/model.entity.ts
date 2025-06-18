@@ -19,7 +19,7 @@ export class Model {
     @Column({ nullable: true })
             picture: string;
 
-    @ManyToOne( () => Brand, Brand => Brand.Model,  { cascade: true })
+    @ManyToOne( () => Brand, Brand => Brand.model,  { cascade: true })
     brand : Brand 
 
     @ManyToOne( () => TypeModel, typeModel => typeModel.model,  { cascade: true })

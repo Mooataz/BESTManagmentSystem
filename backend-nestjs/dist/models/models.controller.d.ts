@@ -6,6 +6,7 @@ export declare class ModelsController {
     create(createModelDto: CreateModelDto, res: any, picture: Express.Multer.File): Promise<any>;
     getBySaleId(brandId: number, res: any): Promise<any>;
     getByTypeModelId(typeModelId: number, res: any): Promise<any>;
+    findByBrandAuthorised(res: any): Promise<any>;
     findAll(res: any): Promise<any>;
     findOne(id: number, res: any): Promise<any>;
     update(id: number, body: any, res: any, picture: Express.Multer.File): Promise<any>;

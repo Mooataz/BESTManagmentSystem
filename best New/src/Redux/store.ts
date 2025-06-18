@@ -11,7 +11,8 @@ import historyRepairReducer from './recptionSlices/historyRepairSlice'
 import legislationReducer from './Administration/LegislationSlice'
 import binReducer from './Stock/binSlice';
 import refrencesReucer from './Stock/referencesSlice'
- 
+import modelsReducer from './Administration/modelsSlise'
+import allpartsReducer from './Administration/AllPartSlice'
 //store
 const rootReducer = combineReducers({
       repair: repairReducer,
@@ -21,13 +22,14 @@ const rootReducer = combineReducers({
       legislation:legislationReducer,
       bin: binReducer,
       references: refrencesReucer,
-       
+      models: modelsReducer,
+      allParts:allpartsReducer,
 
 });
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth','user','userr','repair','bin','references'] // Seulement persister l'auth si nécessaire
+  whitelist: ['auth','user','userr','repair','bin','references','models','allParts'] // Seulement persister l'auth si nécessaire
 }
 const persistedReducer = persistReducer(persistConfig,rootReducer)
 

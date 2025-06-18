@@ -14,24 +14,24 @@ export default function References() {
       <Typography  sx={{textAlign:'left' , fontWeight:'bold', marginBottom:'3%'}} >List des references</Typography   >
     <AddReference />
     
-    <DynamicTable
+     {/*  <DynamicTable
                 rows={references}
-                /* actions={actions} */
+                   actions={actions}    
                 columnLabels={{
                     'id': 'Code',
                     'materialCode': 'Reference',
                     'model': 'Modéle compatible',
-                    'allpart':'Nom piéce'
+                    'allpart.description':'Nom piéce'
 
                 }}
 
                 columnsToShow={['id',
                     'materialCode',
                     'model',
-                    'allpart'
+                    'allpart.description'
                 ]}
 
-            />
+            />   */}
     </div>
   )
 }

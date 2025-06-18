@@ -80,6 +80,23 @@ let ModelsController = class ModelsController {
             });
         }
     }
+    async findByBrandAuthorised(res) {
+        try {
+            const data = await this.modelsService.findByBrandAuthorised();
+            return res.status(common_1.HttpStatus.OK).json({
+                message: "Get Authorised Model successfuly !",
+                status: common_1.HttpStatus.OK,
+                data: data
+            });
+        }
+        catch (error) {
+            return res.status(common_1.HttpStatus.BAD_REQUEST).json({
+                message: error.message,
+                status: common_1.HttpStatus.BAD_REQUEST,
+                data: null
+            });
+        }
+    }
     async findAll(res) {
         try {
             const comp = await this.modelsService.findAll();
@@ -214,6 +231,13 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], ModelsController.prototype, "getByTypeModelId", null);
+__decorate([
+    (0, common_1.Get)('findByBrandAuthorised'),
+    __param(0, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ModelsController.prototype, "findByBrandAuthorised", null);
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Res)()),

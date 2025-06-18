@@ -9,8 +9,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppService = void 0;
 const common_1 = require("@nestjs/common");
 let AppService = class AppService {
-    cleanSpaces(text) {
-        return text.replace(/\s+/g, ' ').trim();
+    cleanSpaces(value) {
+        return (value ?? '').replace(/\s+/g, ' ').trim();
     }
     getHello() {
         return 'Hello amigo ';

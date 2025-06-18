@@ -93,6 +93,27 @@ export class ModelsController {
         status:HttpStatus.BAD_REQUEST,
         data:null }) }
   }
+
+    @Get('findByBrandAuthorised')
+  async findByBrandAuthorised (@Res() res) {
+    
+    try {
+       
+      const  data = await this.modelsService.findByBrandAuthorised();
+      return res.status(HttpStatus.OK).json({
+        message: "Get Authorised Model successfuly !",
+        status: HttpStatus.OK,
+        data: data
+      })
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+        data: null
+      })
+
+    }
+  }
   @Get()
   async findAll(@Res() res) {
 
@@ -218,4 +239,6 @@ export class ModelsController {
 
     }
   }
+
+ 
 }

@@ -18,6 +18,6 @@ export interface Bin {
      id? : number;
      materialCode: string;
      description?: string;
-     model : Model[];
+     modelIds : number | number[];
      allpart : number;
  }

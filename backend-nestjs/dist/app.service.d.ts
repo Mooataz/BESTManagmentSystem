@@ -1,4 +1,4 @@
 export declare class AppService {
-    cleanSpaces(text: string): string;
+    cleanSpaces(value: string | undefined): string;
     getHello(): string;
 }

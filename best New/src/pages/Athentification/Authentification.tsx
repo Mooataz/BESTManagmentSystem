@@ -25,6 +25,7 @@ interface LoginFormData {
 interface SignInFormElement extends HTMLFormElement {
   readonly elements: FormElements;
 }
+ ;
 
 function Authentification() {
 const [open, setOpen] = React.useState(false);
@@ -74,7 +75,7 @@ const {
        
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
-      notify(errorMessage, "danger");
+      notify(errorMessage, "error");
       setOpen(true);
     }
   }

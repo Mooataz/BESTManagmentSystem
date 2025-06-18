@@ -32,6 +32,7 @@ __decorate([
         type: String,
         description: "Required"
     }),
+    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], CreateReferenceDto.prototype, "description", void 0);
 __decorate([

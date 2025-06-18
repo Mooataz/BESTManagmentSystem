@@ -20,4 +20,5 @@ export declare class ModelsService {
     remove(id: number): Promise<Model>;
     findByBrandId(brandId: number): Promise<Model[]>;
     findByTypeModelId(typeModelId: number): Promise<Model[]>;
+    findByBrandAuthorised(): Promise<Model[]>;
 }

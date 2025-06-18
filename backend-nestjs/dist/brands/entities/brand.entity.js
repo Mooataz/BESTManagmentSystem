@@ -18,7 +18,7 @@ let Brand = class Brand {
     name;
     logo;
     status;
-    Model;
+    model;
     levelRepair;
 };
 exports.Brand = Brand;
@@ -41,7 +41,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.OneToMany)(() => model_entity_1.Model, Model => Model.brand),
     __metadata("design:type", model_entity_1.Model)
-], Brand.prototype, "Model", void 0);
+], Brand.prototype, "model", void 0);
 __decorate([
     (0, typeorm_1.ManyToMany)(() => level_repair_entity_1.LevelRepair, (levelRepair) => levelRepair.brand),
     (0, typeorm_1.JoinTable)(),

@@ -17,7 +17,7 @@ export class Brand {
     status : string;
 
     @OneToMany ( () => Model, Model => Model.brand)
-    Model : Model
+    model : Model
 
     @ManyToMany( () => LevelRepair, (levelRepair) => levelRepair.brand)
     @JoinTable()
