@@ -17,13 +17,41 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const history_stock_part_entity_1 = require("./entities/history-stock-part.entity");
+const user_entity_1 = require("../users/entities/user.entity");
+const tracability_entity_1 = require("../tracability/entities/tracability.entity");
+const stock_part_entity_1 = require("../stock-parts/entities/stock-part.entity");
 let HistoryStockPartService = class HistoryStockPartService {
     historyStockPartRepositry;
-    constructor(historyStockPartRepositry) {
+    userRepositry;
+    tracabilityRepositry;
+    stockPartRepositry;
+    constructor(historyStockPartRepositry, userRepositry, tracabilityRepositry, stockPartRepositry) {
         this.historyStockPartRepositry = historyStockPartRepositry;
+        this.userRepositry = userRepositry;
+        this.tracabilityRepositry = tracabilityRepositry;
+        this.stockPartRepositry = stockPartRepositry;
     }
-    async create(createHistoryStockPartDto) {
-        return await this.historyStockPartRepositry.save(createHistoryStockPartDto);
+    async create(data) {
+        const stockPart = await this.stockPartRepositry.findOne({ where: { id: data.stockPart } });
+        if (!stockPart)
+            throw new common_1.NotFoundException('stockPart not found');
+        const user = await this.userRepositry.findOne({ where: { id: data.user?.id } });
+        if (!user)
+            throw new common_1.NotFoundException('user not found');
+        const createHistoryStockPartDto = {
+            step: data.step,
+            date: data.date,
+            stockPart: data.stockPart
+        };
+        const newCreate = this.historyStockPartRepositry.create(createHistoryStockPartDto);
+        const saveHist = await this.historyStockPartRepositry.save(newCreate);
+        const tracData = {
+            user: user,
+            stockPart: saveHist
+        };
+        const newTrac = await this.tracabilityRepositry.create(tracData);
+        await this.tracabilityRepositry.save(newTrac);
+        return saveHist;
     }
     async findAll() {
         const allfind = await this.historyStockPartRepositry.find();
@@ -67,6 +95,12 @@ exports.HistoryStockPartService = HistoryStockPartService;
 exports.HistoryStockPartService = HistoryStockPartService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(history_stock_part_entity_1.HistoryStockPart)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __param(1, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
+    __param(2, (0, typeorm_1.InjectRepository)(tracability_entity_1.Tracability)),
+    __param(3, (0, typeorm_1.InjectRepository)(stock_part_entity_1.StockPart)),
+    __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
+        typeorm_2.Repository,
+        typeorm_2.Repository])
 ], HistoryStockPartService);
 //# sourceMappingURL=history-stock-part.service.js.map

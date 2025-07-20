@@ -19,7 +19,7 @@ const typeorm_1 = require("typeorm");
 let StockPart = class StockPart {
     id;
     remark;
-    serialNumber;
+    serialnumber;
     bin;
     reference;
     historyStockPart;
@@ -38,9 +38,9 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], StockPart.prototype, "serialNumber", void 0);
+], StockPart.prototype, "serialnumber", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => bin_entity_1.Bin, bin => bin.stockPart),
+    (0, typeorm_1.ManyToOne)(() => bin_entity_1.Bin, bin => bin.stockPart, { nullable: true }),
     __metadata("design:type", bin_entity_1.Bin)
 ], StockPart.prototype, "bin", void 0);
 __decorate([

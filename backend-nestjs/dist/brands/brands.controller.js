@@ -26,7 +26,6 @@ let BrandsController = class BrandsController {
         this.brandsService = brandsService;
     }
     async create(createBrandDto, res, logo) {
-        console.log('REÇU', createBrandDto, logo);
         try {
             createBrandDto.logo = logo.filename;
             const newBrand = await this.brandsService.create(createBrandDto);
@@ -44,8 +43,9 @@ let BrandsController = class BrandsController {
             });
         }
     }
-    async getBySaleId(status, res) {
+    async getBySaleId(res) {
         try {
+            const status = 'Autoriser';
             const allfind = await this.brandsService.findByStatus(status);
             return res.status(common_1.HttpStatus.OK).json({
                 message: "Founded Successfuly !",
@@ -159,11 +159,10 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], BrandsController.prototype, "create", null);
 __decorate([
-    (0, common_1.Get)('/findStatus/:status'),
-    __param(0, (0, common_1.Param)('status')),
-    __param(1, (0, common_1.Res)()),
+    (0, common_1.Get)('/findAutoriser'),
+    __param(0, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], BrandsController.prototype, "getBySaleId", null);
 __decorate([

@@ -33,7 +33,7 @@ export class BranchesService {
   }
 
   async findOne(id: number):Promise<Branch> {
-    const Onefind= await this.branchRepositry.findOne({ where: { id } })
+    const Onefind= await this.branchRepositry.findOne({ where: { id }, relations: ['company', 'user', 'bin'],})
     if ( !Onefind){
       throw new NotFoundException("There is no data Available")
     }

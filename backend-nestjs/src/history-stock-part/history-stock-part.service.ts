@@ -4,13 +4,39 @@ import { UpdateHistoryStockPartDto } from './dto/update-history-stock-part.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { HistoryStockPart } from './entities/history-stock-part.entity';
+import { User } from 'src/users/entities/user.entity';
+import { Tracability } from 'src/tracability/entities/tracability.entity';
+import { StockPart } from 'src/stock-parts/entities/stock-part.entity';
 
 @Injectable()
 export class HistoryStockPartService {
-  constructor ( @InjectRepository(HistoryStockPart) private readonly  historyStockPartRepositry:Repository<HistoryStockPart>){}
+  constructor ( @InjectRepository(HistoryStockPart) private readonly  historyStockPartRepositry:Repository<HistoryStockPart>,
+                @InjectRepository(User) private readonly userRepositry:Repository<User>,
+              @InjectRepository(Tracability) private readonly tracabilityRepositry:Repository<Tracability>,
+            @InjectRepository(StockPart) private readonly stockPartRepositry:Repository<StockPart>,){}
 
-  async create(createHistoryStockPartDto: CreateHistoryStockPartDto):Promise<HistoryStockPart> {
-    return await this.historyStockPartRepositry.save(createHistoryStockPartDto);
+  async create(/* createHistoryStockPartDto: CreateHistoryStockPartDto */ data:any):Promise<HistoryStockPart> {
+    const stockPart = await this.stockPartRepositry.findOne({ where: {id: data.stockPart}});
+    if (!stockPart) throw new NotFoundException('stockPart not found');
+     
+    const user = await this.userRepositry.findOne({ where: { id: data.user?.id } }); // ⬅️ AJOUTER CECI
+  if (!user) throw new NotFoundException('user not found');
+   
+  const createHistoryStockPartDto ={
+      step: data.step,
+      date: data.date,
+      stockPart: data.stockPart
+   }
+   const newCreate  = this.historyStockPartRepositry.create(createHistoryStockPartDto)
+
+   const saveHist = await this.historyStockPartRepositry.save(newCreate);
+    const tracData ={
+      user: user,
+      stockPart:saveHist
+    }
+    const newTrac =  await this.tracabilityRepositry.create(tracData)
+    await this.tracabilityRepositry.save(newTrac);
+    return saveHist 
 
   }
 

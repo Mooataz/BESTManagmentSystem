@@ -11,7 +11,7 @@ import { AccessTokenGuard } from 'src/guards/accessToken.guard';
 export class RepairController {
   constructor(private readonly repairService: RepairService) { }
   @Post()
- @ApiConsumes('multipart/form-data')
+ //@ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
@@ -21,7 +21,7 @@ export class RepairController {
         newSerialNumber: { type: 'number' },
         files: { type: 'array', items: { type: 'string', format: 'binary' } },
         advancePayment: { type: 'number' }, */
-        actuellyBranch: { type: 'number' },
+        actuellybranch: { type: 'number' },
         remark: { type: 'string' },
         deviceStateReceive: { type: 'string' },
         device: { type: 'number' },
@@ -76,13 +76,14 @@ export class RepairController {
   ) */
    
   async create(  
-    @Body()  body: any, createRepairDto:   CreateRepairDto  ,  
+    @Body()  body: any, /* createRepairDto:   CreateRepairDto */     
     //@UploadedFiles() files: Express.Multer.File[],
     @Res() res,
   ) {
     try {
        
            const {userId, ...createRepairDto} = body; 
+        
       //createRepairDto.files = files?.map((file) => file.filename) || [];
        //const userId = req.user.id; 
       const newCreate = await this.repairService.create(createRepairDto  ,userId );
@@ -160,17 +161,7 @@ try {
       })
     }
   }
-/*   @Patch('updatePartRepair/:id')
-  async updateRepair(
-    @Param('id') id: number,
-    @Body() updateRepairDto: UpdateRepairDto
-  ) {
-    const updatedRepair = await this.repairService.updateRepairWithParts(+id, updateRepairDto);
-    return {
-      message: 'Repair updated successfully',
-      data: updatedRepair,
-    };
-  } */
+ 
     @Patch(':id')
   async update(@Param('id') id: number,
     @Body() updateRepairDto: UpdateRepairDto,
@@ -289,7 +280,7 @@ try {
     }
   }
 
-  @Get('FilterByUserStep')
+  @Get('FilterByUserStep') 
   async getByUserStep ( @Param() userId: number,
                         @Param() steps: string,
                         @Res() res){
@@ -308,4 +299,6 @@ try {
       });
       }
   }
+ 
+    
 }

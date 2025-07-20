@@ -17,5 +17,5 @@ export declare class ReferencesService {
     update(id: number, updateReferenceDto: UpdateReferenceDto): Promise<Reference>;
     remove(id: number): Promise<Reference>;
     findCompatibleReferences(modelId: number, partId: number): Promise<Reference[]>;
-    findByMaterialCode(materialCode: string): Promise<Reference[]>;
+    findReferenceByMaterialCode(materialCode: string): Promise<Reference>;
 }

@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AppService } from 'src/app.service';
 import { AppController } from 'src/app.controller';
+import { Distributeur } from 'src/distributeur/entities/distributeur.entity';
 
 
 @Injectable()
@@ -79,18 +80,33 @@ export class CustomersService {
     return findAll
   }
  
-  async findByName(name:string, phone: number ,distributer): Promise<Customer> {
-    let customer = await this.customerRepositry
-      .createQueryBuilder('customer')
-      .where('name = :name', { name }) // Filtre sur l'ID de repair
-      .andWhere('phone = :phone', { phone })
-      .getOne();
-    if (!customer ) {
-      
-      customer = this.customerRepositry.create({ name, phone, distributer });
-    await this.customerRepositry.save(customer);
+ 
+
+async findByName(name: string, phone: number, distributer): Promise<Customer> {
+  try {
+     
+
+    const customer = await this.customerRepositry.findOne({
+      where: { name, phone },
+    });
+
+    if (distributer === undefined || distributer === null) {
+      distributer = 0;
     }
-    return customer
+
+    if (!customer) {
+      const newCustomer = this.customerRepositry.create({ name, phone, distributer });
+      await this.customerRepositry.save(newCustomer);
+      
+      return newCustomer;
+    }
+
+    return customer;
+  } catch (error) {
+     throw error;
   }
+}
+
+
 }
 

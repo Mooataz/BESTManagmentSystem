@@ -81,16 +81,23 @@ let CustomersService = class CustomersService {
         return findAll;
     }
     async findByName(name, phone, distributer) {
-        let customer = await this.customerRepositry
-            .createQueryBuilder('customer')
-            .where('name = :name', { name })
-            .andWhere('phone = :phone', { phone })
-            .getOne();
-        if (!customer) {
-            customer = this.customerRepositry.create({ name, phone, distributer });
-            await this.customerRepositry.save(customer);
+        try {
+            const customer = await this.customerRepositry.findOne({
+                where: { name, phone },
+            });
+            if (distributer === undefined || distributer === null) {
+                distributer = 0;
+            }
+            if (!customer) {
+                const newCustomer = this.customerRepositry.create({ name, phone, distributer });
+                await this.customerRepositry.save(newCustomer);
+                return newCustomer;
+            }
+            return customer;
         }
-        return customer;
+        catch (error) {
+            throw error;
+        }
     }
 };
 exports.CustomersService = CustomersService;

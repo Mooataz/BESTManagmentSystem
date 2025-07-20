@@ -43,7 +43,7 @@ export class ModelsService {
   }
 
   async findOne(id: number):Promise<Model>  {
-    const findOne = await this.modelRepositry.findOne({ where : { id } })
+    const findOne = await this.modelRepositry.findOne({ where : { id },relations: ['allpart', 'brand', 'typeModel'] })
     if (!findOne){
       throw new NotFoundException('No model found')
     }

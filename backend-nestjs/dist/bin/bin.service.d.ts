@@ -16,4 +16,5 @@ export declare class BinService {
     remove(id: number): Promise<Bin>;
     findByBranchId(branchId: number): Promise<Bin[]>;
     findByBranchIdAndType(branchId: number, type: string): Promise<Bin[]>;
+    findByName(bname: string): Promise<Bin>;
 }

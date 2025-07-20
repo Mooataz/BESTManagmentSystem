@@ -14,12 +14,14 @@ const typeorm_1 = require("@nestjs/typeorm");
 const transfert_entity_1 = require("./entities/transfert.entity");
 const stock_part_entity_1 = require("../stock-parts/entities/stock-part.entity");
 const repair_entity_1 = require("../repair/entities/repair.entity");
+const user_entity_1 = require("../users/entities/user.entity");
+const branch_entity_1 = require("../branches/entities/branch.entity");
 let TransfertModule = class TransfertModule {
 };
 exports.TransfertModule = TransfertModule;
 exports.TransfertModule = TransfertModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([transfert_entity_1.Transfert, stock_part_entity_1.StockPart, repair_entity_1.Repair])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([transfert_entity_1.Transfert, stock_part_entity_1.StockPart, repair_entity_1.Repair, user_entity_1.User, branch_entity_1.Branch])],
         controllers: [transfert_controller_1.TransfertController],
         providers: [transfert_service_1.TransfertService],
     })

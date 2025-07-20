@@ -125,6 +125,27 @@ let DevicesService = class DevicesService {
         await this.deviceRepositry.save(device);
         return device;
     }
+    async deviceHasOpenRepair(serialNumber) {
+        const device = await this.deviceRepositry.findOne({
+            where: { serialenumber: serialNumber },
+            relations: ['repair', 'repair.historyRepair'],
+        });
+        if (!device || !device.repair || device.repair.length === 0) {
+            return false;
+        }
+        for (const rep of device.repair) {
+            if (rep.historyRepair && rep.historyRepair.length > 0) {
+                const sortedHistory = rep.historyRepair.sort((a, b) => {
+                    return new Date(b.date).getTime() - new Date(a.date).getTime();
+                });
+                const lastStep = sortedHistory[0].step;
+                if (lastStep !== 'Récupérer') {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 };
 exports.DevicesService = DevicesService;
 exports.DevicesService = DevicesService = __decorate([

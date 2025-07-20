@@ -8,10 +8,11 @@ export class StockPartsController {
   constructor(private readonly stockPartsService: StockPartsService) { }
 
   @Post()
-  async create(@Body() createStockPartDto: CreateStockPartDto,
+  async create(@Body() /* createStockPartDto: CreateStockPartDto */ data:any,
     @Res() res) {
     try {
-      const newCreate = await this.stockPartsService.create(createStockPartDto)
+       const {userId, ...createStockPartDto} = data; 
+      const newCreate = await this.stockPartsService.create(createStockPartDto, userId)
       return res.status(HttpStatus.CREATED).json({
         message:"Created Successfuly !",
         status:HttpStatus.CREATED,
@@ -101,11 +102,11 @@ export class StockPartsController {
       })
     }
   }
-  @Get('/find/:binId')
-  async getByBinId(@Param('binId') binId: number,
+  @Get('/findBranch/:branchId')
+  async getByBinId(@Param('branchId') branchId: number,
     @Res() res) {
     try {
-      const allfind = await this.stockPartsService.findByBinId(binId)
+      const allfind = await this.stockPartsService.findByBranchId(branchId)
       return res.status(HttpStatus.OK).json({
         message:"Founded Successfuly !",
         status:HttpStatus.OK,

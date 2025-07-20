@@ -87,4 +87,14 @@ async findByBranchId(branchId: number): Promise<Bin[]> {
         .andWhere('bin.type = :type', { type })
         .getMany();
 }
+
+async findByName(bname: string): Promise<Bin> {
+  const bin = await this.binRepositry.findOne({ where: { name: bname } });
+  if (!bin) {
+    throw new Error(`Bin with name "${bname}" not found.`);
+  }
+  return bin;
+}
+
+
 }

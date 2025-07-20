@@ -15,16 +15,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.StockPartsController = void 0;
 const common_1 = require("@nestjs/common");
 const stock_parts_service_1 = require("./stock-parts.service");
-const create_stock_part_dto_1 = require("./dto/create-stock-part.dto");
 const update_stock_part_dto_1 = require("./dto/update-stock-part.dto");
 let StockPartsController = class StockPartsController {
     stockPartsService;
     constructor(stockPartsService) {
         this.stockPartsService = stockPartsService;
     }
-    async create(createStockPartDto, res) {
+    async create(data, res) {
         try {
-            const newCreate = await this.stockPartsService.create(createStockPartDto);
+            const { userId, ...createStockPartDto } = data;
+            const newCreate = await this.stockPartsService.create(createStockPartDto, userId);
             return res.status(common_1.HttpStatus.CREATED).json({
                 message: "Created Successfuly !",
                 status: common_1.HttpStatus.CREATED,
@@ -107,9 +107,9 @@ let StockPartsController = class StockPartsController {
             });
         }
     }
-    async getByBinId(binId, res) {
+    async getByBinId(branchId, res) {
         try {
-            const allfind = await this.stockPartsService.findByBinId(binId);
+            const allfind = await this.stockPartsService.findByBranchId(branchId);
             return res.status(common_1.HttpStatus.OK).json({
                 message: "Founded Successfuly !",
                 status: common_1.HttpStatus.OK,
@@ -182,7 +182,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_stock_part_dto_1.CreateStockPartDto, Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], StockPartsController.prototype, "create", null);
 __decorate([
@@ -218,8 +218,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], StockPartsController.prototype, "remove", null);
 __decorate([
-    (0, common_1.Get)('/find/:binId'),
-    __param(0, (0, common_1.Param)('binId')),
+    (0, common_1.Get)('/findBranch/:branchId'),
+    __param(0, (0, common_1.Param)('branchId')),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, Object]),

@@ -5,38 +5,32 @@ import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGen
 
 @Entity()
 export class Transfert {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn() id: number;
 
-    @Column()
-    delivredBy: string;
+    @Column({ nullable: true }) delivredBy: string;
 
-    @Column()
-    sendingDate: Date;
     
-    @Column()
-    fromBranch: number;
+    @Column() sendingDate: Date;
+    
+    @Column() frombranch: number;
 
-    @Column()
-    sendUser: number;
+    @Column() sendUser: number;
 
-    @Column()
-    receivedDate: Date;
+    
+    @Column({ nullable: true }) receivedDate: Date;
 
-    @Column()
-    toBranch: number;
+    @Column() tobranch: number;
 
-    @Column()
-    receiveUser: number;
+    @Column({ nullable: true }) receiveUser: number;
 
-    @Column()
-    type: string;
+    
+    @Column() type: string;
 
-    @Column()
-    state: string;
+    @Column({ nullable: true }) state: string;
 
-    @Column()
-    remark: string;
+    @Column({ nullable: true }) remark: string;
+    
+    @Column({ nullable: true }) typePart:string;
 
     @ManyToMany(() => Repair, (repair) => repair.transfert, { cascade: true })
     @JoinTable()

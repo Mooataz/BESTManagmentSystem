@@ -19,6 +19,11 @@ import * as path from 'path';
 import * as os from 'os';
 import { plainToInstance } from 'class-transformer';
 import { Company } from 'src/company/entities/company.entity';
+import { HistoryStockPart } from 'src/history-stock-part/entities/history-stock-part.entity';
+import { Tracability } from 'src/tracability/entities/tracability.entity';
+
+ 
+
 @Injectable({ scope: Scope.DEFAULT })
 export class StockPartsService {
   private readonly LOCK_FILE = path.join(os.tmpdir(), 'stock-calculation.lock');
@@ -27,18 +32,40 @@ export class StockPartsService {
                 @InjectRepository(Branch) private readonly  branchRepositry:Repository<Branch>,
                 @InjectRepository(Bin) private readonly  binRepositry:Repository<Bin>,
                 @InjectRepository(Company) private readonly  companyRepositry:Repository<Company>,
+                @InjectRepository(HistoryStockPart) private readonly historyStockPartRepositry:Repository<HistoryStockPart>,
+                @InjectRepository(Tracability) private readonly tracabilityRepositry:Repository<Tracability>,
                   private appService: AppService,
                   private modelService:ModelsService,
                   private referenceService: ReferencesService ){}
 
-  async create(createStockPartDto: CreateStockPartDto):Promise<StockPart> {
+  async create(createStockPartDto: CreateStockPartDto, userId: number):Promise<StockPart> {
     createStockPartDto.serialNumber =this.appService.cleanSpaces(createStockPartDto.serialNumber)
+const newCreate =  this.stockPartRepositry.create(createStockPartDto);
+ const saveStockPart =   await this.stockPartRepositry.save(newCreate);
 
-    return await this.stockPartRepositry.save(createStockPartDto);
+ const history = this.historyStockPartRepositry.create({
+      date: new Date(),
+      step: 'Création',
+      stockPart: { id: saveStockPart.id },
+    });
+
+    const savedHistory = await this.historyStockPartRepositry.save(history);
+
+
+     const tracability = this.tracabilityRepositry.create({
+      historyStockPart: { id: savedHistory.id },
+      user: { id: userId },
+    });
+    await this.tracabilityRepositry.save(tracability);
+    return saveStockPart
   }
 
   async findAll():Promise<StockPart[]> {
-    const findAll = await this.stockPartRepositry.find()
+    const findAll = await this.stockPartRepositry.find({relations:[
+      'bin',
+      'reference','reference.model','reference.model.brand','reference.allpart',
+      'historyStockPart','historyStockPart.tracability','historyStockPart.tracability.user'
+    ]})
     if (!findAll || findAll.length === 0){
       throw new NotFoundException('No data found')
     }
@@ -82,19 +109,34 @@ export class StockPartsService {
       return findAll
     }
 
-    async findByBinId(binId: number): Promise<StockPart[]> {
-      return this.stockPartRepositry
-          .createQueryBuilder('StockPart')
-          .leftJoinAndSelect('StockPart.bin', 'bin')
-          .where('bin.id = :binId', { binId }) 
-          .getMany();
-  } 
+async findByBranchId(branchId: number): Promise<StockPart[]> {
+  return this.stockPartRepositry
+    .createQueryBuilder('stockPart')
+    .leftJoinAndSelect('stockPart.bin', 'bin')
+    .leftJoinAndSelect('bin.branch', 'branch')
+    .leftJoinAndSelect('stockPart.reference', 'reference')
+    .leftJoinAndSelect('reference.model', 'model')
+    .leftJoinAndSelect('model.brand', 'brand')
+    .leftJoinAndSelect('reference.allpart', 'allpart')
+    .leftJoinAndSelect('stockPart.historyStockPart', 'historyStockPart')
+    .leftJoinAndSelect('historyStockPart.tracability', 'tracability')
+    .leftJoinAndSelect('tracability.user', 'user')
+    .where('branch.id = :branchId', { branchId })
+    .orderBy('stockPart.id', 'DESC')  // ← Ajout du tri ici
+    .getMany();
+}
+
+
+ 
 
   async findByBinType(type: string, branchId: number): Promise<StockPart[]> {
     return this.stockPartRepositry
         .createQueryBuilder('StockPart')
         .leftJoinAndSelect('StockPart.bin', 'bin')
         .leftJoinAndSelect('bin.branch', 'branch')
+        .leftJoinAndSelect('StockPart.reference', 'reference')
+        .leftJoinAndSelect('reference.allpart', 'allpart')
+        .leftJoinAndSelect('reference.model', 'model')
         .where('bin.type = :type', { type }) 
         .andWhere('branch.id = :branchId', { branchId })
         .getMany();

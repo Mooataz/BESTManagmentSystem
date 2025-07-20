@@ -47,7 +47,25 @@ export class BinController {
       })
     }
   }
-
+ @Get('/findName/:name')
+  async getByName(@Param('name') name: string,
+    @Res() res) {
+    try {
+      const allfind = await this.binService.findByName(name)
+       
+      return res.status(HttpStatus.OK).json({
+        message:"Founded Successfuly !",
+        status:HttpStatus.OK,
+        data:allfind
+      })
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message:error.message,
+        status:HttpStatus.BAD_REQUEST,
+        data:null
+      })
+    }
+  }
   @Get('/find/:branchId/:type')
   async getByBranchIdAndType( @Param('branchId') branchId: number,
                               @Param('type') type: string,

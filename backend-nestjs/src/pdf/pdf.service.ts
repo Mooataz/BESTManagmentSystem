@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { Company } from 'src/company/entities/company.entity';
 import { Legislation } from 'src/legislation/entities/legislation.entity';
 import { Branch } from 'src/branches/entities/branch.entity';
+import { Model } from 'src/models/entities/model.entity';
 
  
  
@@ -21,6 +22,7 @@ export class PdfService {
     @InjectRepository(Company) private readonly companyRepository: Repository<Company>,
     @InjectRepository(Legislation) private readonly legislationRepository: Repository<Legislation>,
     @InjectRepository(Branch) private readonly branchRepository: Repository<Branch>,
+    @InjectRepository(Model) private readonly modelRepository: Repository<Model>,
   ) {}
 
   async generatRepairPdf(repair: Repair): Promise<Buffer> {
@@ -41,6 +43,8 @@ export class PdfService {
         const company = await this.companyRepository.findOne({ 
           where: { id: userBranch.company?.id } 
         });
+
+        
 
         const allLaw = await this.legislationRepository.find()
 
@@ -102,14 +106,19 @@ export class PdfService {
           { label: 'Téléphone', value: repair.customer?.phone || 'N/A' },
           { label: 'Distributeur', value: repair.customer?.distributer?.name || '-' },
           { label: 'Reçue le', value: safeDate(firstHistory.date) },
-          { label: 'Employée', value: firstTracability.user?.name || '-' },
+          { label: 'Reçue par', value: firstTracability.user?.name || '-' },
           { label: 'Agence', value: userBranch.name || '-' }
         ];
+const model = await this.modelRepository.findOne({
+  where: { id: repair.device.model.id },
+  relations: ['brand', 'typeModel'], // ou autres relations nécessaires
+});
 
         const box2Items = [
           { label: 'Code Appareil', value: repair.device?.id || 'N/A' },
           { label: 'Marque', value: repair.device?.model?.brand?.name || 'N/A' },
           { label: 'Modèle', value: repair.device?.model?.name || 'N/A' },
+          { label: 'Type', value: model?.typeModel.description || 'N/A' },
           { label: 'Imei', value: repair.device?.serialenumber || 'N/A' },
           { label: 'Date achat', value: safeDate(repair.device?.purchaseDate) }
         ];
@@ -404,6 +413,29 @@ const Ystart = StartY +10
     });
 
     return boxHeight; // Retourne la hauteur utilisée
+  }
+
+  async generatAddStockPdf(ids: number[]): Promise<Buffer>{
+return new Promise(async (resolve, reject) => {
+const doc = new PDFDocument({ margin: 20 });
+      const buffers: Buffer[] = [];
+
+      doc.on('data', (chunk) => buffers.push(chunk));
+      doc.on('end', () => resolve(Buffer.concat(buffers)));
+      doc.on('error', reject);
+
+      try {
+        {/*
+           -------- Contenue de fichier PDF ------
+          */}
+        
+      } catch (error) {
+        console.error('Erreur génération PDF:', error);
+        reject(error);
+      }
+})
+
+      
   }
 }
 

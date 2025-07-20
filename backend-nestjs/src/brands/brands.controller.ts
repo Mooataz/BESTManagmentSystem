@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseInterceptors, UploadedFile, Req } from '@nestjs/common';
 import { BrandsService } from './brands.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
@@ -35,7 +35,7 @@ export class BrandsController {
   async create( @Body() createBrandDto: CreateBrandDto, 
                 @Res() res , 
                 @UploadedFile() logo:Express.Multer.File) {
-    console.log('REÇU', createBrandDto, logo);
+     
     try {
       createBrandDto.logo=logo.filename
       const newBrand= await this.brandsService.create(createBrandDto)
@@ -54,10 +54,11 @@ export class BrandsController {
     }
   }
 
-  @Get('/findStatus/:status')
-  async getBySaleId(@Param('status') status: string,
+  @Get('/findAutoriser')
+  async getBySaleId(/* @Param('status') status: string, */
                       @Res() res) {
     try {
+      const status ='Autoriser'
       const allfind = await this.brandsService.findByStatus(status)
       return res.status(HttpStatus.OK).json({
         message:"Founded Successfuly !",
@@ -169,4 +170,29 @@ export class BrandsController {
       
     }
   }
+
+   
+
+  
+/* @Get('authorized')
+async getAuthorizedBrands(@Req() req, @Res() res ) {
+  console.log('Requête entrante:', req.query); // ou req.params
+  try {
+    const brands = await this.brandsService.getAuthorizedBrands();
+    return res.status(HttpStatus.OK).json({
+      message: 'Liste des marques autorisées récupérée avec succès.',
+      status: HttpStatus.OK,
+      data: brands,
+    });
+  } catch (error) {
+    console.error('Erreur:', error);
+    return res.status(HttpStatus.BAD_REQUEST).json({
+      message: error.message,
+      status: HttpStatus.BAD_REQUEST,
+      data: null,
+    });
+  }
+} */
+
+
 }

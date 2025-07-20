@@ -3,7 +3,7 @@ import { ApiProperty } from "@nestjs/swagger";
 export class CreateLevelRepairDto {
     @ApiProperty({
         type: String,
-        description: "Required"
+        description: "Required" 
     })
     name: string;
 
@@ -13,4 +13,5 @@ export class CreateLevelRepairDto {
         description: "Required"
     })
     price: number;
+    
 }

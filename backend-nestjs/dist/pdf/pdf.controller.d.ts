@@ -6,4 +6,5 @@ export declare class PdfController {
     private readonly pdfService;
     constructor(repairService: RepairService, pdfService: PdfService);
     generateRepairsPdf(id: number, res: Response): Promise<void>;
+    generateAddStockPartPDF(body: any, res: any): Promise<void>;
 }

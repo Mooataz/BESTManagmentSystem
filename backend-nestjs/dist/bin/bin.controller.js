@@ -59,6 +59,23 @@ let BinController = class BinController {
             });
         }
     }
+    async getByName(name, res) {
+        try {
+            const allfind = await this.binService.findByName(name);
+            return res.status(common_1.HttpStatus.OK).json({
+                message: "Founded Successfuly !",
+                status: common_1.HttpStatus.OK,
+                data: allfind
+            });
+        }
+        catch (error) {
+            return res.status(common_1.HttpStatus.BAD_REQUEST).json({
+                message: error.message,
+                status: common_1.HttpStatus.BAD_REQUEST,
+                data: null
+            });
+        }
+    }
     async getByBranchIdAndType(branchId, type, res) {
         try {
             const allfind = await this.binService.findByBranchIdAndType(branchId, type);
@@ -165,6 +182,14 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], BinController.prototype, "getByBranchId", null);
+__decorate([
+    (0, common_1.Get)('/findName/:name'),
+    __param(0, (0, common_1.Param)('name')),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], BinController.prototype, "getByName", null);
 __decorate([
     (0, common_1.Get)('/find/:branchId/:type'),
     __param(0, (0, common_1.Param)('branchId')),

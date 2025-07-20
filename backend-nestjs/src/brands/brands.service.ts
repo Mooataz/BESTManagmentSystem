@@ -62,4 +62,10 @@ async findByStatus(status: string): Promise<Brand[]> {
         throw new NotFoundException("There is no data Available") }
   return findAll
     }
+
+
+ 
+ 
+
+
 }

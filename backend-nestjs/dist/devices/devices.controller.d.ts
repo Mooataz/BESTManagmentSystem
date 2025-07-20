@@ -14,4 +14,5 @@ export declare class DevicesController {
         purchaseDate?: string;
         model?: number;
     }, res: any): Promise<any>;
+    deviceHasOpenRepair(id: string, res: any): Promise<any>;
 }

@@ -17,69 +17,76 @@ class CreateTransfertDto {
     sendingDate;
     receivedDate;
     type;
+    frombranch;
+    sendUser;
+    receiveUser;
     state;
     remark;
     repairIds;
     stockPartIds;
-    toBranch;
+    tobranch;
+    typePart;
 }
 exports.CreateTransfertDto = CreateTransfertDto;
 __decorate([
-    (0, swagger_1.ApiProperty)({
-        type: String,
-        description: "Required"
-    }),
+    (0, swagger_1.ApiProperty)({ type: String, description: "Required" }),
+    (0, common_1.Optional)(),
     __metadata("design:type", String)
 ], CreateTransfertDto.prototype, "delivredBy", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({
-        type: Date,
-        description: "Required"
-    }),
+    (0, swagger_1.ApiProperty)({ type: Date, description: "Required" }),
     __metadata("design:type", Date)
 ], CreateTransfertDto.prototype, "sendingDate", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({
-        type: Date,
-        description: "Required"
-    }),
+    (0, swagger_1.ApiProperty)({ type: Date, description: "Required" }),
     (0, common_1.Optional)(),
     __metadata("design:type", Date)
 ], CreateTransfertDto.prototype, "receivedDate", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({
-        type: String,
-        description: "Required"
-    }),
+    (0, swagger_1.ApiProperty)({ type: String, description: "Required" }),
+    (0, common_1.Optional)(),
     __metadata("design:type", String)
 ], CreateTransfertDto.prototype, "type", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({
-        type: String,
-        description: "Required"
-    }),
+    (0, swagger_1.ApiProperty)({ type: String, description: "Required" }),
+    __metadata("design:type", Number)
+], CreateTransfertDto.prototype, "frombranch", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String, description: "Required" }),
+    __metadata("design:type", Number)
+], CreateTransfertDto.prototype, "sendUser", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String, description: "Required" }),
+    (0, common_1.Optional)(),
+    __metadata("design:type", Number)
+], CreateTransfertDto.prototype, "receiveUser", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String, description: "Required" }),
+    (0, common_1.Optional)(),
     __metadata("design:type", String)
 ], CreateTransfertDto.prototype, "state", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({
-        type: String,
-        description: "Required"
-    }),
+    (0, swagger_1.ApiProperty)({ type: String, description: "Required" }),
+    (0, common_1.Optional)(),
     __metadata("design:type", String)
 ], CreateTransfertDto.prototype, "remark", void 0);
 __decorate([
-    (0, swagger_1.ApiProperty)({
-        type: Array,
-        description: "Required"
-    }),
+    (0, swagger_1.ApiProperty)({ type: Array, description: "Required" }),
+    (0, common_1.Optional)(),
     __metadata("design:type", Array)
 ], CreateTransfertDto.prototype, "repairIds", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: Array, description: "Required" }),
+    (0, common_1.Optional)(),
     __metadata("design:type", Array)
 ], CreateTransfertDto.prototype, "stockPartIds", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ type: Number, description: "Required" }),
     __metadata("design:type", Number)
-], CreateTransfertDto.prototype, "toBranch", void 0);
+], CreateTransfertDto.prototype, "tobranch", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: String, description: "Required" }),
+    (0, common_1.Optional)(),
+    __metadata("design:type", String)
+], CreateTransfertDto.prototype, "typePart", void 0);
 //# sourceMappingURL=create-transfert.dto.js.map

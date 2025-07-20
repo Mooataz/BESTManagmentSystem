@@ -4,6 +4,6 @@ export declare class LevelRepair {
     id: number;
     name: string;
     price: number;
-    brand: Brand;
+    brand: Brand[];
     partsPrice: PartsPrice;
 }

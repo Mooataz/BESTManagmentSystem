@@ -68,7 +68,7 @@ export class RepairService {
  
     // Create the repair entity with required fields
     const repairData = {
-      actuellyBranch: createRepairDto.actuellybranch,
+      actuellybranch: createRepairDto.actuellybranch,
       remark: createRepairDto.remark,
       deviceStateReceive: createRepairDto.deviceStateReceive,
       accessory,
@@ -379,4 +379,6 @@ async FiltreByUserStep (userId: number, steps: string): Promise<Repair[]> {
   });
   return filtered
 }
+
+ 
 }

@@ -22,14 +22,17 @@ const typeorm_2 = require("typeorm");
 const company_entity_1 = require("../company/entities/company.entity");
 const legislation_entity_1 = require("../legislation/entities/legislation.entity");
 const branch_entity_1 = require("../branches/entities/branch.entity");
+const model_entity_1 = require("../models/entities/model.entity");
 let PdfService = class PdfService {
     companyRepository;
     legislationRepository;
     branchRepository;
-    constructor(companyRepository, legislationRepository, branchRepository) {
+    modelRepository;
+    constructor(companyRepository, legislationRepository, branchRepository, modelRepository) {
         this.companyRepository = companyRepository;
         this.legislationRepository = legislationRepository;
         this.branchRepository = branchRepository;
+        this.modelRepository = modelRepository;
     }
     async generatRepairPdf(repair) {
         return new Promise(async (resolve, reject) => {
@@ -93,13 +96,18 @@ let PdfService = class PdfService {
                     { label: 'Téléphone', value: repair.customer?.phone || 'N/A' },
                     { label: 'Distributeur', value: repair.customer?.distributer?.name || '-' },
                     { label: 'Reçue le', value: safeDate(firstHistory.date) },
-                    { label: 'Employée', value: firstTracability.user?.name || '-' },
+                    { label: 'Reçue par', value: firstTracability.user?.name || '-' },
                     { label: 'Agence', value: userBranch.name || '-' }
                 ];
+                const model = await this.modelRepository.findOne({
+                    where: { id: repair.device.model.id },
+                    relations: ['brand', 'typeModel'],
+                });
                 const box2Items = [
                     { label: 'Code Appareil', value: repair.device?.id || 'N/A' },
                     { label: 'Marque', value: repair.device?.model?.brand?.name || 'N/A' },
                     { label: 'Modèle', value: repair.device?.model?.name || 'N/A' },
+                    { label: 'Type', value: model?.typeModel.description || 'N/A' },
                     { label: 'Imei', value: repair.device?.serialenumber || 'N/A' },
                     { label: 'Date achat', value: safeDate(repair.device?.purchaseDate) }
                 ];
@@ -288,6 +296,23 @@ let PdfService = class PdfService {
         });
         return boxHeight;
     }
+    async generatAddStockPdf(ids) {
+        return new Promise(async (resolve, reject) => {
+            const doc = new PDFDocument({ margin: 20 });
+            const buffers = [];
+            doc.on('data', (chunk) => buffers.push(chunk));
+            doc.on('end', () => resolve(Buffer.concat(buffers)));
+            doc.on('error', reject);
+            try {
+                {
+                }
+            }
+            catch (error) {
+                console.error('Erreur génération PDF:', error);
+                reject(error);
+            }
+        });
+    }
 };
 exports.PdfService = PdfService;
 exports.PdfService = PdfService = __decorate([
@@ -295,7 +320,9 @@ exports.PdfService = PdfService = __decorate([
     __param(0, (0, typeorm_1.InjectRepository)(company_entity_1.Company)),
     __param(1, (0, typeorm_1.InjectRepository)(legislation_entity_1.Legislation)),
     __param(2, (0, typeorm_1.InjectRepository)(branch_entity_1.Branch)),
+    __param(3, (0, typeorm_1.InjectRepository)(model_entity_1.Model)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository])
 ], PdfService);

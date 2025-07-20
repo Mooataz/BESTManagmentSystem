@@ -40,7 +40,7 @@ __decorate([
 ], Brand.prototype, "status", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => model_entity_1.Model, Model => Model.brand),
-    __metadata("design:type", model_entity_1.Model)
+    __metadata("design:type", Array)
 ], Brand.prototype, "model", void 0);
 __decorate([
     (0, typeorm_1.ManyToMany)(() => level_repair_entity_1.LevelRepair, (levelRepair) => levelRepair.brand),

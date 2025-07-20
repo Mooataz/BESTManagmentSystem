@@ -58,7 +58,7 @@ let ModelsService = class ModelsService {
         return findAll;
     }
     async findOne(id) {
-        const findOne = await this.modelRepositry.findOne({ where: { id } });
+        const findOne = await this.modelRepositry.findOne({ where: { id }, relations: ['allpart', 'brand', 'typeModel'] });
         if (!findOne) {
             throw new common_1.NotFoundException('No model found');
         }

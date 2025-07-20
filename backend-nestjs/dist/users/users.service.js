@@ -43,14 +43,14 @@ let UsersService = class UsersService {
         return await this.userRepositry.save(newCreate);
     }
     async findAll() {
-        const allUsers = await this.userRepositry.find({ relations: ['branch'], });
+        const allUsers = await this.userRepositry.find({ relations: ['branch', 'branch.company'], });
         if (!allUsers || allUsers.length === 0) {
             throw new common_1.NotFoundException("There is no users data Available");
         }
         return allUsers;
     }
     async findOne(id) {
-        const OneUser = await this.userRepositry.findOne({ relations: ['branch'], where: { id } });
+        const OneUser = await this.userRepositry.findOne({ relations: ['branch', 'branch.company'], where: { id } });
         if (!OneUser) {
             throw new common_1.NotFoundException("There is no user data Available");
         }
@@ -104,7 +104,7 @@ let UsersService = class UsersService {
         return findAll;
     }
     async findUserByLogin(login) {
-        const userByLogin = await this.userRepositry.findOne({ where: { login }, relations: ['branch'] });
+        const userByLogin = await this.userRepositry.findOne({ where: { login }, relations: ['branch', 'branch.company'] });
         if (!userByLogin) {
             throw new common_1.NotFoundException('User not found');
         }

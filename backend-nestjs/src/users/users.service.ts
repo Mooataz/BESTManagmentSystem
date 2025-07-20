@@ -33,7 +33,7 @@ export class UsersService {
  
 
   async findAll():Promise<User[]> {
-    const allUsers= await this.userRepositry.find({relations: ['branch'],})
+    const allUsers= await this.userRepositry.find({relations: ['branch','branch.company'],})
       if ( !allUsers || allUsers.length === 0){
         throw new NotFoundException("There is no users data Available")
       }
@@ -41,7 +41,7 @@ export class UsersService {
   }
 
   async findOne(id: number):Promise<User> {
-    const OneUser= await this.userRepositry.findOne({relations: ['branch'], where: { id } })
+    const OneUser= await this.userRepositry.findOne({relations: ['branch','branch.company'], where: { id } })
     if ( !OneUser){
       throw new NotFoundException("There is no user data Available")
     }
@@ -106,7 +106,7 @@ async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
   }
 
   async findUserByLogin( login: string): Promise<User> {
-    const userByLogin = await this.userRepositry.findOne({ where: {login},relations: ['branch']});
+    const userByLogin = await this.userRepositry.findOne({ where: {login},relations: ['branch','branch.company']});
     if(!userByLogin) { throw new NotFoundException('User not found')};
     return userByLogin;
   }

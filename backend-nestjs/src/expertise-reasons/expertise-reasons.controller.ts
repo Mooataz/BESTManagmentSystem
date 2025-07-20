@@ -10,6 +10,8 @@ export class ExpertiseReasonsController {
   @Post()
   async create(@Body() createExpertiseReasonDto: CreateExpertiseReasonDto,
     @Res() res) {
+
+      console.log('body' , createExpertiseReasonDto)
     try {
       const newcreate = await this.expertiseReasonsService.create(createExpertiseReasonDto)
       return res.status(HttpStatus.CREATED).json({

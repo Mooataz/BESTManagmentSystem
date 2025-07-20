@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, Que
 import { ReferencesService } from './references.service';
 import { CreateReferenceDto } from './dto/create-reference.dto';
 import { UpdateReferenceDto } from './dto/update-reference.dto';
+import { Reference } from './entities/reference.entity';
+import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('references')
 export class ReferencesController {
@@ -32,6 +34,7 @@ export class ReferencesController {
   @Get()
   async findAll(@Res() res) {
     try {
+      
       const findAll = await this.referencesService.findAll()
       return res.status(HttpStatus.OK).json({
         message:"reference founded Successfuly !",
@@ -105,7 +108,7 @@ export class ReferencesController {
     }
   }
 
-  @Get(':modelId/:partId')
+  @Get('getCompatibleReferences/:modelId/:partId')
   async getCompatibleReferences(@Param('modelId') modelId: number,
                                 @Param('partId') partId: number,
                                 @Res() res ) {
@@ -124,11 +127,20 @@ export class ReferencesController {
       })
     }    
   }
-  @Get('findByMC/:materialCode')
-  async getByMaterialCode(@Param('materialCode') materialCode: string,
-                                @Res() res ) {
+
+    
+  
+@Get('GetMC/:code')
+  @ApiOperation({ summary: 'Find reference by material code' })
+  async findReferenceByMaterialCode(
+    @Param('code') code: string,
+    @Res() res
+) {
+ 
+                                   
     try {
-      const findReferences = await this.referencesService.findByMaterialCode(materialCode)
+      
+      const findReferences = await this.referencesService.findReferenceByMaterialCode(  code)
       return res.status(HttpStatus.OK).json({
         message:"Founnd Successfuly !",
         status:HttpStatus.OK,
@@ -141,5 +153,7 @@ export class ReferencesController {
         data:null
       })
     }    
-  }
+  } 
+ 
+
 }

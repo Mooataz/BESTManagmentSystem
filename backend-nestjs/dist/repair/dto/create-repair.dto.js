@@ -25,7 +25,6 @@ class CreateRepairDto {
 exports.CreateRepairDto = CreateRepairDto;
 __decorate([
     (0, swagger_1.ApiProperty)({ type: String }),
-    (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], CreateRepairDto.prototype, "actuellybranch", void 0);
 __decorate([

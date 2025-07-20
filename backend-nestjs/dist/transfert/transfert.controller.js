@@ -56,9 +56,26 @@ let TransfertController = class TransfertController {
             });
         }
     }
-    async getByBranchId(branchId, res) {
+    async getFromBranchId(branchId, type, res) {
         try {
-            const allfind = await this.transfertService.findByBranchId(branchId);
+            const allfind = await this.transfertService.getFromBranch(branchId, type);
+            return res.status(common_1.HttpStatus.OK).json({
+                message: "Founded Successfuly !",
+                status: common_1.HttpStatus.OK,
+                data: allfind
+            });
+        }
+        catch (error) {
+            return res.status(common_1.HttpStatus.BAD_REQUEST).json({
+                message: error.message,
+                status: common_1.HttpStatus.BAD_REQUEST,
+                data: null
+            });
+        }
+    }
+    async getByBranchId(branchId, type, res) {
+        try {
+            const allfind = await this.transfertService.getToBranch(branchId, type);
             return res.status(common_1.HttpStatus.OK).json({
                 message: "Founded Successfuly !",
                 status: common_1.HttpStatus.OK,
@@ -160,11 +177,21 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TransfertController.prototype, "getByState", null);
 __decorate([
-    (0, common_1.Get)('/findByBranch/:branchId'),
+    (0, common_1.Get)('/findFromBranchId/:branchId/:type'),
     __param(0, (0, common_1.Param)('branchId')),
-    __param(1, (0, common_1.Res)()),
+    __param(1, (0, common_1.Param)('type')),
+    __param(2, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:paramtypes", [Number, String, Object]),
+    __metadata("design:returntype", Promise)
+], TransfertController.prototype, "getFromBranchId", null);
+__decorate([
+    (0, common_1.Get)('/findToBranchId/:branchId/:type'),
+    __param(0, (0, common_1.Param)('branchId')),
+    __param(1, (0, common_1.Param)('type')),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, String, Object]),
     __metadata("design:returntype", Promise)
 ], TransfertController.prototype, "getByBranchId", null);
 __decorate([

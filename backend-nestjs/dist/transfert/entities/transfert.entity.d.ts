@@ -4,14 +4,15 @@ export declare class Transfert {
     id: number;
     delivredBy: string;
     sendingDate: Date;
-    fromBranch: number;
+    frombranch: number;
     sendUser: number;
     receivedDate: Date;
-    toBranch: number;
+    tobranch: number;
     receiveUser: number;
     type: string;
     state: string;
     remark: string;
+    typePart: string;
     repair: Repair[];
     stockPart: StockPart[];
 }

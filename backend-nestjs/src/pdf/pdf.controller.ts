@@ -38,6 +38,29 @@ async generateRepairsPdf(
   }
 }
 
+
+@Post()
+async generateAddStockPartPDF(@Body() body: any, @Res() res) {
+  try {
+    const pdfBuffer = await this.pdfService.generatAddStockPdf(body);
+    
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="Ajoute_Stock.pdf"',
+      'Content-Length': pdfBuffer.length
+    });
+    res.send(pdfBuffer);
+  } catch (error) {
+    if (error instanceof NotFoundException) {
+      res.status(404).send(error.message);
+    } else {
+      res.status(500).send('Erreur lors de la génération du PDF');
+    }
+  }
+
+  }
+ 
+
   /* @Post()
   create(@Body() createPdfDto: CreatePdfDto) {
     return this.pdfService.create(createPdfDto);

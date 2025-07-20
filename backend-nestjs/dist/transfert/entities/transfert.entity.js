@@ -17,14 +17,15 @@ let Transfert = class Transfert {
     id;
     delivredBy;
     sendingDate;
-    fromBranch;
+    frombranch;
     sendUser;
     receivedDate;
-    toBranch;
+    tobranch;
     receiveUser;
     type;
     state;
     remark;
+    typePart;
     repair;
     stockPart;
 };
@@ -34,7 +35,7 @@ __decorate([
     __metadata("design:type", Number)
 ], Transfert.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Transfert.prototype, "delivredBy", void 0);
 __decorate([
@@ -44,21 +45,21 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
-], Transfert.prototype, "fromBranch", void 0);
+], Transfert.prototype, "frombranch", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
 ], Transfert.prototype, "sendUser", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", Date)
 ], Transfert.prototype, "receivedDate", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Number)
-], Transfert.prototype, "toBranch", void 0);
+], Transfert.prototype, "tobranch", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", Number)
 ], Transfert.prototype, "receiveUser", void 0);
 __decorate([
@@ -66,13 +67,17 @@ __decorate([
     __metadata("design:type", String)
 ], Transfert.prototype, "type", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Transfert.prototype, "state", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Transfert.prototype, "remark", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    __metadata("design:type", String)
+], Transfert.prototype, "typePart", void 0);
 __decorate([
     (0, typeorm_1.ManyToMany)(() => repair_entity_1.Repair, (repair) => repair.transfert, { cascade: true }),
     (0, typeorm_1.JoinTable)(),

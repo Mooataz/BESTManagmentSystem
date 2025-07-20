@@ -6,7 +6,7 @@ export class CreateRepairDto {
 
     
     @ApiProperty({ type: String  })
-    @IsOptional()
+   
     actuellybranch: number;
 
     @ApiProperty({type: Number,})

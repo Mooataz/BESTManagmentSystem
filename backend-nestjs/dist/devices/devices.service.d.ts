@@ -20,4 +20,5 @@ export declare class DevicesService {
     filterBySerialNumber(serialNumber: number): Promise<Device[]>;
     filterByModel(model: number): Promise<Device[]>;
     chekDevice(serialenumber?: string, purchaseDate?: string, Fmodel?: number): Promise<Device>;
+    deviceHasOpenRepair(serialNumber: string): Promise<boolean>;
 }

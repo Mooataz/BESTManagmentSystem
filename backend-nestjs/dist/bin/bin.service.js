@@ -94,6 +94,13 @@ let BinService = class BinService {
             .andWhere('bin.type = :type', { type })
             .getMany();
     }
+    async findByName(bname) {
+        const bin = await this.binRepositry.findOne({ where: { name: bname } });
+        if (!bin) {
+            throw new Error(`Bin with name "${bname}" not found.`);
+        }
+        return bin;
+    }
 };
 exports.BinService = BinService;
 exports.BinService = BinService = __decorate([

@@ -19,18 +19,28 @@ const transfert_entity_1 = require("./entities/transfert.entity");
 const typeorm_2 = require("typeorm");
 const stock_part_entity_1 = require("../stock-parts/entities/stock-part.entity");
 const repair_entity_1 = require("../repair/entities/repair.entity");
+const user_entity_1 = require("../users/entities/user.entity");
+const branch_entity_1 = require("../branches/entities/branch.entity");
 let TransfertService = class TransfertService {
     transfertRepositry;
     stockPartRepositry;
     repairRepositry;
-    constructor(transfertRepositry, stockPartRepositry, repairRepositry) {
+    userRepositry;
+    branchRepositry;
+    constructor(transfertRepositry, stockPartRepositry, repairRepositry, userRepositry, branchRepositry) {
         this.transfertRepositry = transfertRepositry;
         this.stockPartRepositry = stockPartRepositry;
         this.repairRepositry = repairRepositry;
+        this.userRepositry = userRepositry;
+        this.branchRepositry = branchRepositry;
     }
     async create(createTransfertDto) {
-        const stockPart = await this.stockPartRepositry.find({ where: { id: (0, typeorm_2.In)(createTransfertDto.stockPartIds) }, });
-        const repair = await this.repairRepositry.find({ where: { id: (0, typeorm_2.In)(createTransfertDto.repairIds) }, });
+        const stockPart = await this.stockPartRepositry.find({
+            where: { id: (0, typeorm_2.In)(createTransfertDto.stockPartIds ?? []) },
+        });
+        const repair = await this.repairRepositry.find({
+            where: { id: (0, typeorm_2.In)(createTransfertDto.repairIds ?? []) },
+        });
         if ((!stockPart.length) && (!repair.length)) {
             throw new common_1.NotFoundException('No data for transfert');
         }
@@ -38,9 +48,21 @@ let TransfertService = class TransfertService {
         let newCreate;
         if (!stockPart.length) {
             newCreate = this.transfertRepositry.create({ ...createTransfertDto, repair });
+            await this.repairRepositry
+                .createQueryBuilder()
+                .update(repair_entity_1.Repair)
+                .set({ actuellybranch: 0 })
+                .where('id IN (:...ids)', { ids: repair.map(p => p.id) })
+                .execute();
         }
         else {
             newCreate = this.transfertRepositry.create({ ...createTransfertDto, stockPart });
+            await this.stockPartRepositry
+                .createQueryBuilder()
+                .update(stock_part_entity_1.StockPart)
+                .set({ bin: () => 'NULL' })
+                .where('id IN (:...ids)', { ids: stockPart.map(p => p.id) })
+                .execute();
         }
         return await this.transfertRepositry.save(newCreate);
     }
@@ -84,11 +106,41 @@ let TransfertService = class TransfertService {
         }
         return findAll;
     }
-    async findByBranchId(branchId) {
+    async getFromBranch(branchId, type) {
         const findAll = await this.transfertRepositry
             .createQueryBuilder('transfert')
-            .where('fromBranch = :branchId', { branchId })
-            .orWhere('toBranch = :branchId', { branchId })
+            .leftJoinAndSelect('transfert.stockPart', 'stockPart')
+            .leftJoinAndSelect('stockPart.reference', 'reference')
+            .leftJoinAndSelect('reference.materialCode', 'materialCode')
+            .where('transfert.frombranch = :branchId', { branchId })
+            .andWhere('transfert.type = :type', { type })
+            .getMany();
+        if (!findAll || findAll.length === 0) {
+            throw new common_1.NotFoundException("There is no data available");
+        }
+        const result = [];
+        for (const t of findAll) {
+            const sendUser = await this.userRepositry.findOne({ where: { id: t.sendUser } });
+            const receiveUser = t.receiveUser
+                ? await this.userRepositry.findOne({ where: { id: t.receiveUser } })
+                : null;
+            const fromBranch = await this.branchRepositry.findOne({ where: { id: t.frombranch } });
+            const toBranch = await this.branchRepositry.findOne({ where: { id: t.tobranch } });
+            result.push({
+                ...t,
+                sendUserName: sendUser?.name || null,
+                receiveUserName: receiveUser?.name || null,
+                fromBranchName: fromBranch?.name || null,
+                toBranchName: toBranch?.name || null,
+            });
+        }
+        return result;
+    }
+    async getToBranch(branchId, type) {
+        const findAll = await this.transfertRepositry
+            .createQueryBuilder('transfert')
+            .where('tobranch = :branchId', { branchId })
+            .andWhere('type = :type', { type })
             .getMany();
         if (!findAll || findAll.length === 0) {
             throw new common_1.NotFoundException("There is no data Available");
@@ -102,7 +154,11 @@ exports.TransfertService = TransfertService = __decorate([
     __param(0, (0, typeorm_1.InjectRepository)(transfert_entity_1.Transfert)),
     __param(1, (0, typeorm_1.InjectRepository)(stock_part_entity_1.StockPart)),
     __param(2, (0, typeorm_1.InjectRepository)(repair_entity_1.Repair)),
+    __param(3, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
+    __param(4, (0, typeorm_1.InjectRepository)(branch_entity_1.Branch)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository])
 ], TransfertService);

@@ -1,0 +1,174 @@
+ 
+import React, { useState, useMemo } from 'react';
+import {
+  Box, Typography, Button, Grid, Select, MenuItem,
+  InputLabel, FormControl, OutlinedInput, Checkbox, ListItemText
+} from '@mui/material';
+
+
+import * as XLSX from 'xlsx';
+import type { RootState } from '../../Redux/store';
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../../Redux/hooks';
+import { getAllStockPartBranch } from '../../Redux/Actions/stock/EtatStockActions';
+import DynamicTable from '../../Componants/Global/TableComponat';
+ 
+export default function EtatStock() {
+  const dispatch = useAppDispatch();
+  const userr = useSelector((state: RootState) => state.user);
+  const allStockPart = useSelector((state: RootState) => state.stockParts.stockPartsBranch);
+  const [filters, setFilters] = useState({
+    materialCode: [] as string[],
+    description: [] as string[],
+    model: [] as string[],
+    caseName: [] as string[],
+    caseType: [] as string[],
+  });
+  React.useEffect(() => {
+    if (userr.branch?.id) {
+      dispatch(getAllStockPartBranch(userr.branch.id));
+    }
+  }, [userr.branch?.id, dispatch]);
+
+ 
+  const handleFilterChange = (field: string, value: string[]) => {
+    setFilters({ ...filters, [field]: value });
+  };
+  // Extraire options uniques
+
+  const filteredRows = useMemo(() => {
+    return allStockPart.filter((row: any) => {
+
+      return (
+
+        (filters.materialCode.length === 0 || filters.materialCode.includes(row.reference?.materialCode)) &&
+        (filters.description.length === 0 || filters.description.includes(row.reference?.allpart?.description)) &&
+        (filters.model.length === 0 ||
+          (Array.isArray(row.reference?.model) &&
+            row.reference.model.some((m: any) => {
+              const modelName = typeof m === 'string' ? m : m?.name;
+              return filters.model.includes(modelName);
+            }))
+        ) &&
+
+        (filters.caseName.length === 0 || filters.caseName.includes(row.bin?.name)) &&
+        (filters.caseType.length === 0 || filters.caseType.includes(row.bin?.type))
+      );
+    });
+  }, [allStockPart, filters]);
+  
+  const handleExport = () => {
+    const data = filteredRows.map((row: any) => ({
+      Code: row.id,
+      'Material Code': row.reference?.materialCode,
+      'Pièce': row.reference?.allpart?.description,
+      'Modèle compatible': Array.isArray(row.reference?.model)
+        ? row.reference.model
+          .map((m: any) => typeof m === 'string' ? m : m?.name)
+          .filter((name: any) => typeof name === 'string' && name.trim() !== '')
+          .join(', ')
+        : '',
+      'Imei': row.serialnumber,
+      'Case': row.bin?.name,
+      'Type case': row.bin?.type,
+      'Remarque': row.remark,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "État de stock");
+    XLSX.writeFile(workbook, "etat-stock-filtré.xlsx");
+  };
+  const getUniqueOptions = (key: keyof typeof filters): string[] => {
+    const values = allStockPart.flatMap((row: any) => {
+      switch (key) {
+        case 'materialCode':
+          return row.reference?.materialCode ? [row.reference.materialCode] : [];
+        case 'description':
+          return row.reference?.allpart?.description ? [row.reference.allpart.description] : [];
+        case 'model':
+          return Array.isArray(row.reference?.model)
+            ? row.reference.model
+              .map((m: any) => (typeof m === 'string' ? m : m?.name))
+              .filter((name: any) => typeof name === 'string' && name.trim() !== '')
+            : [];
+        case 'caseName':
+          return row.bin?.name ? [row.bin.name] : [];
+        case 'caseType':
+          return row.bin?.type ? [row.bin.type] : [];
+        default:
+          return [];
+      }
+    });
+    return Array.from(new Set(values)).sort();
+  };
+  const renderMultiSelect = (label: string, field: keyof typeof filters) => (
+    <Grid sx={{width:'200px'}} >
+      <FormControl fullWidth>
+        <InputLabel>{label}</InputLabel>
+        <Select
+          multiple
+          value={filters[field]}
+          onChange={(e) => handleFilterChange(field, e.target.value as string[])}
+          input={<OutlinedInput label={label} />}
+          renderValue={(selected) => selected.join(', ')}
+          MenuProps={{
+            PaperProps: {
+              style: {
+                maxHeight: 300,
+                width: '200px'
+              }
+            }
+          }}
+        >
+          {getUniqueOptions(field).map((option) => (
+            <MenuItem key={option} value={option}>
+              <Checkbox checked={filters[field].includes(option)} />
+              <ListItemText primary={option} />
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Grid>
+  );
+  return (
+    <Box>
+      <Typography variant="h5" gutterBottom>État de stock</Typography>
+      <Grid container spacing={2} sx={{ mb: 2 }}>
+        {renderMultiSelect('Material Code', 'materialCode')}
+        {renderMultiSelect('Pièce', 'description')}
+        {renderMultiSelect('Modèle compatible', 'model')}
+        {renderMultiSelect('Case', 'caseName')}
+        {renderMultiSelect('Type case', 'caseType')}
+        <Grid sx={{ display: 'flex', alignItems: 'center' }}>
+          <Button onClick={handleExport} variant="outlined" color="primary" fullWidth>
+            Exporter Excel
+          </Button>
+        </Grid>
+      </Grid>
+      <DynamicTable
+        rows={filteredRows}
+        columnLabels={{
+          'id': 'Code',
+          'reference.materialCode': 'Material Code',
+          'reference.allpart.description': 'Pièce',
+          'reference.model': 'Modèle compatible',
+          'serialnumber': 'Imei',
+          'bin.name': 'Case',
+          'bin.type': 'Type case',
+          'remark': 'Remarque'
+        }}
+        columnsToShow={[
+          'id',
+          'reference.materialCode',
+          'reference.allpart.description',
+          'reference.model',
+          'serialnumber',
+          'bin.name',
+          'bin.type',
+          'remark'
+        ]}
+      />
+    </Box>
+  );
+}

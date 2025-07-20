@@ -10,5 +10,5 @@ export declare class ReferencesController {
     update(id: number, updateReferenceDto: UpdateReferenceDto, res: any): Promise<any>;
     remove(id: number, res: any): Promise<any>;
     getCompatibleReferences(modelId: number, partId: number, res: any): Promise<any>;
-    getByMaterialCode(materialCode: string, res: any): Promise<any>;
+    findReferenceByMaterialCode(code: string, res: any): Promise<any>;
 }

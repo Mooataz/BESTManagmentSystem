@@ -28,7 +28,7 @@ __decorate([
     __metadata("design:type", Number)
 ], Customer.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ unique: true }),
+    (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], Customer.prototype, "name", void 0);
 __decorate([

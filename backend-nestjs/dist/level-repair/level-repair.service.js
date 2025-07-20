@@ -30,7 +30,11 @@ let LevelRepairService = class LevelRepairService {
         return await this.levelRepairRepositry.save(createLevelRepairDto);
     }
     async findAll() {
-        const allfind = await this.levelRepairRepositry.find();
+        const allfind = await this.levelRepairRepositry.find({
+            relations: [
+                'brand', 'partsPrice'
+            ]
+        });
         if (!allfind || allfind.length === 0) {
             throw new common_1.NotFoundException("There is no data available");
         }

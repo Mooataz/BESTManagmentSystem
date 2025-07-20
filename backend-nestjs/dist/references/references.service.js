@@ -55,7 +55,7 @@ let ReferencesService = class ReferencesService {
         return findAll;
     }
     async findOne(id) {
-        const findOne = await this.referenceRepositry.findOne({ where: { id } });
+        const findOne = await this.referenceRepositry.findOne({ where: { id }, relations: ['allpart', 'model'] });
         if (!findOne) {
             throw new common_1.NotFoundException('No Reference available');
         }
@@ -99,15 +99,15 @@ let ReferencesService = class ReferencesService {
         }
         return references;
     }
-    async findByMaterialCode(materialCode) {
-        const references = await this.referenceRepositry
-            .createQueryBuilder('reference')
-            .andWhere('materialCode = :materialCode', { materialCode })
-            .getMany();
-        if (!references.length) {
-            throw new common_1.NotFoundException('Reference not found');
+    async findReferenceByMaterialCode(materialCode) {
+        const reference = await this.referenceRepositry.findOne({
+            where: { materialCode },
+            relations: ['stockPart', 'model', 'allpart'],
+        });
+        if (!reference) {
+            throw new common_1.NotFoundException(`Reference with materialCode ${materialCode} not found`);
         }
-        return references;
+        return reference;
     }
 };
 exports.ReferencesService = ReferencesService;

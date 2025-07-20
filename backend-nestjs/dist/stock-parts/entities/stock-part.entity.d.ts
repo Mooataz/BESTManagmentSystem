@@ -6,7 +6,7 @@ import { Transfert } from "src/transfert/entities/transfert.entity";
 export declare class StockPart {
     id: number;
     remark: string;
-    serialNumber: string;
+    serialnumber: string;
     bin: Bin;
     reference: Reference;
     historyStockPart: HistoryStockPart[];

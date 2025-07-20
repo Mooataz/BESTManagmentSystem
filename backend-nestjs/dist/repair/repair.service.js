@@ -82,7 +82,7 @@ let RepairService = class RepairService {
         if (!device)
             throw new common_1.NotFoundException('Device not found');
         const repairData = {
-            actuellyBranch: createRepairDto.actuellybranch,
+            actuellybranch: createRepairDto.actuellybranch,
             remark: createRepairDto.remark,
             deviceStateReceive: createRepairDto.deviceStateReceive,
             accessory,

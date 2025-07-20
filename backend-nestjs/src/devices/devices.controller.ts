@@ -157,7 +157,25 @@ export class DevicesController {
 
    }
 
-   
+    @Get('deviceHasOpenRepair/:id')
+  async deviceHasOpenRepair( @Param('id') id: string, 
+                 @Res() res) {
+    try {
+      const findOne = await this.devicesService.deviceHasOpenRepair(id)
+       return res.status(HttpStatus.OK).json({
+        message:"Tested successfuly !",
+        status:HttpStatus.OK,
+        data:findOne
+      })
+     } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message:error.message,
+        status:HttpStatus.BAD_REQUEST,
+        data:null
+      })
+     }
+  }
+
   
   }
  

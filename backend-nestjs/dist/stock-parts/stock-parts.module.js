@@ -21,12 +21,14 @@ const models_module_1 = require("../models/models.module");
 const references_module_1 = require("../references/references.module");
 const branch_entity_1 = require("../branches/entities/branch.entity");
 const company_entity_1 = require("../company/entities/company.entity");
+const tracability_entity_1 = require("../tracability/entities/tracability.entity");
+const history_stock_part_entity_1 = require("../history-stock-part/entities/history-stock-part.entity");
 let StockPartsModule = class StockPartsModule {
 };
 exports.StockPartsModule = StockPartsModule;
 exports.StockPartsModule = StockPartsModule = __decorate([
     (0, common_1.Module)({
-        imports: [models_module_1.ModelsModule, references_module_1.ReferencesModule, typeorm_1.TypeOrmModule.forFeature([stock_part_entity_1.StockPart, model_entity_1.Model, reference_entity_1.Reference, all_part_entity_1.AllPart, branch_entity_1.Branch, bin_entity_1.Bin, company_entity_1.Company])],
+        imports: [models_module_1.ModelsModule, references_module_1.ReferencesModule, typeorm_1.TypeOrmModule.forFeature([stock_part_entity_1.StockPart, model_entity_1.Model, reference_entity_1.Reference, all_part_entity_1.AllPart, branch_entity_1.Branch, bin_entity_1.Bin, company_entity_1.Company, tracability_entity_1.Tracability, history_stock_part_entity_1.HistoryStockPart])],
         controllers: [stock_parts_controller_1.StockPartsController],
         providers: [stock_parts_service_1.StockPartsService, app_service_1.AppService],
         exports: [typeorm_1.TypeOrmModule, stock_parts_service_1.StockPartsService]

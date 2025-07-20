@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RepairController = void 0;
 const common_1 = require("@nestjs/common");
 const repair_service_1 = require("./repair.service");
-const create_repair_dto_1 = require("./dto/create-repair.dto");
 const update_repair_dto_1 = require("./dto/update-repair.dto");
 const swagger_1 = require("@nestjs/swagger");
 let RepairController = class RepairController {
@@ -23,7 +22,7 @@ let RepairController = class RepairController {
     constructor(repairService) {
         this.repairService = repairService;
     }
-    async create(body, createRepairDto, res) {
+    async create(body, res) {
         try {
             const { userId, ...createRepairDto } = body;
             const newCreate = await this.repairService.create(createRepairDto, userId);
@@ -223,12 +222,11 @@ let RepairController = class RepairController {
 exports.RepairController = RepairController;
 __decorate([
     (0, common_1.Post)(),
-    (0, swagger_1.ApiConsumes)('multipart/form-data'),
     (0, swagger_1.ApiBody)({
         schema: {
             type: 'object',
             properties: {
-                actuellyBranch: { type: 'number' },
+                actuellybranch: { type: 'number' },
                 remark: { type: 'string' },
                 deviceStateReceive: { type: 'string' },
                 device: { type: 'number' },
@@ -241,9 +239,9 @@ __decorate([
         },
     }),
     __param(0, (0, common_1.Body)()),
-    __param(2, (0, common_1.Res)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, create_repair_dto_1.CreateRepairDto, Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], RepairController.prototype, "create", null);
 __decorate([

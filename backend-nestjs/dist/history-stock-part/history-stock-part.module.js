@@ -12,12 +12,15 @@ const history_stock_part_service_1 = require("./history-stock-part.service");
 const history_stock_part_controller_1 = require("./history-stock-part.controller");
 const typeorm_1 = require("@nestjs/typeorm");
 const history_stock_part_entity_1 = require("./entities/history-stock-part.entity");
+const stock_part_entity_1 = require("../stock-parts/entities/stock-part.entity");
+const user_entity_1 = require("../users/entities/user.entity");
+const tracability_entity_1 = require("../tracability/entities/tracability.entity");
 let HistoryStockPartModule = class HistoryStockPartModule {
 };
 exports.HistoryStockPartModule = HistoryStockPartModule;
 exports.HistoryStockPartModule = HistoryStockPartModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([history_stock_part_entity_1.HistoryStockPart])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([history_stock_part_entity_1.HistoryStockPart, stock_part_entity_1.StockPart, user_entity_1.User, tracability_entity_1.Tracability])],
         controllers: [history_stock_part_controller_1.HistoryStockPartController],
         providers: [history_stock_part_service_1.HistoryStockPartService],
     })

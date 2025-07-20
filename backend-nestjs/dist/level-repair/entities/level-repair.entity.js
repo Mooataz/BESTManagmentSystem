@@ -35,7 +35,7 @@ __decorate([
 ], LevelRepair.prototype, "price", void 0);
 __decorate([
     (0, typeorm_1.ManyToMany)(() => brand_entity_1.Brand, (brand) => brand.levelRepair),
-    __metadata("design:type", brand_entity_1.Brand)
+    __metadata("design:type", Array)
 ], LevelRepair.prototype, "brand", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => parts_price_entity_1.PartsPrice, (partsPrice) => partsPrice.levelRepair),

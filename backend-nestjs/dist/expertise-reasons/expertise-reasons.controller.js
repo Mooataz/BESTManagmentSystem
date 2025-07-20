@@ -23,6 +23,7 @@ let ExpertiseReasonsController = class ExpertiseReasonsController {
         this.expertiseReasonsService = expertiseReasonsService;
     }
     async create(createExpertiseReasonDto, res) {
+        console.log('body', createExpertiseReasonDto);
         try {
             const newcreate = await this.expertiseReasonsService.create(createExpertiseReasonDto);
             return res.status(common_1.HttpStatus.CREATED).json({

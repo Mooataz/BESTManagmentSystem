@@ -27,7 +27,7 @@ export class Repair {
     approveRepair: boolean;
 
     @Column({ nullable: true })
-    newSerialNumber: string;
+    newserialnumber: string;
 
    
 

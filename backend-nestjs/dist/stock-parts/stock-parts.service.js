@@ -27,31 +27,54 @@ const fs = require("fs/promises");
 const path = require("path");
 const os = require("os");
 const company_entity_1 = require("../company/entities/company.entity");
+const history_stock_part_entity_1 = require("../history-stock-part/entities/history-stock-part.entity");
+const tracability_entity_1 = require("../tracability/entities/tracability.entity");
 let StockPartsService = class StockPartsService {
     stockPartRepositry;
     branchRepositry;
     binRepositry;
     companyRepositry;
+    historyStockPartRepositry;
+    tracabilityRepositry;
     appService;
     modelService;
     referenceService;
     LOCK_FILE = path.join(os.tmpdir(), 'stock-calculation.lock');
     isRunning = false;
-    constructor(stockPartRepositry, branchRepositry, binRepositry, companyRepositry, appService, modelService, referenceService) {
+    constructor(stockPartRepositry, branchRepositry, binRepositry, companyRepositry, historyStockPartRepositry, tracabilityRepositry, appService, modelService, referenceService) {
         this.stockPartRepositry = stockPartRepositry;
         this.branchRepositry = branchRepositry;
         this.binRepositry = binRepositry;
         this.companyRepositry = companyRepositry;
+        this.historyStockPartRepositry = historyStockPartRepositry;
+        this.tracabilityRepositry = tracabilityRepositry;
         this.appService = appService;
         this.modelService = modelService;
         this.referenceService = referenceService;
     }
-    async create(createStockPartDto) {
+    async create(createStockPartDto, userId) {
         createStockPartDto.serialNumber = this.appService.cleanSpaces(createStockPartDto.serialNumber);
-        return await this.stockPartRepositry.save(createStockPartDto);
+        const newCreate = this.stockPartRepositry.create(createStockPartDto);
+        const saveStockPart = await this.stockPartRepositry.save(newCreate);
+        const history = this.historyStockPartRepositry.create({
+            date: new Date(),
+            step: 'Création',
+            stockPart: { id: saveStockPart.id },
+        });
+        const savedHistory = await this.historyStockPartRepositry.save(history);
+        const tracability = this.tracabilityRepositry.create({
+            historyStockPart: { id: savedHistory.id },
+            user: { id: userId },
+        });
+        await this.tracabilityRepositry.save(tracability);
+        return saveStockPart;
     }
     async findAll() {
-        const findAll = await this.stockPartRepositry.find();
+        const findAll = await this.stockPartRepositry.find({ relations: [
+                'bin',
+                'reference', 'reference.model', 'reference.model.brand', 'reference.allpart',
+                'historyStockPart', 'historyStockPart.tracability', 'historyStockPart.tracability.user'
+            ] });
         if (!findAll || findAll.length === 0) {
             throw new common_1.NotFoundException('No data found');
         }
@@ -93,11 +116,20 @@ let StockPartsService = class StockPartsService {
         }
         return findAll;
     }
-    async findByBinId(binId) {
+    async findByBranchId(branchId) {
         return this.stockPartRepositry
-            .createQueryBuilder('StockPart')
-            .leftJoinAndSelect('StockPart.bin', 'bin')
-            .where('bin.id = :binId', { binId })
+            .createQueryBuilder('stockPart')
+            .leftJoinAndSelect('stockPart.bin', 'bin')
+            .leftJoinAndSelect('bin.branch', 'branch')
+            .leftJoinAndSelect('stockPart.reference', 'reference')
+            .leftJoinAndSelect('reference.model', 'model')
+            .leftJoinAndSelect('model.brand', 'brand')
+            .leftJoinAndSelect('reference.allpart', 'allpart')
+            .leftJoinAndSelect('stockPart.historyStockPart', 'historyStockPart')
+            .leftJoinAndSelect('historyStockPart.tracability', 'tracability')
+            .leftJoinAndSelect('tracability.user', 'user')
+            .where('branch.id = :branchId', { branchId })
+            .orderBy('stockPart.id', 'DESC')
             .getMany();
     }
     async findByBinType(type, branchId) {
@@ -105,6 +137,9 @@ let StockPartsService = class StockPartsService {
             .createQueryBuilder('StockPart')
             .leftJoinAndSelect('StockPart.bin', 'bin')
             .leftJoinAndSelect('bin.branch', 'branch')
+            .leftJoinAndSelect('StockPart.reference', 'reference')
+            .leftJoinAndSelect('reference.allpart', 'allpart')
+            .leftJoinAndSelect('reference.model', 'model')
             .where('bin.type = :type', { type })
             .andWhere('branch.id = :branchId', { branchId })
             .getMany();
@@ -222,7 +257,11 @@ exports.StockPartsService = StockPartsService = __decorate([
     __param(1, (0, typeorm_1.InjectRepository)(branch_entity_1.Branch)),
     __param(2, (0, typeorm_1.InjectRepository)(bin_entity_1.Bin)),
     __param(3, (0, typeorm_1.InjectRepository)(company_entity_1.Company)),
+    __param(4, (0, typeorm_1.InjectRepository)(history_stock_part_entity_1.HistoryStockPart)),
+    __param(5, (0, typeorm_1.InjectRepository)(tracability_entity_1.Tracability)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,

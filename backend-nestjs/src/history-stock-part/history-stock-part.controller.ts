@@ -8,10 +8,10 @@ export class HistoryStockPartController {
   constructor(private readonly historyStockPartService: HistoryStockPartService) { }
 
   @Post()
-  async create(@Body() createHistoryStockPartDto: CreateHistoryStockPartDto,
+  async create(@Body() /* createHistoryStockPartDto: CreateHistoryStockPartDto */ data:any,
     @Res() res) {
     try {
-      const newcreate = await this.historyStockPartService.create(createHistoryStockPartDto)
+      const newcreate = await this.historyStockPartService.create(data)
       return res.status(HttpStatus.CREATED).json({
         message:"Created Successfuly !",
         status:HttpStatus.CREATED,

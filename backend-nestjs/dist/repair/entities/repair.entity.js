@@ -29,7 +29,7 @@ let Repair = class Repair {
     id;
     warrenty;
     approveRepair;
-    newSerialNumber;
+    newserialnumber;
     actuellybranch;
     files;
     partsNeed;
@@ -66,7 +66,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
-], Repair.prototype, "newSerialNumber", void 0);
+], Repair.prototype, "newserialnumber", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", Number)

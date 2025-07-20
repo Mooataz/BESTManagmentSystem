@@ -17,6 +17,7 @@ const common_1 = require("@nestjs/common");
 const references_service_1 = require("./references.service");
 const create_reference_dto_1 = require("./dto/create-reference.dto");
 const update_reference_dto_1 = require("./dto/update-reference.dto");
+const swagger_1 = require("@nestjs/swagger");
 let ReferencesController = class ReferencesController {
     referencesService;
     constructor(referencesService) {
@@ -127,9 +128,9 @@ let ReferencesController = class ReferencesController {
             });
         }
     }
-    async getByMaterialCode(materialCode, res) {
+    async findReferenceByMaterialCode(code, res) {
         try {
-            const findReferences = await this.referencesService.findByMaterialCode(materialCode);
+            const findReferences = await this.referencesService.findReferenceByMaterialCode(code);
             return res.status(common_1.HttpStatus.OK).json({
                 message: "Founnd Successfuly !",
                 status: common_1.HttpStatus.OK,
@@ -187,7 +188,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ReferencesController.prototype, "remove", null);
 __decorate([
-    (0, common_1.Get)(':modelId/:partId'),
+    (0, common_1.Get)('getCompatibleReferences/:modelId/:partId'),
     __param(0, (0, common_1.Param)('modelId')),
     __param(1, (0, common_1.Param)('partId')),
     __param(2, (0, common_1.Res)()),
@@ -196,13 +197,14 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ReferencesController.prototype, "getCompatibleReferences", null);
 __decorate([
-    (0, common_1.Get)('findByMC/:materialCode'),
-    __param(0, (0, common_1.Param)('materialCode')),
+    (0, common_1.Get)('GetMC/:code'),
+    (0, swagger_1.ApiOperation)({ summary: 'Find reference by material code' }),
+    __param(0, (0, common_1.Param)('code')),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
-], ReferencesController.prototype, "getByMaterialCode", null);
+], ReferencesController.prototype, "findReferenceByMaterialCode", null);
 exports.ReferencesController = ReferencesController = __decorate([
     (0, common_1.Controller)('references'),
     __metadata("design:paramtypes", [references_service_1.ReferencesService])

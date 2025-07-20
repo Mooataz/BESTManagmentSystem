@@ -6,6 +6,7 @@ export declare class BinController {
     constructor(binService: BinService);
     create(createBinDto: CreateBinDto, res: any): Promise<any>;
     getByBranchId(branchId: number, res: any): Promise<any>;
+    getByName(name: string, res: any): Promise<any>;
     getByBranchIdAndType(branchId: number, type: string, res: any): Promise<any>;
     findAll(res: any): Promise<any>;
     findOne(id: number, res: any): Promise<any>;

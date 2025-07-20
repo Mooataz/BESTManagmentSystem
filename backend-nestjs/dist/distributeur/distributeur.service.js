@@ -33,7 +33,9 @@ let DistributeurService = class DistributeurService {
         return await this.distributeurRepositry.save(distributeur);
     }
     async findAll() {
-        const allDistributeurs = await this.distributeurRepositry.find();
+        const allDistributeurs = await this.distributeurRepositry.find({ order: {
+                id: 'DESC'
+            } });
         if (!allDistributeurs || allDistributeurs.length === 0) {
             throw new common_1.NotFoundException("There is no distributeurs data Available");
         }

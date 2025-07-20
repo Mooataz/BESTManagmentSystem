@@ -3,9 +3,13 @@ export declare class CreateTransfertDto {
     sendingDate: Date;
     receivedDate: Date;
     type: string;
+    frombranch: number;
+    sendUser: number;
+    receiveUser: number;
     state: string;
     remark: string;
     repairIds: number[];
     stockPartIds: number[];
-    toBranch: number;
+    tobranch: number;
+    typePart: string;
 }

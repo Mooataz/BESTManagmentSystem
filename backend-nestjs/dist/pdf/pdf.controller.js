@@ -46,6 +46,25 @@ let PdfController = class PdfController {
             }
         }
     }
+    async generateAddStockPartPDF(body, res) {
+        try {
+            const pdfBuffer = await this.pdfService.generatAddStockPdf(body);
+            res.set({
+                'Content-Type': 'application/pdf',
+                'Content-Disposition': 'attachment; filename="Ajoute_Stock.pdf"',
+                'Content-Length': pdfBuffer.length
+            });
+            res.send(pdfBuffer);
+        }
+        catch (error) {
+            if (error instanceof common_1.NotFoundException) {
+                res.status(404).send(error.message);
+            }
+            else {
+                res.status(500).send('Erreur lors de la génération du PDF');
+            }
+        }
+    }
 };
 exports.PdfController = PdfController;
 __decorate([
@@ -56,6 +75,14 @@ __decorate([
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], PdfController.prototype, "generateRepairsPdf", null);
+__decorate([
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], PdfController.prototype, "generateAddStockPartPDF", null);
 exports.PdfController = PdfController = __decorate([
     (0, common_1.Controller)('pdf'),
     __metadata("design:paramtypes", [repair_service_1.RepairService,

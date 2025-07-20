@@ -18,7 +18,11 @@ export class LevelRepairService {
   }
 
   async findAll():Promise<LevelRepair[]> {
-    const allfind = await this.levelRepairRepositry.find()
+    const allfind = await this.levelRepairRepositry.find({
+      relations:[
+        'brand', 'partsPrice'
+      ]
+    })
 
     if (!allfind || allfind.length === 0) {
       throw new NotFoundException ("There is no data available")

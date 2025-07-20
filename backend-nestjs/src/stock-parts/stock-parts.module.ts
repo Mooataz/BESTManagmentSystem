@@ -15,9 +15,11 @@ import { ReferencesModule } from 'src/references/references.module';
 import { AppModule } from 'src/app.module';
 import { Branch } from 'src/branches/entities/branch.entity';
 import { Company } from 'src/company/entities/company.entity';
+import { Tracability } from 'src/tracability/entities/tracability.entity';
+import { HistoryStockPart } from 'src/history-stock-part/entities/history-stock-part.entity';
 
 @Module({
-  imports: [ModelsModule,ReferencesModule,/* AppModule, */ TypeOrmModule.forFeature([StockPart,  Model, Reference, AllPart, Branch, Bin, Company])],
+  imports: [ModelsModule,ReferencesModule,/* AppModule, */ TypeOrmModule.forFeature([StockPart,  Model, Reference, AllPart, Branch, Bin, Company, Tracability, HistoryStockPart])],
   controllers: [StockPartsController],
   providers: [StockPartsService, AppService],
   exports:[TypeOrmModule,StockPartsService]

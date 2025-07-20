@@ -47,7 +47,7 @@ let BranchesService = class BranchesService {
         return allfind;
     }
     async findOne(id) {
-        const Onefind = await this.branchRepositry.findOne({ where: { id } });
+        const Onefind = await this.branchRepositry.findOne({ where: { id }, relations: ['company', 'user', 'bin'], });
         if (!Onefind) {
             throw new common_1.NotFoundException("There is no data Available");
         }

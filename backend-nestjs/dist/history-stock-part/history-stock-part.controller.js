@@ -15,16 +15,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HistoryStockPartController = void 0;
 const common_1 = require("@nestjs/common");
 const history_stock_part_service_1 = require("./history-stock-part.service");
-const create_history_stock_part_dto_1 = require("./dto/create-history-stock-part.dto");
 const update_history_stock_part_dto_1 = require("./dto/update-history-stock-part.dto");
 let HistoryStockPartController = class HistoryStockPartController {
     historyStockPartService;
     constructor(historyStockPartService) {
         this.historyStockPartService = historyStockPartService;
     }
-    async create(createHistoryStockPartDto, res) {
+    async create(data, res) {
         try {
-            const newcreate = await this.historyStockPartService.create(createHistoryStockPartDto);
+            const newcreate = await this.historyStockPartService.create(data);
             return res.status(common_1.HttpStatus.CREATED).json({
                 message: "Created Successfuly !",
                 status: common_1.HttpStatus.CREATED,
@@ -131,7 +130,7 @@ __decorate([
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_history_stock_part_dto_1.CreateHistoryStockPartDto, Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], HistoryStockPartController.prototype, "create", null);
 __decorate([

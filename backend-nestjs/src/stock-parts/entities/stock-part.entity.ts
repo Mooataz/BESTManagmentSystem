@@ -16,9 +16,9 @@ export class StockPart {
     remark: string;
 
     @Column()
-    serialNumber: string;
+    serialnumber: string;
 
-    @ManyToOne( () => Bin, bin => bin.stockPart)
+    @ManyToOne( () => Bin, bin => bin.stockPart, { nullable: true })
     bin: Bin;
 
     @ManyToOne( () =>Reference, reference => reference.stockPart)

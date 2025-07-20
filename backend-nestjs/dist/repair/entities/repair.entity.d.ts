@@ -16,7 +16,7 @@ export declare class Repair {
     id: number;
     warrenty: boolean;
     approveRepair: boolean;
-    newSerialNumber: string;
+    newserialnumber: string;
     actuellybranch: number;
     files: string[];
     partsNeed: number[];

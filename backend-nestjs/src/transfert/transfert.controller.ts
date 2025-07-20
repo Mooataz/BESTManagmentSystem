@@ -43,11 +43,11 @@ export class TransfertController {
         data:null }) }
   }
 
-  @Get('/findByBranch/:branchId')
-  async getByBranchId(@Param('branchId') branchId: number,
+  @Get('/findFromBranchId/:branchId/:type')
+  async getFromBranchId(@Param('branchId') branchId: number, @Param('type') type: string,
                       @Res() res) {
     try {
-      const allfind = await this.transfertService.findByBranchId(branchId)
+      const allfind = await this.transfertService.getFromBranch(branchId,type)
       return res.status(HttpStatus.OK).json({
         message:"Founded Successfuly !",
         status:HttpStatus.OK,
@@ -58,6 +58,23 @@ export class TransfertController {
         status:HttpStatus.BAD_REQUEST,
         data:null }) }
   }
+  @Get('/findToBranchId/:branchId/:type')
+  async getByBranchId(@Param('branchId') branchId: number, @Param('type') type: string,
+                      @Res() res) {
+    try {
+      const allfind = await this.transfertService.getToBranch(branchId,type)
+      return res.status(HttpStatus.OK).json({
+        message:"Founded Successfuly !",
+        status:HttpStatus.OK,
+        data:allfind })
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message:error.message,
+        status:HttpStatus.BAD_REQUEST,
+        data:null }) }
+  }
+
+
   @Get()
   async findAll( @Res() res) {
     try {

@@ -5,6 +5,6 @@ export declare class Brand {
     name: string;
     logo: string;
     status: string;
-    model: Model;
+    model: Model[];
     levelRepair: LevelRepair;
 }
