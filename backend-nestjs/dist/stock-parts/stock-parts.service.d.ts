@@ -11,6 +11,9 @@ import { Branch } from 'src/branches/entities/branch.entity';
 import { Company } from 'src/company/entities/company.entity';
 import { HistoryStockPart } from 'src/history-stock-part/entities/history-stock-part.entity';
 import { Tracability } from 'src/tracability/entities/tracability.entity';
+import { PdfService } from 'src/pdf/pdf.service';
+import { StockGateway } from './Stock.Gateway';
+import { User } from 'src/users/entities/user.entity';
 export declare class StockPartsService {
     private readonly stockPartRepositry;
     private readonly branchRepositry;
@@ -18,12 +21,15 @@ export declare class StockPartsService {
     private readonly companyRepositry;
     private readonly historyStockPartRepositry;
     private readonly tracabilityRepositry;
+    private readonly UserRepositry;
     private appService;
     private modelService;
     private referenceService;
+    private PDFService;
+    private StockGateway;
     private readonly LOCK_FILE;
     private isRunning;
-    constructor(stockPartRepositry: Repository<StockPart>, branchRepositry: Repository<Branch>, binRepositry: Repository<Bin>, companyRepositry: Repository<Company>, historyStockPartRepositry: Repository<HistoryStockPart>, tracabilityRepositry: Repository<Tracability>, appService: AppService, modelService: ModelsService, referenceService: ReferencesService);
+    constructor(stockPartRepositry: Repository<StockPart>, branchRepositry: Repository<Branch>, binRepositry: Repository<Bin>, companyRepositry: Repository<Company>, historyStockPartRepositry: Repository<HistoryStockPart>, tracabilityRepositry: Repository<Tracability>, UserRepositry: Repository<User>, appService: AppService, modelService: ModelsService, referenceService: ReferencesService, PDFService: PdfService, StockGateway: StockGateway);
     create(createStockPartDto: CreateStockPartDto, userId: number): Promise<StockPart>;
     findAll(): Promise<StockPart[]>;
     findOne(id: number): Promise<StockPart>;

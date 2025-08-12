@@ -30,6 +30,8 @@ const approve_stock_entity_1 = require("../approve-stock/entities/approve-stock.
 const customer_entity_1 = require("../customers/entities/customer.entity");
 const history_repair_entity_1 = require("../history-repair/entities/history-repair.entity");
 const tracability_entity_1 = require("../tracability/entities/tracability.entity");
+const path = require("path");
+const fs = require("fs");
 let RepairService = class RepairService {
     repairRepositry;
     accessoryRepositry;
@@ -108,7 +110,20 @@ let RepairService = class RepairService {
     }
     async findAll() {
         const allfind = await this.repairRepositry.find({
-            relations: ['device', 'device.model', 'device.model.brand', 'customer'],
+            relations: ['customer', 'customer.distributer',
+                'device', 'device.model', 'device.model.brand', 'device.model.allpart', 'device.model.typeModel',
+                'accessory',
+                'listFault',
+                'customerRequest',
+                'notesCustomer',
+                'expertiseReason',
+                'repairAction',
+                'user',
+                'approveStock',
+                'outputList',
+                'transfert',
+                'invoice',
+                'historyRepair', 'historyRepair.tracability', 'historyRepair.tracability.user', 'historyRepair.tracability.user.branch', 'historyRepair.tracability.user.branch.company'],
         });
         if (!allfind || allfind.length === 0) {
             throw new common_1.NotFoundException('There is no data available');
@@ -119,60 +134,24 @@ let RepairService = class RepairService {
         const onefind = await this.repairRepositry.findOne({
             where: { id },
             relations: ['customer', 'customer.distributer',
-                'device', 'device.model', 'device.model.brand',
+                'device', 'device.model', 'device.model.brand', 'device.model.allpart', 'device.model.typeModel',
                 'accessory',
                 'listFault',
                 'customerRequest',
+                'notesCustomer',
+                'expertiseReason',
+                'repairAction',
+                'user',
+                'approveStock',
+                'outputList',
+                'transfert',
+                'invoice',
                 'historyRepair', 'historyRepair.tracability', 'historyRepair.tracability.user', 'historyRepair.tracability.user.branch', 'historyRepair.tracability.user.branch.company'],
         });
         if (!onefind) {
             throw new common_1.NotFoundException('No data available');
         }
         return onefind;
-    }
-    async update(id, updateRepairDto) {
-        const existingRepair = await this.repairRepositry.findOne({ where: { id }, });
-        if (!existingRepair) {
-            throw new common_1.NotFoundException('Repair not found');
-        }
-        let device = undefined;
-        if (updateRepairDto.device !== undefined) {
-            const foundDevice = await this.deviceRepositry.findOne({ where: { id: updateRepairDto.device } });
-            if (!foundDevice) {
-                throw new common_1.NotFoundException('Device not found');
-            }
-            device = foundDevice;
-        }
-        let user = undefined;
-        if (updateRepairDto.user !== undefined) {
-            const foundUser = await this.userRepositry.findOne({ where: { id: updateRepairDto.user } });
-            if (!foundUser) {
-                throw new common_1.NotFoundException('User not found');
-            }
-            user = foundUser;
-        }
-        let customer = undefined;
-        if (updateRepairDto.customer !== undefined) {
-            const foundCustomer = await this.customerRepositry.findOne({ where: { id: updateRepairDto.customer } });
-            if (!foundCustomer) {
-                throw new common_1.NotFoundException('Customer not found');
-            }
-            customer = foundCustomer;
-        }
-        const updateData = {
-            ...updateRepairDto,
-            device: device ?? existingRepair.device,
-            user: user ?? existingRepair.user,
-            customer: customer ?? existingRepair.customer
-        };
-        delete updateData.deviceId;
-        delete updateData.userId;
-        delete updateData.customerId;
-        await this.repairRepositry.update(id, updateData);
-        return this.repairRepositry.findOneOrFail({
-            where: { id },
-            relations: ['device', 'user']
-        });
     }
     async remove(id) {
         const deletedata = await this.repairRepositry.findOne({ where: { id } });
@@ -264,47 +243,6 @@ let RepairService = class RepairService {
         });
         return filtered;
     }
-    async updateRepairWithParts(repairId, updateData) {
-        const repair = await this.repairRepositry.findOne({
-            where: { id: repairId },
-            relations: ['approveStock'],
-        });
-        if (!repair) {
-            throw new common_1.NotFoundException('Repair not found');
-        }
-        if (updateData.device && typeof updateData.device === 'number') {
-            const device = await this.deviceRepositry.findOneBy({ id: updateData.device });
-            if (!device)
-                throw new common_1.NotFoundException('Device not found');
-            repair.device = device;
-        }
-        if (updateData.user && typeof updateData.user === 'number') {
-            const user = await this.userRepositry.findOneBy({ id: updateData.user });
-            if (!user)
-                throw new common_1.NotFoundException('User not found');
-            repair.user = user;
-        }
-        const addedParts = repair.partsNeed || [];
-        const { device, user, ...restData } = updateData;
-        Object.assign(repair, restData);
-        const updatedRepair = await this.repairRepositry.save(repair);
-        if (repair.approveRepair === true) {
-            for (const partId of addedParts) {
-                const stockPart = await this.stockPartRepositry.findOneBy({ id: partId });
-                if (!stockPart)
-                    continue;
-                const approveStock = this.approveStockRepositry.create({
-                    type: 'Repair',
-                    date: new Date(),
-                    state: 'pending',
-                    idPartRepair: partId,
-                    repair: updatedRepair,
-                });
-                await this.approveStockRepositry.save(approveStock);
-            }
-        }
-        return updatedRepair;
-    }
     async FiltreByUserStep(userId, steps) {
         const filtreuserId = await this.repairRepositry.find({
             where: {
@@ -337,6 +275,97 @@ let RepairService = class RepairService {
             return lastStep === steps;
         });
         return filtered;
+    }
+    async update(id, updateRepairDto) {
+        if (!updateRepairDto || typeof updateRepairDto !== 'object') {
+            throw new common_1.BadRequestException('Invalid update data');
+        }
+        const existingRepair = await this.repairRepositry.findOne({
+            where: { id },
+            relations: [
+                'device', 'user', 'customer',
+                'accessory', 'listFault', 'customerRequest',
+                'notesCustomer', 'expertiseReason', 'repairAction'
+            ]
+        });
+        if (!existingRepair) {
+            throw new common_1.NotFoundException('Repair not found');
+        }
+        const parseIfString = (value) => typeof value === 'string' ? JSON.parse(value) : value;
+        updateRepairDto.accessoryIds = parseIfString(updateRepairDto?.accessoryIds);
+        updateRepairDto.listFaultIds = parseIfString(updateRepairDto?.listFaultIds);
+        updateRepairDto.customerRequestIds = parseIfString(updateRepairDto?.customerRequestIds);
+        updateRepairDto.notesCustomerIds = parseIfString(updateRepairDto?.notesCustomerIds);
+        updateRepairDto.expertiseReasonsIds = parseIfString(updateRepairDto?.expertiseReasonsIds);
+        updateRepairDto.repairActionIds = parseIfString(updateRepairDto?.repairActionIds);
+        updateRepairDto.partsNeed = parseIfString(updateRepairDto?.partsNeed);
+        updateRepairDto.device = parseIfString(updateRepairDto?.device);
+        updateRepairDto.user = parseIfString(updateRepairDto?.user);
+        updateRepairDto.customer = parseIfString(updateRepairDto?.customer);
+        if (updateRepairDto.device !== undefined) {
+            existingRepair.device = await this.deviceRepositry.findOneByOrFail({ id: updateRepairDto.device });
+        }
+        if (updateRepairDto.user !== undefined) {
+            existingRepair.user = await this.userRepositry.findOneByOrFail({ id: updateRepairDto.user });
+        }
+        if (updateRepairDto.customer !== undefined) {
+            existingRepair.customer = await this.customerRepositry.findOneByOrFail({ id: updateRepairDto.customer });
+        }
+        if (updateRepairDto.accessoryIds) {
+            existingRepair.accessory = await this.accessoryRepositry.findBy({ id: (0, typeorm_1.In)(updateRepairDto.accessoryIds) });
+        }
+        if (updateRepairDto.listFaultIds) {
+            existingRepair.listFault = await this.listFaultRepositry.findBy({ id: (0, typeorm_1.In)(updateRepairDto.listFaultIds) });
+        }
+        if (updateRepairDto.customerRequestIds) {
+            existingRepair.customerRequest = await this.customerRequestRepositry.findBy({ id: (0, typeorm_1.In)(updateRepairDto.customerRequestIds) });
+        }
+        if (updateRepairDto.notesCustomerIds) {
+            existingRepair.notesCustomer = await this.notesCustomerRepositry.findBy({ id: (0, typeorm_1.In)(updateRepairDto.notesCustomerIds) });
+        }
+        if (updateRepairDto.expertiseReasonsIds) {
+            existingRepair.expertiseReason = await this.expertiseReasonRepositry.findBy({ id: (0, typeorm_1.In)(updateRepairDto.expertiseReasonsIds) });
+        }
+        if (updateRepairDto.repairActionIds) {
+            existingRepair.repairAction = await this.repairActionRepositry.findBy({ id: (0, typeorm_1.In)(updateRepairDto.repairActionIds) });
+        }
+        const simpleFields = [
+            'warrenty', 'approveRepair', 'newSerialNumber', 'remark',
+            'deviceStateReceive', 'files', 'partsNeed', 'actuellybranch'
+        ];
+        for (const field of simpleFields) {
+            if (updateRepairDto[field] !== undefined) {
+                existingRepair[field] = updateRepairDto[field];
+            }
+        }
+        await this.repairRepositry.save(existingRepair);
+        return this.repairRepositry.findOneOrFail({
+            where: { id },
+            relations: [
+                'device', 'user', 'customer',
+                'accessory', 'listFault', 'customerRequest',
+                'notesCustomer', 'expertiseReason', 'repairAction'
+            ]
+        });
+    }
+    async updateRepairWithParts(id, updateRepairDto, files) {
+        const repair = await this.repairRepositry.findOne({ where: { id } });
+        if (!repair) {
+            throw new common_1.NotFoundException(`Repair with id ${id} not found`);
+        }
+        if (files && files.length > 0) {
+            if (repair.files && repair.files.length > 0) {
+                for (const oldFile of repair.files) {
+                    const filePath = path.join(__dirname, '../../upload/repairs', oldFile);
+                    if (fs.existsSync(filePath)) {
+                        fs.unlinkSync(filePath);
+                    }
+                }
+            }
+            repair.files = files;
+        }
+        Object.assign(repair, updateRepairDto);
+        return await this.repairRepositry.save(repair);
     }
 };
 exports.RepairService = RepairService;

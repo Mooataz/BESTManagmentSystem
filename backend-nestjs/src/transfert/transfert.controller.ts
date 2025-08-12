@@ -5,151 +5,162 @@ import { UpdateTransfertDto } from './dto/update-transfert.dto';
 
 @Controller('transfert')
 export class TransfertController {
-  constructor(private readonly transfertService: TransfertService) {}
+  constructor(private readonly transfertService: TransfertService) { }
 
   @Post()
-  async create( @Body() createTransfertDto: CreateTransfertDto, 
-                @Res() res) {
+  async create(@Body() createTransfertDto: CreateTransfertDto,
+    @Res() res) {
     try {
-              const newDevice = await this.transfertService.create(createTransfertDto)
-              return res.status(HttpStatus.CREATED).json({
-                message:"Transfert created Successfuly !",
-                status:HttpStatus.CREATED,
-                data:newDevice
-              })
-        
-            } catch (error) {
-              return res.status(HttpStatus.BAD_REQUEST).json({
-                message:error.message,
-                status:HttpStatus.BAD_REQUEST,
-                data:null
-              })
-            }
+      const newDevice = await this.transfertService.create(createTransfertDto)
+      return res.status(HttpStatus.CREATED).json({
+        message: "Transfert created Successfuly !",
+        status: HttpStatus.CREATED,
+        data: newDevice
+      })
+
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+        data: null
+      })
+    }
   }
 
   @Get('/findByState/:state')
   async getByState(@Param('state') state: string,
-                      @Res() res) {
+    @Res() res) {
     try {
       const allfind = await this.transfertService.findByState(state)
       return res.status(HttpStatus.OK).json({
-        message:"Founded Successfuly !",
-        status:HttpStatus.OK,
-        data:allfind })
+        message: "Founded Successfuly !",
+        status: HttpStatus.OK,
+        data: allfind
+      })
     } catch (error) {
       return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+        data: null
+      })
+    }
   }
 
   @Get('/findFromBranchId/:branchId/:type')
   async getFromBranchId(@Param('branchId') branchId: number, @Param('type') type: string,
-                      @Res() res) {
+    @Res() res) {
     try {
-      const allfind = await this.transfertService.getFromBranch(branchId,type)
+      const allfind = await this.transfertService.getFromBranch(branchId, type)
       return res.status(HttpStatus.OK).json({
-        message:"Founded Successfuly !",
-        status:HttpStatus.OK,
-        data:allfind })
+        message: "Founded Successfuly !",
+        status: HttpStatus.OK,
+        data: allfind
+      })
     } catch (error) {
       return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+        data: null
+      })
+    }
   }
-  @Get('/findToBranchId/:branchId/:type')
-  async getByBranchId(@Param('branchId') branchId: number, @Param('type') type: string,
+  @Get('/findToBranchId/:branchId/:type/:state')
+  async getByBranchId(@Param('branchId') branchId: number,
+                      @Param('type') type: string,
+                      @Param('state') state: string,
                       @Res() res) {
     try {
-      const allfind = await this.transfertService.getToBranch(branchId,type)
+      const allfind = await this.transfertService.getToBranch(branchId, type, state)
       return res.status(HttpStatus.OK).json({
-        message:"Founded Successfuly !",
-        status:HttpStatus.OK,
-        data:allfind })
+        message: "Founded Successfuly !",
+        status: HttpStatus.OK,
+        data: allfind
+      })
     } catch (error) {
       return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+        data: null
+      })
+    }
   }
 
 
   @Get()
-  async findAll( @Res() res) {
+  async findAll(@Res() res) {
     try {
-      const findAll= await this.transfertService.findAll()
+      const findAll = await this.transfertService.findAll()
       return res.status(HttpStatus.OK).json({
-        message:"All transfert found successfuly !",
-        status:HttpStatus.OK,
-        data:findAll
+        message: "All transfert found successfuly !",
+        status: HttpStatus.OK,
+        data: findAll
       })
     } catch (error) {
       return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+        data: null
       })
     }
   }
 
   @Get(':id')
-  async findOne( @Param('id') id: number, 
-                 @Res() res) {
+  async findOne(@Param('id') id: number,
+    @Res() res) {
     try {
       const findOne = await this.transfertService.findOne(+id)
-       return res.status(HttpStatus.OK).json({
-        message:"One transfert found successfuly !",
-        status:HttpStatus.OK,
-        data:findOne
-      })
-     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-     }
-  }
-
-  @Patch(':id')
-  async update( @Param('id') id: number, 
-                @Body() updateTransfertDto: UpdateTransfertDto, 
-                @Res() res) {
-    try {
-    const updatedata = await this.transfertService.update(+id, updateTransfertDto)
-    return res.status(HttpStatus.OK).json({
-      message:"Transfert updated successfuly !",
-      status:HttpStatus.OK,
-      data:updatedata
-    })
-  } catch (error) {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-    message:error.message,
-    status:HttpStatus.BAD_REQUEST,
-    data:null
-  })
-    
-  }
-  }
-
-  @Delete(':id')
-  async remove( @Param('id') id: number, 
-                @Res() res) {
-    try {
-      const deletedata = await this.transfertService.remove(+id);
       return res.status(HttpStatus.OK).json({
-        message:"Transfert deleted successfuly !",
-        status:HttpStatus.OK,
-        data:deletedata
+        message: "One transfert found successfuly !",
+        status: HttpStatus.OK,
+        data: findOne
       })
     } catch (error) {
       return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+        data: null
       })
-      
+    }
+  }
+
+  @Patch(':id')
+  async update(@Param('id') id: number,
+    @Body() updateTransfertDto: UpdateTransfertDto,
+    @Res() res) {
+    try {
+      const updatedata = await this.transfertService.update(+id, updateTransfertDto)
+      return res.status(HttpStatus.OK).json({
+        message: "Transfert updated successfuly !",
+        status: HttpStatus.OK,
+        data: updatedata
+      })
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+        data: null
+      })
+
+    }
+  }
+
+  @Delete(':id')
+  async remove(@Param('id') id: number,
+    @Res() res) {
+    try {
+      const deletedata = await this.transfertService.remove(+id);
+      return res.status(HttpStatus.OK).json({
+        message: "Transfert deleted successfuly !",
+        status: HttpStatus.OK,
+        data: deletedata
+      })
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+        data: null
+      })
+
     }
   }
 }

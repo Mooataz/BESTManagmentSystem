@@ -39,6 +39,8 @@ export default function RecieveReception() {
   
     
     };
+    const [clickedRowId, setClickedRowId] = React.useState<number | undefined>(undefined);
+
     const actions: TableAction[] = [
     {
       icon: (
@@ -48,8 +50,11 @@ export default function RecieveReception() {
           </Button>
         </Box>
       ),
-      onClick: (row) => {
+      onClick: async (row) => {
+        setClickedRowId(row.id);
+        await new Promise((res) => setTimeout(res, 1000));
         AccepetAssign(row);
+        setClickedRowId(undefined);
       }
     }
   ];
@@ -60,7 +65,7 @@ export default function RecieveReception() {
 
       <DynamicTable
         rows={repairs}
-
+        clickedRowId={clickedRowId} 
         columnLabels={{
           'id': 'Reparation',
           'customer.name': 'Nom client',

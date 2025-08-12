@@ -80,13 +80,43 @@ let TransfertService = class TransfertService {
         }
         return findOne;
     }
-    async update(id, updateTransfertDto) {
-        await this.transfertRepositry.update(id, updateTransfertDto);
-        const updatedata = await this.transfertRepositry.findOne({ where: { id } });
-        if (!updatedata) {
+    async update(id, data) {
+        const stockPart = await this.stockPartRepositry.find({
+            where: { id: (0, typeorm_2.In)(data.stockPartIds ?? []) },
+        });
+        const repair = await this.repairRepositry.find({
+            where: { id: (0, typeorm_2.In)(data.repairIds ?? []) },
+        });
+        if ((!stockPart.length) && (!repair.length)) {
+            throw new common_1.NotFoundException('No data for transfert');
+        }
+        if (repair.length) {
+            await this.repairRepositry
+                .createQueryBuilder()
+                .update(repair_entity_1.Repair)
+                .set({ actuellybranch: data.actuellybranch })
+                .where('id IN (:...ids)', { ids: repair.map(p => p.id) })
+                .execute();
+        }
+        if (stockPart.length) {
+            await this.stockPartRepositry
+                .createQueryBuilder()
+                .update(stock_part_entity_1.StockPart)
+                .set({ bin: () => data.bin })
+                .where('id IN (:...ids)', { ids: stockPart.map(p => p.id) })
+                .execute();
+        }
+        const transfert = await this.transfertRepositry.findOne({
+            where: { id },
+            relations: ['repair', 'stockPart'],
+        });
+        if (!transfert) {
             throw new common_1.NotFoundException('Transfert Not found for update = failed');
         }
-        return updatedata;
+        Object.assign(transfert, data);
+        transfert.repair = repair;
+        transfert.stockPart = stockPart;
+        return await this.transfertRepositry.save(transfert);
     }
     async remove(id) {
         const deletedata = await this.transfertRepositry.findOne({ where: { id } });
@@ -107,45 +137,101 @@ let TransfertService = class TransfertService {
         return findAll;
     }
     async getFromBranch(branchId, type) {
-        const findAll = await this.transfertRepositry
+        const transferts = await this.transfertRepositry
             .createQueryBuilder('transfert')
             .leftJoinAndSelect('transfert.stockPart', 'stockPart')
             .leftJoinAndSelect('stockPart.reference', 'reference')
-            .leftJoinAndSelect('reference.materialCode', 'materialCode')
+            .leftJoinAndSelect('reference.allpart', 'allpart')
+            .leftJoinAndSelect('reference.model', 'model')
+            .leftJoinAndSelect('stockPart.bin', 'bin')
             .where('transfert.frombranch = :branchId', { branchId })
             .andWhere('transfert.type = :type', { type })
             .getMany();
-        if (!findAll || findAll.length === 0) {
-            throw new common_1.NotFoundException("There is no data available");
+        if (!transferts || transferts.length === 0) {
+            throw new common_1.NotFoundException('There is no data available');
         }
         const result = [];
-        for (const t of findAll) {
-            const sendUser = await this.userRepositry.findOne({ where: { id: t.sendUser } });
-            const receiveUser = t.receiveUser
-                ? await this.userRepositry.findOne({ where: { id: t.receiveUser } })
-                : null;
-            const fromBranch = await this.branchRepositry.findOne({ where: { id: t.frombranch } });
-            const toBranch = await this.branchRepositry.findOne({ where: { id: t.tobranch } });
+        for (const t of transferts) {
+            const [sendUser, receiveUser, fromBranch, toBranch] = await Promise.all([
+                this.userRepositry.findOne({ where: { id: t.sendUser } }),
+                t.receiveUser ? this.userRepositry.findOne({ where: { id: t.receiveUser } }) : null,
+                this.branchRepositry.findOne({ where: { id: t.frombranch } }),
+                this.branchRepositry.findOne({ where: { id: t.tobranch } }),
+            ]);
+            const stockPartsDetail = t.stockPart.map(sp => ({
+                id: sp.id,
+                serialnumber: sp.serialnumber,
+                remark: sp.remark,
+                binName: sp.bin?.name ?? null,
+                materialCode: sp.reference?.materialCode ?? null,
+                model: sp.reference?.model ?? null,
+                partDescription: sp.reference?.allpart?.description ?? null,
+            }));
             result.push({
-                ...t,
+                delivredBy: t.delivredBy,
+                transfertId: t.id,
+                sendingDate: t.sendingDate,
+                receivedDate: t.receivedDate,
+                type: t.type,
+                state: t.state,
+                remark: t.remark,
                 sendUserName: sendUser?.name || null,
                 receiveUserName: receiveUser?.name || null,
                 fromBranchName: fromBranch?.name || null,
                 toBranchName: toBranch?.name || null,
+                stockPart: stockPartsDetail
             });
         }
         return result;
     }
-    async getToBranch(branchId, type) {
-        const findAll = await this.transfertRepositry
+    async getToBranch(branchId, type, state) {
+        const transferts = await this.transfertRepositry
             .createQueryBuilder('transfert')
-            .where('tobranch = :branchId', { branchId })
-            .andWhere('type = :type', { type })
+            .leftJoinAndSelect('transfert.stockPart', 'stockPart')
+            .leftJoinAndSelect('stockPart.reference', 'reference')
+            .leftJoinAndSelect('reference.allpart', 'allpart')
+            .leftJoinAndSelect('reference.model', 'model')
+            .leftJoinAndSelect('stockPart.bin', 'bin')
+            .where('transfert.tobranch = :branchId', { branchId })
+            .andWhere('transfert.type = :type', { type })
+            .andWhere('transfert.state = :state', { state })
             .getMany();
-        if (!findAll || findAll.length === 0) {
-            throw new common_1.NotFoundException("There is no data Available");
+        if (!transferts || transferts.length === 0) {
+            throw new common_1.NotFoundException('There is no data available');
         }
-        return findAll;
+        const result = [];
+        for (const t of transferts) {
+            const [sendUser, receiveUser, fromBranch, toBranch] = await Promise.all([
+                this.userRepositry.findOne({ where: { id: t.sendUser } }),
+                t.receiveUser ? this.userRepositry.findOne({ where: { id: t.receiveUser } }) : null,
+                this.branchRepositry.findOne({ where: { id: t.frombranch } }),
+                this.branchRepositry.findOne({ where: { id: t.tobranch } }),
+            ]);
+            const stockPartsDetail = t.stockPart.map(sp => ({
+                id: sp.id,
+                serialnumber: sp.serialnumber,
+                remark: sp.remark,
+                binName: sp.bin?.name ?? null,
+                materialCode: sp.reference?.materialCode ?? null,
+                model: sp.reference?.model ?? null,
+                partDescription: sp.reference?.allpart?.description ?? null,
+            }));
+            result.push({
+                delivredBy: t.delivredBy,
+                transfertId: t.id,
+                sendingDate: t.sendingDate,
+                receivedDate: t.receivedDate,
+                type: t.type,
+                state: t.state,
+                remark: t.remark,
+                sendUserName: sendUser?.name || null,
+                receiveUserName: receiveUser?.name || null,
+                fromBranchName: fromBranch?.name || null,
+                toBranchName: toBranch?.name || null,
+                stockPart: stockPartsDetail
+            });
+        }
+        return result;
     }
 };
 exports.TransfertService = TransfertService;

@@ -184,7 +184,6 @@ export class ModelsController {
     @Res() res,
     @UploadedFile() picture: Express.Multer.File) {
 
-    // return this.modelsService.update(+id, updateModelDto);
     try {
       const updateModelDto = new UpdateModelDto();
       updateModelDto.name = body.name;

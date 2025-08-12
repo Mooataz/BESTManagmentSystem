@@ -63,3 +63,22 @@ export const AddCustomer = createAsyncThunk<
     }
   }
 );
+export const UpdateOneCustomer = createAsyncThunk<
+  Customer,
+  Customer,
+  AsyncThunkConfig
+>(
+  'customer/Update',
+  async (body, { rejectWithValue }) => {
+    try {
+      // Utilisation de POST pour envoyer les données dans le body
+      const response = await API.patch(`customers/${body.id}`,   body  );
+       
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Échec de l\'envoi'
+      );
+    }
+  }
+);

@@ -13,6 +13,7 @@ import { getAllPart } from '../../../Redux/Actions/Administration/ListAllPart';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Controller, useForm } from 'react-hook-form';
 import * as Yup from 'yup';
+import theme from '../../../Theme/theme';
 const validationSchema = Yup.object().shape({
     materialCode: Yup.string().required('Reference requis'),
     allpart: Yup.number().required('Une piéce doit étre selectionnée'),
@@ -150,7 +151,10 @@ export default function AddReference() {
 
     return (
         <div>
-            <Button variant="outlined" onClick={handleOpen}>Ajouter Reference</Button>
+            <Button variant="outlined" sx={{
+                        borderColor: theme.palette.primary.main,
+                        marginLeft: '70%'
+                    }} onClick={handleOpen}>Ajouter Reference</Button>
             <Modal
                 aria-labelledby="spring-modal-title"
                 aria-describedby="spring-modal-description"

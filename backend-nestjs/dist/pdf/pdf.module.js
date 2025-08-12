@@ -28,6 +28,7 @@ const approve_stock_module_1 = require("../approve-stock/approve-stock.module");
 const core_module_1 = require("../core/core.module");
 const legislation_entity_1 = require("../legislation/entities/legislation.entity");
 const branch_entity_1 = require("../branches/entities/branch.entity");
+const legislation_service_1 = require("../legislation/legislation.service");
 let PdfModule = class PdfModule {
 };
 exports.PdfModule = PdfModule;
@@ -48,7 +49,7 @@ exports.PdfModule = PdfModule = __decorate([
             typeorm_1.TypeOrmModule.forFeature([repair_entity_1.Repair, customer_entity_1.Customer, device_entity_1.Device, legislation_entity_1.Legislation, branch_entity_1.Branch]),
         ],
         controllers: [pdf_controller_1.PdfController],
-        providers: [pdf_service_1.PdfService, repair_service_1.RepairService],
+        providers: [pdf_service_1.PdfService, repair_service_1.RepairService, legislation_service_1.LegislationService],
         exports: [pdf_service_1.PdfService]
     })
 ], PdfModule);

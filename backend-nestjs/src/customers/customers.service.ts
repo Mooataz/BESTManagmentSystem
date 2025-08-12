@@ -106,7 +106,31 @@ async findByName(name: string, phone: number, distributer): Promise<Customer> {
      throw error;
   }
 }
+/* async UpdateByName(data:Customer): Promise<Customer> {
+  let {name, phone,distributer} =data
+  try {
+     
 
+    const customer = await this.customerRepositry.findOne({
+      where: { name,  phone },
+    });
+
+     
+
+    if (!customer) {
+      const newCustomer = this.customerRepositry.create({ name, phone, distributer });
+      await this.customerRepositry.save(newCustomer);
+      return newCustomer;
+    }else{
+      const newCustomer = await this.customerRepositry.update(data.id, customer);
+      return newCustomer;
+    }
+
+     
+  } catch (error) {
+     throw error;
+  }
+} */
 
 }
 

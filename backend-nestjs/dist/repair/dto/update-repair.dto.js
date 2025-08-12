@@ -16,6 +16,12 @@ const class_validator_1 = require("class-validator");
 class UpdateRepairDto extends (0, swagger_1.PartialType)(create_repair_dto_1.CreateRepairDto) {
     device;
     user;
+    accessoryIds;
+    listFaultIds;
+    customerRequestIds;
+    notesCustomer;
+    expertiseReason;
+    repairAction;
 }
 exports.UpdateRepairDto = UpdateRepairDto;
 __decorate([
@@ -28,4 +34,40 @@ __decorate([
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], UpdateRepairDto.prototype, "user", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsNumber)({}, { each: true }),
+    __metadata("design:type", Array)
+], UpdateRepairDto.prototype, "accessoryIds", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsNumber)({}, { each: true }),
+    __metadata("design:type", Array)
+], UpdateRepairDto.prototype, "listFaultIds", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsNumber)({}, { each: true }),
+    __metadata("design:type", Array)
+], UpdateRepairDto.prototype, "customerRequestIds", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsNumber)({}, { each: true }),
+    __metadata("design:type", Array)
+], UpdateRepairDto.prototype, "notesCustomer", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsNumber)({}, { each: true }),
+    __metadata("design:type", Array)
+], UpdateRepairDto.prototype, "expertiseReason", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsNumber)({}, { each: true }),
+    __metadata("design:type", Array)
+], UpdateRepairDto.prototype, "repairAction", void 0);
 //# sourceMappingURL=update-repair.dto.js.map

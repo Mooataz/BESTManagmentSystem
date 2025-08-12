@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateRepairDto } from './dto/create-repair.dto';
 import { UpdateRepairDto } from './dto/update-repair.dto';
 import { In, Repository } from 'typeorm';
@@ -20,6 +20,8 @@ import { Customer } from 'src/customers/entities/customer.entity';
 import { HistoryRepair } from 'src/history-repair/entities/history-repair.entity';
 import { Tracability } from 'src/tracability/entities/tracability.entity';
 import { SelectQueryBuilder } from 'typeorm';
+import * as path from 'path';
+import * as fs from 'fs';
 @Injectable()
 export class RepairService {
 
@@ -65,7 +67,7 @@ export class RepairService {
     if (!listFault.length) throw new NotFoundException('No Fault found');
     if (!device) throw new NotFoundException('Device not found');
 
- 
+
     // Create the repair entity with required fields
     const repairData = {
       actuellybranch: createRepairDto.actuellybranch,
@@ -104,9 +106,22 @@ export class RepairService {
 
   async findAll(): Promise<Repair[]> {
     const allfind = await this.repairRepositry.find({
-    relations: ['device','device.model', 'device.model.brand', 'customer'], // 👈 ajoute les relations nécessaires ici
-  })
-  
+      relations: ['customer', 'customer.distributer',
+        'device', 'device.model', 'device.model.brand', 'device.model.allpart', 'device.model.typeModel',
+        'accessory',
+        'listFault',
+        'customerRequest',
+        'notesCustomer',
+        'expertiseReason',
+        'repairAction',
+        'user',
+        'approveStock',
+        'outputList',
+        'transfert',
+        'invoice',
+        'historyRepair', 'historyRepair.tracability', 'historyRepair.tracability.user', 'historyRepair.tracability.user.branch', 'historyRepair.tracability.user.branch.company'], // 👈 ajoute les relations nécessaires ici
+    })
+
     if (!allfind || allfind.length === 0) {
       throw new NotFoundException('There is no data available')
     }
@@ -117,11 +132,19 @@ export class RepairService {
     const onefind = await this.repairRepositry.findOne({
       where: { id },
       relations: ['customer', 'customer.distributer',
-                  'device','device.model', 'device.model.brand',
-                  'accessory',
-                  'listFault',
-                  'customerRequest',
-                  'historyRepair', 'historyRepair.tracability', 'historyRepair.tracability.user','historyRepair.tracability.user.branch','historyRepair.tracability.user.branch.company'],
+        'device', 'device.model', 'device.model.brand', 'device.model.allpart', 'device.model.typeModel',
+        'accessory',
+        'listFault',
+        'customerRequest',
+        'notesCustomer',
+        'expertiseReason',
+        'repairAction',
+        'user',
+        'approveStock',
+        'outputList',
+        'transfert',
+        'invoice',
+        'historyRepair', 'historyRepair.tracability', 'historyRepair.tracability.user', 'historyRepair.tracability.user.branch', 'historyRepair.tracability.user.branch.company'],
     })
     if (!onefind) {
       throw new NotFoundException('No data available')
@@ -130,52 +153,52 @@ export class RepairService {
   }
 
 
-  async update(id: number, updateRepairDto: UpdateRepairDto): Promise<Repair> {
-    const existingRepair = await this.repairRepositry.findOne({ where: { id }, });
-    if (!existingRepair) { throw new NotFoundException('Repair not found'); }
-
-    // Handle device relation
-    let device: Device | undefined = undefined;
-    if (updateRepairDto.device !== undefined) {
-      const foundDevice = await this.deviceRepositry.findOne({ where: { id: updateRepairDto.device } });
-      if (!foundDevice) { throw new NotFoundException('Device not found'); }
-      device = foundDevice;
-    }
-
-    // Handle user relation
-    let user: User | undefined = undefined;
-    if (updateRepairDto.user !== undefined) {
-      const foundUser = await this.userRepositry.findOne({ where: { id: updateRepairDto.user } });
-      if (!foundUser) { throw new NotFoundException('User not found'); }
-      user = foundUser;
-    }
-    let customer: Customer | undefined = undefined;
-    if (updateRepairDto.customer !== undefined) {
-      const foundCustomer = await this.customerRepositry.findOne({ where: { id: updateRepairDto.customer } });
-      if (!foundCustomer) { throw new NotFoundException('Customer not found'); }
-      customer = foundCustomer;
-    }
-    // Prepare the update data
-    const updateData: Partial<Repair> = {
-      ...updateRepairDto,
-      device: device ?? existingRepair.device,
-      user: user ?? existingRepair.user,
-      customer: customer ?? existingRepair.customer
-    };
-
-    // Remove the ID fields if they exist in the DTO
-
-    delete (updateData as any).deviceId;
-    delete (updateData as any).userId;
-    delete (updateData as any).customerId;
-
-    await this.repairRepositry.update(id, updateData);
-
-    return this.repairRepositry.findOneOrFail({
-      where: { id },
-      relations: ['device', 'user'] // Include relations in the response
-    });
-  }
+  /*   async update(id: number, updateRepairDto: UpdateRepairDto): Promise<Repair> {
+      const existingRepair = await this.repairRepositry.findOne({ where: { id }, });
+      if (!existingRepair) { throw new NotFoundException('Repair not found'); }
+  
+      // Handle device relation
+      let device: Device | undefined = undefined;
+      if (updateRepairDto.device !== undefined) {
+        const foundDevice = await this.deviceRepositry.findOne({ where: { id: updateRepairDto.device } });
+        if (!foundDevice) { throw new NotFoundException('Device not found'); }
+        device = foundDevice;
+      }
+  
+      // Handle user relation
+      let user: User | undefined = undefined;
+      if (updateRepairDto.user !== undefined) {
+        const foundUser = await this.userRepositry.findOne({ where: { id: updateRepairDto.user } });
+        if (!foundUser) { throw new NotFoundException('User not found'); }
+        user = foundUser;
+      }
+      let customer: Customer | undefined = undefined;
+      if (updateRepairDto.customer !== undefined) {
+        const foundCustomer = await this.customerRepositry.findOne({ where: { id: updateRepairDto.customer } });
+        if (!foundCustomer) { throw new NotFoundException('Customer not found'); }
+        customer = foundCustomer;
+      }
+      // Prepare the update data
+      const updateData: Partial<Repair> = {
+        ...updateRepairDto,
+        device: device ?? existingRepair.device,
+        user: user ?? existingRepair.user,
+        customer: customer ?? existingRepair.customer
+      };
+  
+      // Remove the ID fields if they exist in the DTO
+  
+      delete (updateData as any).deviceId;
+      delete (updateData as any).userId;
+      delete (updateData as any).customerId;
+  
+      await this.repairRepositry.update(id, updateData);
+  
+      return this.repairRepositry.findOneOrFail({
+        where: { id },
+        relations: ['device', 'user'] // Include relations in the response
+      });
+    } */
 
 
   async remove(id: number): Promise<Repair> {
@@ -215,170 +238,237 @@ export class RepairService {
     return findAll
   }
 
-    async filterByActuellyBranch(actuellyBranch: number): Promise<Repair[]> {
+  async filterByActuellyBranch(actuellyBranch: number): Promise<Repair[]> {
     const findAll = await this.repairRepositry.find({
-    where: {
-      actuellybranch: actuellyBranch,
-       
-    },
-    relations: [
-      'customer', 'customer.distributer',
-      'device', 'device.model', 'device.model.brand',
-      'accessory',
-      'listFault',
-      'customerRequest',
-      'historyRepair',
-      'historyRepair.tracability',
-      'historyRepair.tracability.user',
-      'historyRepair.tracability.user.branch',
-      'historyRepair.tracability.user.branch.company'
-    ],  order: {
-      id: 'DESC' 
-    }
-  });
-       
+      where: {
+        actuellybranch: actuellyBranch,
+
+      },
+      relations: [
+        'customer', 'customer.distributer',
+        'device', 'device.model', 'device.model.brand',
+        'accessory',
+        'listFault',
+        'customerRequest',
+        'historyRepair',
+        'historyRepair.tracability',
+        'historyRepair.tracability.user',
+        'historyRepair.tracability.user.branch',
+        'historyRepair.tracability.user.branch.company'
+      ], order: {
+        id: 'DESC'
+      }
+    });
+
     if (!findAll || findAll.length === 0) {
       throw new NotFoundException("There is no data Available")
     }
     return findAll
   }
-  
-async findByBranchAndStep(branchId: number, step: string): Promise<Repair[]> {
-  const allRepairs = await this.repairRepositry.find({
-    where: {
-      actuellybranch: branchId
-    },
-    relations: [
-      'customer', 'customer.distributer',
-      'device', 'device.model', 'device.model.brand',
-      'accessory',
-      'listFault',
-      'customerRequest',
-      'historyRepair',
-      'historyRepair.tracability',
-      'historyRepair.tracability.user',
-      'historyRepair.tracability.user.branch',
-      'historyRepair.tracability.user.branch.company',
-      'user'
-    ],
-    order: {
-      historyRepair: {
-        date: 'DESC' // pour que le dernier soit en premier
+
+  async findByBranchAndStep(branchId: number, step: string): Promise<Repair[]> {
+    const allRepairs = await this.repairRepositry.find({
+      where: {
+        actuellybranch: branchId
+      },
+      relations: [
+        'customer', 'customer.distributer',
+        'device', 'device.model', 'device.model.brand',
+        'accessory',
+        'listFault',
+        'customerRequest',
+        'historyRepair',
+        'historyRepair.tracability',
+        'historyRepair.tracability.user',
+        'historyRepair.tracability.user.branch',
+        'historyRepair.tracability.user.branch.company',
+        'user'
+      ],
+      order: {
+        historyRepair: {
+          date: 'DESC' // pour que le dernier soit en premier
+        }
       }
-    }
-  });
+    });
 
-  // Filtrer en mémoire : garder seulement ceux dont le dernier step correspond
-  const filtered = allRepairs.filter(repair => {
-    const history = repair.historyRepair;
-    if (!history || history.length === 0) return false;
+    // Filtrer en mémoire : garder seulement ceux dont le dernier step correspond
+    const filtered = allRepairs.filter(repair => {
+      const history = repair.historyRepair;
+      if (!history || history.length === 0) return false;
 
-    const lastStep = history[0].step; // grâce au tri DESC
-    return lastStep === step;
-  });
+      const lastStep = history[0].step; // grâce au tri DESC
+      return lastStep === step;
+    });
 
-  return filtered;
+    return filtered;
+  }
+
+
+
+
+  async FiltreByUserStep(userId: number, steps: string): Promise<Repair[]> {
+
+    const filtreuserId = await this.repairRepositry.find({
+      where: {
+        user: { id: userId },
+
+
+      },
+      relations: [
+        'customer', 'customer.distributer',
+        'device', 'device.model', 'device.model.brand',
+        'accessory',
+        'listFault',
+        'customerRequest',
+        'historyRepair',
+        'historyRepair.tracability',
+        'historyRepair.tracability.user',
+        'historyRepair.tracability.user.branch',
+        'historyRepair.tracability.user.branch.company',
+        'user'
+      ],
+      order: {
+        historyRepair: {
+          date: 'DESC' // pour que le dernier soit en premier
+        }
+      }
+    })
+    // Filtrer en mémoire : garder seulement ceux dont le dernier step correspond
+    const filtered = filtreuserId.filter(repair => {
+      const history = repair.historyRepair;
+      if (!history || history.length === 0) return false;
+
+      const lastStep = history[0].step; // grâce au tri DESC
+      return lastStep === steps;
+    });
+    return filtered
+  }
+
+
+
+ async update(id: number, updateRepairDto: UpdateRepairDto): Promise<Repair> {
+  // Sécurise dès le début
+if (!updateRepairDto || typeof updateRepairDto !== 'object') {
+  throw new BadRequestException('Invalid update data');
 }
+  const existingRepair = await this.repairRepositry.findOne({
+    where: { id },
+    relations: [
+      'device', 'user', 'customer',
+      'accessory', 'listFault', 'customerRequest',
+      'notesCustomer', 'expertiseReason', 'repairAction'
+    ]
+  });
+
+  if (!existingRepair) {
+    throw new NotFoundException('Repair not found');
+  }
+
+  // Parse helper
+  const parseIfString = <T>(value: any): T =>
+    typeof value === 'string' ? JSON.parse(value) : value;
+
+  // Parse tous les champs ID-array s'ils arrivent en string
+  updateRepairDto.accessoryIds = parseIfString(updateRepairDto?.accessoryIds);
+  updateRepairDto.listFaultIds = parseIfString(updateRepairDto?.listFaultIds);
+  updateRepairDto.customerRequestIds = parseIfString(updateRepairDto?.customerRequestIds);
+  updateRepairDto.notesCustomerIds = parseIfString(updateRepairDto?.notesCustomerIds);
+  updateRepairDto.expertiseReasonsIds = parseIfString(updateRepairDto?.expertiseReasonsIds);
+  updateRepairDto.repairActionIds = parseIfString(updateRepairDto?.repairActionIds);
+  updateRepairDto.partsNeed = parseIfString(updateRepairDto?.partsNeed);
+  updateRepairDto.device = parseIfString(updateRepairDto?.device);
+  updateRepairDto.user = parseIfString(updateRepairDto?.user);
+  updateRepairDto.customer = parseIfString(updateRepairDto?.customer);
+
+  // Relations ManyToOne
+  if (updateRepairDto.device !== undefined) {
+    existingRepair.device = await this.deviceRepositry.findOneByOrFail({ id: updateRepairDto.device });
+  }
+  if (updateRepairDto.user !== undefined) {
+    existingRepair.user = await this.userRepositry.findOneByOrFail({ id: updateRepairDto.user });
+  }
+  if (updateRepairDto.customer !== undefined) {
+    existingRepair.customer = await this.customerRepositry.findOneByOrFail({ id: updateRepairDto.customer });
+  }
+
+  // Relations ManyToMany
+  if (updateRepairDto.accessoryIds) {
+    existingRepair.accessory = await this.accessoryRepositry.findBy({ id: In(updateRepairDto.accessoryIds) });
+  }
+  if (updateRepairDto.listFaultIds) {
+    existingRepair.listFault = await this.listFaultRepositry.findBy({ id: In(updateRepairDto.listFaultIds) });
+  }
+  if (updateRepairDto.customerRequestIds) {
+    existingRepair.customerRequest = await this.customerRequestRepositry.findBy({ id: In(updateRepairDto.customerRequestIds) });
+  }
+  if (updateRepairDto.notesCustomerIds) {
+    existingRepair.notesCustomer = await this.notesCustomerRepositry.findBy({ id: In(updateRepairDto.notesCustomerIds) });
+  }
+  if (updateRepairDto.expertiseReasonsIds) {
+    existingRepair.expertiseReason = await this.expertiseReasonRepositry.findBy({ id: In(updateRepairDto.expertiseReasonsIds) });
+  }
+  if (updateRepairDto.repairActionIds) {
+    existingRepair.repairAction = await this.repairActionRepositry.findBy({ id: In(updateRepairDto.repairActionIds) });
+  }
+
+  // Champs simples
+  const simpleFields: (keyof UpdateRepairDto)[] = [
+    'warrenty', 'approveRepair', 'newSerialNumber', 'remark',
+    'deviceStateReceive', 'files', 'partsNeed', 'actuellybranch'
+  ];
+
+  for (const field of simpleFields) {
+    if (updateRepairDto[field] !== undefined) {
+      (existingRepair as any)[field] = updateRepairDto[field];
+    }
+  }
+
+  await this.repairRepositry.save(existingRepair);
+
+  return this.repairRepositry.findOneOrFail({
+    where: { id },
+    relations: [
+      'device', 'user', 'customer',
+      'accessory', 'listFault', 'customerRequest',
+      'notesCustomer', 'expertiseReason', 'repairAction'
+    ]
+  });
+}
+
+
 
 
   async updateRepairWithParts(
-    repairId: number,
-    updateData: UpdateRepairDto, // <-- Garde bien ici le type UpdateRepairDto
+    id: number,
+    updateRepairDto: UpdateRepairDto,
+    files?: string[],
   ): Promise<Repair> {
-    const repair = await this.repairRepositry.findOne({
-      where: { id: repairId },
-      relations: ['approveStock'],
-    });
+    const repair = await this.repairRepositry.findOne({ where: { id } });
 
     if (!repair) {
-      throw new NotFoundException('Repair not found');
+      throw new NotFoundException(`Repair with id ${id} not found`);
     }
 
-    // Gérer les relations ManyToOne
-    if (updateData.device && typeof updateData.device === 'number') {
-      const device = await this.deviceRepositry.findOneBy({ id: updateData.device });
-      if (!device) throw new NotFoundException('Device not found');
-      repair.device = device;
-    }
-
-    if (updateData.user && typeof updateData.user === 'number') {
-      const user = await this.userRepositry.findOneBy({ id: updateData.user });
-      if (!user) throw new NotFoundException('User not found');
-      repair.user = user;
-    }
-
-    const addedParts = repair.partsNeed || [];
-    //const addedParts = updateData.partsNeed || [];
-
-    // Filtrer les nouvelles pièces
-    //const addedParts = newParts.filter(p => !previousParts.includes(p));
-
-    // Supprimer `device` et `user` du DTO pour éviter la collision de type
-    const { device, user, ...restData } = updateData;
-
-    // Mise à jour des autres champs
-    Object.assign(repair, restData);
-
-    const updatedRepair = await this.repairRepositry.save(repair);
-
-    if (repair.approveRepair === true) {
-      // Ajout des nouveaux éléments dans ApproveStock
-      for (const partId of addedParts) {
-        const stockPart = await this.stockPartRepositry.findOneBy({ id: partId });
-        if (!stockPart) continue;
-
-        const approveStock = this.approveStockRepositry.create({
-          type: 'Repair',
-          date: new Date(),
-          state: 'pending',
-          idPartRepair: partId,
-          //stockPart,
-          repair: updatedRepair,
-        });
-        await this.approveStockRepositry.save(approveStock);
+    // Supprimer les anciens fichiers si de nouveaux sont fournis
+    if (files && files.length > 0) {
+      if (repair.files && repair.files.length > 0) {
+        for (const oldFile of repair.files) {
+          const filePath = path.join(__dirname, '../../upload/repairs', oldFile);
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        }
       }
+
+      repair.files = files;
     }
 
+    Object.assign(repair, updateRepairDto);
 
-    return updatedRepair;
+    return await this.repairRepositry.save(repair);
   }
-async FiltreByUserStep (userId: number, steps: string): Promise<Repair[]> {
 
-  const filtreuserId = await this.repairRepositry.find({
-    where: {
-      user: { id: userId},
-      
 
-    },
-    relations: [
-      'customer', 'customer.distributer',
-      'device', 'device.model', 'device.model.brand',
-      'accessory',
-      'listFault',
-      'customerRequest',
-      'historyRepair',
-      'historyRepair.tracability',
-      'historyRepair.tracability.user',
-      'historyRepair.tracability.user.branch',
-      'historyRepair.tracability.user.branch.company',
-      'user'
-    ],
-    order: {
-      historyRepair: {
-        date: 'DESC' // pour que le dernier soit en premier
-      }
-    }
-  })
-  // Filtrer en mémoire : garder seulement ceux dont le dernier step correspond
-  const filtered = filtreuserId.filter(repair => {
-    const history = repair.historyRepair;
-    if (!history || history.length === 0) return false;
 
-    const lastStep = history[0].step; // grâce au tri DESC
-    return lastStep === steps;
-  });
-  return filtered
-}
 
- 
 }

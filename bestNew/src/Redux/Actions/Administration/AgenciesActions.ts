@@ -1,7 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import type { Agency } from "../../Types/Stock";
-import type { FormOneInput } from "../../Types/administrationTypes";
 import type { AsyncThunkConfig } from "../../Types/authenTypes";
 
 const API = axios.create({

@@ -77,3 +77,46 @@ interface Agency {
      }
    }
  );
+
+/*  export const updatePassword = async (data: { id: number; currentPassword: string; newPassword: string }) => {
+  const token = localStorage.getItem('accessToken'); // ou sessionStorage ou autre selon ton app
+  const response = await API.patch(`auth/password/${data.id}`, {
+    currentPassword: data.currentPassword,
+    newPassword: data.newPassword,
+  }, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  return response.data.data;
+}; */
+interface UpassWord{
+  id: number; 
+  currentPassword: string; 
+  newPassword: string
+}
+ export const updatePassword = createAsyncThunk<
+   User ,                         // résultat attendu
+   UpassWord  , // payload accepté
+   AsyncThunkConfig
+ >(
+   'Employèes/updatePassword',
+   async (data, { rejectWithValue }) => {
+     try {
+       const token = localStorage.getItem('accessToken');
+    const response = await API.patch(`auth/password/${data.id}`, {
+      currentPassword: data.currentPassword,
+      newPassword: data.newPassword,
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+       return response.data.data;
+     } catch (error: any) {
+       return rejectWithValue(error.response?.data?.message || 'Échec');
+     }
+   }
+ );
+ 

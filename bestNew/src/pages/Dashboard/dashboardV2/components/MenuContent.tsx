@@ -69,7 +69,8 @@ export default function MenuContent() {
         { label: 'CustomerRequest', page: 'DemandeClient', icon: <FcReadingEbook /> }, //ok_Done
         { label: 'NoteClient', page: 'NoteToCustomers', icon: <RiUserVoiceLine style={{ color: theme.palette.secondary.main }} /> }, //ok_Done
         { label: 'ListAllPart', page: 'listePiécesTotal', icon: <FcList /> },
-        { label: 'LevelRepair', page: 'NiveauRéparation', icon: <BiTrendingUp style={{ color: 'gold' }} /> },
+        { label: 'LevelRepair', page: 'NiveauRéparation', icon: <BiTrendingUp style={{ color: 'gold' }} /> }, 
+        { label: 'Action de diagnostique', page: 'RepairActions', icon: <BiTrendingUp style={{ color: 'gold' }} /> },
         { label: 'OthersCoast', page: 'AutresFrais', icon: <FcCurrencyExchange /> },
         { label: 'Legislation', page: 'Legislation', icon: <GoLaw style={{ color: theme.palette.secondary.main }} /> },
       ],
@@ -140,8 +141,10 @@ export default function MenuContent() {
         { label: 'Reçoireception', page: 'ReçoiReception', icon: <BsEarbuds /> },
         { label: 'Affectation', page: 'Affectation', icon: <BsEarbuds /> },
         { label: 'Réaffectation', page: 'Réaffectation', icon: <BsEarbuds /> },
+        { label: 'Accepter CQ', page: 'AccepteQC', icon: <BsEarbuds /> }, 
         { label: 'Envoyérécuperer', page: 'EnvoyéRécuperer', icon: <BsEarbuds /> },
         { label: 'Transfertproduit', page: 'TransfertProduit', icon: <BsEarbuds /> },
+        
 
       ]
     },

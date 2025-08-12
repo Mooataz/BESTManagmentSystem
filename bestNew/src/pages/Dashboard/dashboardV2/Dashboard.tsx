@@ -47,6 +47,13 @@ import ListlevelRepair from '../../Administration/LevelRepair/ListlevelRepair';
 import ListFrais from '../../Administration/AutresFrais.tsx/ListFrais';
 import TypeModel from '../../ModelAccessory/TypeModel/TypeModel';
 import ListModel from '../../ModelAccessory/Model/ListModel';
+import ReceiveState from '../../Stock/Transfert/ReceiveState';
+import ListPartPrice from '../../Stock/PartAndPrice/ListPartPrice';
+import UpdateUserPassword from '../../Administration/Employees/UpdateUserPassword';
+import ShowRepair from '../../Reparation/ShowRepair';
+import RepairedRepair from '../../Reparation/RepairedRepair';
+import ListRepairActions from '../../Administration/RepairActions/ListRepairActions';
+import AccepteQC from '../../Coordinate/AccepteQC';
 
 const xThemeComponents = {
   ...chartsCustomizations,
@@ -99,6 +106,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
               <Route path="Agencies" element={<Agencies />} />
               <Route path="Entreprise" element={<Entreprise />} />
               <Route path="Employees" element={<ListEmployèes />} />
+              <Route path="Updatepassword/:userId" element={<UpdateUserPassword />} />
               <Route path="Marques" element={<ListMarques />} />
               <Route path="RaisonsExpertise" element={<RaisonsExpertise />} />
               <Route path="ListProblemes" element={<ListProblems />} />
@@ -109,33 +117,33 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
               <Route path="Legislation" element={<ListLegislations />} />
               <Route path='NiveauRéparation' element={<ListlevelRepair />} />
               <Route path="AutresFrais" element={<ListFrais />} />
+              <Route path="RepairActions" element={<ListRepairActions />} />
 
               <Route path="ListRepair" element={<ListRepair />} />
               <Route path="EnvoyeAffectation" element={<SendToAssign />} />
               <Route path="ReçoiReception" element={<RecieveReception />} />
+              <Route path="AccepteQC" element={<AccepteQC />} />
+
 
               <Route path='case' element={<Bin />} />
               <Route path='Reférences' element={<References />} />
               <Route path="RemplissageStock" element={<RemplissageStock />} />
               <Route path="EtatStock" element={<EtatStock />} />
               <Route path='TransfertPiéces' element={<TransfertPart />} />
+              <Route path='ReçoiPiéces' element={<ReceiveState />} />
+              <Route path="AjusterPrixPiéces" element={<ListPartPrice />} />
 
               <Route path='Affectation' element={<Assign />} />
               <Route path='ReçoiAffectation' element={<AcceptAssign />} />
               <Route path="Reçoiproduit" element={<Checkout />} />
-
               <Route path='listTotal' element={<ListReparation />} />
+              <Route path="ShowRepair/:id" element={<ShowRepair />} />
+              <Route path="RepairedRepair/:id" element={<RepairedRepair />} />
 
               <Route path='TypeModéle' element={<TypeModel />} />
               <Route path="accessoires" element={<Accessoires />} />
               <Route path='Modéles' element={<ListModel />} />
-              {/*
-                            
-                             
-                            <Route path="Updatepassword/:userId" element={<Updatepassword />} />
-                            
-                              
-                             */}
+
             </Routes>
           </Stack>
         </Box>

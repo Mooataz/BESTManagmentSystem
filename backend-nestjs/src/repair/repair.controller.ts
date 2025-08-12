@@ -1,12 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseInterceptors, UploadedFiles, UseGuards, Req, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseInterceptors, UploadedFiles, UseGuards, Req, Query, BadRequestException } from '@nestjs/common';
 import { RepairService } from './repair.service';
 import { CreateRepairDto } from './dto/create-repair.dto';
 import { UpdateRepairDto } from './dto/update-repair.dto';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { AccessTokenGuard } from 'src/guards/accessToken.guard';
  import { AuthGuard } from '@nestjs/passport';
+ import { Response } from 'express';
 @Controller('repair')
 export class RepairController {
   constructor(private readonly repairService: RepairService) { }
@@ -161,12 +162,63 @@ try {
       })
     }
   }
+
+@UseInterceptors(
+  FilesInterceptor('files', 5, {
+    storage: diskStorage({
+      destination: './upload/repairs',
+      filename: (_req, file, cb) =>
+        cb(null, `${Date.now()}-${file.originalname}`),
+    }),
+  }),
+)
+ @ApiConsumes("multipart/form-data")
+@Patch('updateWithPartsFiles/:id')
+async updateWithPartsFiles(
+  @Param('id') id: number,
+  @Body() updateRepairDto: UpdateRepairDto,
+  //@UploadedFiles() files: Express.Multer.File[],
+  @Res() res: Response
+) {
+  // Validate files before processing
+
+/* const filePaths = (files || [])
+  .filter(file => file && typeof file.filename === 'string' && file.filename.trim() !== '')
+  .map(file => {
+    if (!file.filename.match(/^[a-zA-Z0-9\-._]+$/)) {
+      throw new BadRequestException(...'');
+    }
+    return file.filename;
+  }); */
  
-    @Patch(':id')
+  const updatedRepair = await this.repairService.updateRepairWithParts(
+    +id, 
+    updateRepairDto, 
+   /*  filePaths */
+  );
+
+  return res.status(HttpStatus.OK).json({
+    message: "Mise à jour réussie!",
+    status: HttpStatus.OK,
+    data: updatedRepair,
+  });
+}
+ @Patch(':id')
   async update(@Param('id') id: number,
-    @Body() updateRepairDto: UpdateRepairDto,
+    @Body() body: any,
+    //@UploadedFiles() files: Express.Multer.File[],
     @Res() res) {
     try {
+      const updateRepairDto = {
+      ...body,
+      accessoryIds: body.accessoryIds ? JSON.parse(body.accessoryIds) : undefined,
+      listFaultIds: body.listFaultIds ? JSON.parse(body.listFaultIds) : undefined,
+      // ... répéter pour tous les champs array ou objets
+    };
+
+      /*  if (files.length > 0) {
+      updateRepairDto.files = files.map(f => f.path);
+    } */
       const updatedata = await this.repairService.update(+id, updateRepairDto)
       return res.status(HttpStatus.OK).json({
         message:" updated Successfuly !",
@@ -181,7 +233,7 @@ try {
       })
     }
   }   
-
+ 
   @Delete(':id')
   async remove(@Param('id') id: number,
     @Res() res) {
@@ -280,25 +332,37 @@ try {
     }
   }
 
-  @Get('FilterByUserStep') 
-  async getByUserStep ( @Param() userId: number,
-                        @Param() steps: string,
-                        @Res() res){
-      try {
-        const user = await this.repairService.FiltreByUserStep(userId,steps);
-      return res.status(HttpStatus.OK).json({
-        message: 'Repairs found successfully!',
-        status: HttpStatus.OK,
-        data: user,
-      });
-      } catch (error) {
-        return res.status(HttpStatus.BAD_REQUEST).json({
-        message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null,
-      });
-      }
+ @Get('FilterUserStep/:branchId/:userId/:steps')
+async getByUserStep(
+  @Param('branchId') branchId: string,
+  @Param('userId') userId: string,
+  @Param('steps') steps: string,
+  @Res() res
+) {
+  try {
+    const numericBranchId = Number(branchId);
+    const numericUserId = Number(userId);
+
+    const result = await this.repairService.findByBranchAndStep(numericBranchId, steps);
+
+    const filterResult = result.filter(repair => repair.user?.id === numericUserId);
+
+    return res.status(HttpStatus.OK).json({
+      message: 'Réparations récupérées avec succès',
+      status: HttpStatus.OK,
+      data: filterResult,
+    });
+  } catch (error) {
+    return res.status(HttpStatus.BAD_REQUEST).json({
+      message: error.message,
+      status: HttpStatus.BAD_REQUEST,
+      data: null,
+    });
   }
+}
+
+
+
  
     
 }

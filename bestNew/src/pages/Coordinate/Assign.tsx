@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
- import type { RepairForm, RepairFormInput, TableAction } from '../../Redux/Types/repairTypes';
+import type { RepairForm, RepairFormInput, TableAction } from '../../Redux/Types/repairTypes';
 import type { RootState } from '../../Redux/store';
 import { useSelector } from 'react-redux';
 import { useNotification } from '../../Componants/NotificationContext';
@@ -14,163 +14,148 @@ import { addHistoryRepair } from '../../Redux/Actions/Reception/History';
 import theme from '../../Theme/theme';
 
 export default function Assign() {
-      const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   const { notify } = useNotification();
-   const userr = useSelector((state: RootState) => state.user);
+  const userr = useSelector((state: RootState) => state.auth.user);
   const repairs = useSelector((state: RootState) => state.repair.repairs)
   const [results, setResults] = useState<RepairForm[]>([]);
   const [techs, setTechs] = useState<User[]>([]);
-
+  if (!userr?.id || !userr?.branch) return;
+const branchId = typeof userr.branch === 'object' ? userr.branch.id : userr.branch;
+  if (!branchId || isNaN(userr.id)) return;
   React.useEffect(() => {
-    if (userr.branch?.id) {
-      dispatch(getByBranchStep({ branch: userr.branch.id, step: 'On affectation' }))
-        .then((resultAction) => {  if (getByBranchStep.fulfilled.match(resultAction)) {
-        setResults(resultAction.payload);
-      } else {
-        notify(`Erreur lors du chargement : ${resultAction.payload}`, 'error')
-      }
-        })
-     
-    }
-  }, [dispatch, userr.branch?.id])
-
-const isAdmin = userr.role.includes('Administrateur');
-React.useEffect(() => {
-  if (userr.branch?.id) {
-    dispatch(AssignTech({ branchId: userr.branch.id, admin: isAdmin }))
-      .then((resultAction) => {
-        if (getByBranchStep.fulfilled.match(resultAction)) {
-          setTechs(resultAction.payload); // Les données sont valides, donc on les utilise
-        } else {
-          // Vérifier si resultAction.payload contient des utilisateurs ou des données valides
-          if (Array.isArray(resultAction.payload) && resultAction.payload.length > 0) {
-            // Si c'est un tableau d'utilisateurs, afficher un message approprié
-            setTechs(resultAction.payload);
+    if (branchId) {
+      dispatch(getByBranchStep({ branch: branchId, step: 'On affectation' }))
+        .then((resultAction) => {
+          if (getByBranchStep.fulfilled.match(resultAction)) {
+            setResults(resultAction.payload);
           } else {
-            // Sinon, c'est probablement une erreur
-            const errorMessage = 
-              typeof resultAction.payload === 'object'
-                ? JSON.stringify(resultAction.payload)  // Convertir l'objet en chaîne
-                : resultAction.payload;  // Si ce n'est pas un objet, utilisez la valeur telle quelle
-            notify(`Erreur lors du chargement : ${errorMessage}`, 'error');
+            notify(`Erreur lors du chargement : ${resultAction.payload}`, 'error')
           }
-        }
-         
-      })
-      .catch((error) => {
-        // Gérer l'erreur dans le cas où la promesse échoue
-        notify(`Erreur lors du chargement : ${error.message}`, 'error');
-         
-      });
-  }
-}, [dispatch, userr.branch?.id]);
+        })
 
-  
-const [selectedIds, setSelectedIds] = React.useState<number[] | number  >( );
- 
-  const handleSelectionChange = (ids: number[] | number  ) => {
-  setSelectedIds(ids);
-  
-  };
- 
-const AssignToTechnicien = async (repairId: number, userId: number) => {
-  try { 
-      dispatch ( AssignRepair({ id: repairId, user: userId }) ) 
-        .then ( () => {
-          dispatch (
-            addHistoryRepair({
-                        date: new Date(),
-                        step: 'Affecter',
-                        user: { id: userr.id  || 0 },
-                        repair: repairId
-                      })
-
-          ) .then( () => {
-                dispatch ( getByBranchStep({ 
-                                          branch: userr?.branch?.id || 0, 
-                                          step: 'On affectation' }) ).then((resultAction) => {  if (getByBranchStep.fulfilled.match(resultAction)) {
-                                                                      setResults(resultAction.payload); }} )
-          });
-                
-        }) ;
-     
-       
-        
-     
-  } catch (error) {
-    notify(`Erreur lors de l\'assignation du technicien: ${error}`,'error');
-     
-  }
-};
-
-// 1. Définition des actions
-const actions: TableAction[] = [
-  {
-    icon:  
-      <Box sx={{ display: 'flex', gap: 1 }}>
-        <CustomAutocomplete
-          data={techs}
-          displayFields={['name']}
-          idField="id"
-          multiple={false}
-          label="Technicien"
-          onChange={handleSelectionChange}
-        />
-
-        {/* Utilisation de row dans une fonction d'action */}
-        <Button
-            size="small"
-            variant="outlined"
-             >
-            Affecter  
-          </Button>
-  
-      </Box>
-     ,
-    // Fonction d'action qui sera appelée lors de l'usage
-    onClick: (row :any) => {
-       if (row) {
-                try {
-                  let userId: number | undefined;
-
-                  if (Array.isArray(selectedIds) && selectedIds.length > 0) {
-                    // Si c'est un tableau, on prend le premier élément
-                    userId = selectedIds[0];
-                  } else if (typeof selectedIds === 'number') {
-                    // Si c'est déjà un nombre, on l'utilise directement
-                    userId = selectedIds;
-                  }
-                  if (userId !== undefined) {
-         
-                     AssignToTechnicien(row.id, userId)
-                   
-                      
-                    
-                   } else {
-                    notify(`Aucun technicien sélectionné`,'error')
-        
-                          }
-                } catch (error) {
-                  notify(`Erreur lors de l\'assignation  : ${error}`,'error');
-                  
-                }
-              }
-       
-             
     }
+  }, [dispatch, branchId])
+
+  const isAdmin = userr.role.includes('Administrateur');
+  React.useEffect(() => {
+    if (branchId) {
+      dispatch(AssignTech({ branchId: branchId, admin: isAdmin }))
+        .then((resultAction) => {
+          if (getByBranchStep.fulfilled.match(resultAction)) {
+            setTechs(resultAction.payload); // Les données sont valides, donc on les utilise
+          } else {
+            // Vérifier si resultAction.payload contient des utilisateurs ou des données valides
+            if (Array.isArray(resultAction.payload) && resultAction.payload.length > 0) {
+              // Si c'est un tableau d'utilisateurs, afficher un message approprié
+              setTechs(resultAction.payload);
+            } else {
+              // Sinon, c'est probablement une erreur
+              const errorMessage =
+                typeof resultAction.payload === 'object'
+                  ? JSON.stringify(resultAction.payload)  // Convertir l'objet en chaîne
+                  : resultAction.payload;  // Si ce n'est pas un objet, utilisez la valeur telle quelle
+              notify(`Erreur lors du chargement : ${errorMessage}`, 'error');
+            }
+          }
+
+        })
+        .catch((error) => {
+          // Gérer l'erreur dans le cas où la promesse échoue
+          notify(`Erreur lors du chargement : ${error.message}`, 'error');
+
+        });
+    }
+  }, [dispatch, branchId]);
+
+
+  const [selectedIds, setSelectedIds] = React.useState<number>()
+
+  const handleSelectionChange = (ids: number) => {
+    setSelectedIds(ids);
+
+  };
+
+  const AssignToTechnicien = async (repairId: number, userId: number) => {
+    try {
+      dispatch(AssignRepair({ id: repairId, user: userId }))
+        .then(() => {
+          dispatch(
+            addHistoryRepair({
+              date: new Date(),
+              step: 'Affecter',
+              user: { id: userr.id || 0 },
+              repair: repairId
+            })
+
+          ).then(() => {
+            dispatch(getByBranchStep({
+              branch: branchId || 0,
+              step: 'On affectation'
+            })).then((resultAction) => {
+              if (getByBranchStep.fulfilled.match(resultAction)) {
+                setResults(resultAction.payload);
+              }
+            })
+          });
+
+        });
 
 
 
-  }
-];
+
+    } catch (error) {
+      notify(`Erreur lors de l\'assignation du technicien: ${error}`, 'error');
+
+    }
+  };
+
+
+  const [clickedRowId, setClickedRowId] = React.useState<number | undefined>(undefined);
+
+  const actions: TableAction[] = [
+    {
+      icon: (
+        <Button size="small" variant="outlined">
+          Affecter
+        </Button>
+      ),
+      onClick: async (row: any) => {
+        let userId: number | undefined = selectedIds;
+
+
+
+
+        if (userId !== undefined) {
+          setClickedRowId(row.id);
+          await new Promise((res) => setTimeout(res, 1000));
+          AssignToTechnicien(row.id, userId);
+          setClickedRowId(undefined);
+        } else {
+          notify("Aucun technicien sélectionné", "error");
+        }
+      },
+    },
+  ];
+
+
 
   return (
-     <div style={{ padding: '20px' }}>
-      <Typography sx=  {{ textAlign: 'left', fontWeight: 'bold', marginBottom: '3%' , color:theme.palette.secondary.main ,width: '200px' }} >List affectation</Typography   >
-
+    <div style={{ padding: '20px' }}>
+      <Typography sx={{ textAlign: 'left', fontWeight: 'bold', marginBottom: '3%', color: theme.palette.secondary.main, width: '200px' }} >List affectation</Typography   >
+      <br />
+      <CustomAutocomplete
+        data={techs}
+        displayFields={['name']}
+        idField="id"
+        multiple={false}
+        label="Technicien"
+        onChange={handleSelectionChange}
+      />
+      <br />
       <DynamicTable
         rows={results}
-
+        clickedRowId={clickedRowId}
         columnLabels={{
           'id': 'Reparation',
           'customer.name': 'Nom client',
@@ -191,7 +176,7 @@ const actions: TableAction[] = [
           'device.model.name',
           'deviceStateReceive']}
 
-         actions = {actions}    
+        actions={actions}
 
       />
     </div>

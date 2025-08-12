@@ -17,11 +17,16 @@ import { Branch } from 'src/branches/entities/branch.entity';
 import { Company } from 'src/company/entities/company.entity';
 import { Tracability } from 'src/tracability/entities/tracability.entity';
 import { HistoryStockPart } from 'src/history-stock-part/entities/history-stock-part.entity';
+import { PdfService } from 'src/pdf/pdf.service';
+import { Pdf } from 'src/pdf/entities/pdf.entity';
+import { Legislation } from 'src/legislation/entities/legislation.entity';
+import { StockGateway } from './Stock.Gateway';
+import { User } from 'src/users/entities/user.entity';
 
 @Module({
-  imports: [ModelsModule,ReferencesModule,/* AppModule, */ TypeOrmModule.forFeature([StockPart,  Model, Reference, AllPart, Branch, Bin, Company, Tracability, HistoryStockPart])],
+  imports: [ModelsModule,ReferencesModule,/* AppModule, */ TypeOrmModule.forFeature([StockPart, StockGateway, Model,User, Reference, AllPart, Branch, Bin, Company, Tracability, HistoryStockPart,Pdf, Legislation])],
   controllers: [StockPartsController],
-  providers: [StockPartsService, AppService],
-  exports:[TypeOrmModule,StockPartsService]
+  providers: [StockPartsService, AppService, PdfService, StockGateway],
+  exports:[TypeOrmModule,StockPartsService, PdfService, StockGateway]
 })
 export class StockPartsModule {}

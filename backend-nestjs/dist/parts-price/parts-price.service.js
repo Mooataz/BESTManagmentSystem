@@ -49,7 +49,7 @@ let PartsPriceService = class PartsPriceService {
         return this.partsPriceRepositry.save(partsPrice);
     }
     async findAll() {
-        const findAll = await this.partsPriceRepositry.find();
+        const findAll = await this.partsPriceRepositry.find({ relations: ['model', 'allPart', 'levelRepair'] });
         if (!findAll || findAll.length === 0) {
             throw new common_1.NotFoundException('No data found');
         }

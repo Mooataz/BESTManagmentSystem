@@ -72,6 +72,7 @@ export default function Checkout(props: { disableCustomTheme?: boolean }) {
     customerRequestIds: [],
     userId: user?.id ?? 0,
     actuellybranch: user?.branch?.id ?? 1,
+    historyRepair: [],
   });
   const repair = useSelector((state: RootState) => state.repair)
 
@@ -112,10 +113,13 @@ export default function Checkout(props: { disableCustomTheme?: boolean }) {
         try {
           const resultAction = await dispatch(deviceHasOpenRepair(sn));
           const isInRepair = unwrapResult(resultAction); // ou resultAction.payload
-
           if (!isInRepair) {
             dispatch(AddDevice(dataDevice)).then(() => {
-              dispatch(getOneModel(dataDevice.model));
+              if (dataDevice.model !== undefined) {
+                if (typeof dataDevice.model === 'number') {
+                  dispatch(getOneModel(dataDevice.model));
+                }
+              }
               setActiveStep(activeStep + 1);
             });
           } else {
@@ -150,10 +154,13 @@ export default function Checkout(props: { disableCustomTheme?: boolean }) {
 
         dispatch(addRepair(body)).then((rep: any) => {
           const id = rep.payload.id;
-          console.log('rep.payload.id', rep)
-
+          
           CreateRepairPDF(id);
           setActiveStep(0);
+           /* const msg = encodeURIComponent(`vous avéz dèposer votre appareille IMEI: ${repair.temDevice?.serialenumber} chez notre STE`)
+          const phNb = repair.tempCustomer?.phone
+          const url = `https://wa.me/${phNb}?text=${msg}`;
+          window.open(url, '_blank');   */
         });
         break;
 
@@ -247,12 +254,23 @@ export default function Checkout(props: { disableCustomTheme?: boolean }) {
                 </TableRow>
                 <TableRow sx={{ borderBottom: '2px solid #ccc ' }}>
                   <TableCell component="th" scope="row" sx={{ borderTop: '1px solid #ccc', backgroundColor: '#EEEEEE' }}> Modèle</TableCell>
-                  <TableCell>{oneModel?.brand?.name} {oneModel?.name}</TableCell>
+                  <TableCell>
+                    {typeof oneModel?.brand === 'object' && !Array.isArray(oneModel.brand)
+                      ? oneModel.brand.name
+                      : ''}
+                    {oneModel?.name}
+                  </TableCell>
+
 
                 </TableRow>
                 <TableRow sx={{ borderBottom: '2px solid #ccc ' }}>
                   <TableCell component="th" scope="row" sx={{ borderTop: '1px solid #ccc', backgroundColor: '#EEEEEE' }}> Type de modèle</TableCell>
-                  <TableCell>  {oneModel?.typeModel.description}</TableCell>
+                  <TableCell>
+                    {typeof oneModel?.typeModel === 'object' && !Array.isArray(oneModel.typeModel)
+                      ? oneModel.typeModel.description
+                      : ''}
+                  </TableCell>
+
 
                 </TableRow>
               </Table></>

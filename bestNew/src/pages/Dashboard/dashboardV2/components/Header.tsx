@@ -35,7 +35,8 @@ const dispatch = useAppDispatch();
     dispatch(getAgencies()  )
     
   }, [dispatch]);  
- const user = useSelector((state: RootState) => state.user);
+ const user = useSelector((state: RootState) => state.auth.user);
+ 
          const roleColors: Record<string, string> = {
     Administrateur: 'gold',
     Reception: 'pink',
@@ -66,6 +67,7 @@ const dispatch = useAppDispatch();
         };
 
  
+
   return (
     <Stack
       direction="row"
@@ -97,7 +99,8 @@ const dispatch = useAppDispatch();
 
         ) : (
           <Typography  >
-            {t('Agence')} : {user?.branch?.name || '-'} 
+           {t('Agence')} : {(typeof user?.branch === 'object' && 'name' in user.branch) ? user.branch.name : '-'}
+
           </Typography>
         )}
 

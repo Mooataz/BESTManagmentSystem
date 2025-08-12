@@ -2,21 +2,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { Customer, Device, RepairForm } from '../Types/repairTypes'
-import { addRepair, AssignRepair, getByBranchStep, getByUserStep, getOneRepair, getRepairIncomplet, getRepairs, getRepairsByBranch } from '../Actions/Reception/repairAction';
+import { addRepair, AssignRepair, getByBranchStep, getByUserStep, getOneRepair, getRepairIncomplet, getRepairs, getRepairsByBranch, UpdateOneRepair, UpdatePartFileRepair } from '../Actions/Reception/repairAction';
 import { AddDevice } from '../Actions/Reception/DeviceActions';
 import { AddCustomer } from '../Actions/Reception/customerActions';
 
-/* interface RepairState {
-  repairs: RepairForm[];
-  repBranchStep: RepairForm[];
-  tempactuellybranch: number | null;
-  tempCustomer: Customer | null;
-  temDevice: Device | null; // Pour la réparation actuelle
-  loading: boolean;
-  success: boolean;
-  error: string | null;
-}
- */
+
 interface RepairState {
   repairs: RepairForm[];
   repBranchStep: RepairForm[];
@@ -34,13 +24,13 @@ const initialState: RepairState = {
   repairs: [],
   repBranchStep: [],
   oneRepair: null,
-  tempactuellybranch:null,
+  tempactuellybranch: null,
   tempCustomer: null,
   temDevice: null,
   loading: false,
   success: false,
   error: null,
-  currentRepair :null,
+  currentRepair: null,
 };
 
 const repairSlice = createSlice({
@@ -51,13 +41,13 @@ const repairSlice = createSlice({
       state.error = null;
     },
     setActuellyBranch: (state, action: PayloadAction<number>) => {
-    state.tempactuellybranch = action.payload;
-  },
+      state.tempactuellybranch = action.payload;
+    },
     // Ajoutez d'autres reducers si nécessaire
   },
   extraReducers: (builder) => {
     builder
-    
+
       .addCase(getRepairs.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -73,7 +63,7 @@ const repairSlice = createSlice({
         state.success = false;
         state.error = typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
       })
-      
+
       .addCase(getRepairsByBranch.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -82,14 +72,14 @@ const repairSlice = createSlice({
       .addCase(getRepairsByBranch.fulfilled, (state, action: PayloadAction<RepairForm[]>) => {
         state.loading = false;
         state.success = true;
-        state.repairs = action.payload;
+        state.repairs = [...action.payload];
       })
       .addCase(getRepairsByBranch.rejected, (state, action) => {
         state.loading = false;
         state.success = false;
         state.error = typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
       })
-      
+
       .addCase(getByBranchStep.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -105,7 +95,7 @@ const repairSlice = createSlice({
         state.success = false;
         state.error = typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
       })
-      
+
       .addCase(addRepair.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -115,16 +105,16 @@ const repairSlice = createSlice({
         state.loading = false;
         state.success = true;
         state.repairs.push(action.payload);
-        state.tempCustomer=null;
-        state.temDevice=null;
-        
+        state.tempCustomer = null;
+        state.temDevice = null;
+
       })
       .addCase(addRepair.rejected, (state, action: PayloadAction<string | undefined>) => {
         state.loading = false;
         state.success = false;
         state.error = action.payload || 'Erreur inconnue';
       })
-      
+
       .addCase(AssignRepair.pending, (state) => { //getByUserStep
         state.loading = true;
         state.error = null;
@@ -141,7 +131,7 @@ const repairSlice = createSlice({
         state.success = false;
         state.error = action.payload || 'Erreur inconnue';
       })
-      
+
       .addCase(getByUserStep.pending, (state) => { //getByUserStep
         state.loading = true;
         state.error = null;
@@ -158,7 +148,7 @@ const repairSlice = createSlice({
         state.success = false;
         state.error = action.payload || 'Erreur inconnue';
       })
-      
+
       .addCase(AddCustomer.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -168,15 +158,15 @@ const repairSlice = createSlice({
         state.loading = false;
         state.success = true;
         state.tempCustomer = action.payload;
-        console.log('Repair slice- customer',state.tempCustomer)
+        console.log('Repair slice- customer', state.tempCustomer)
       })
       .addCase(AddCustomer.rejected, (state, action: PayloadAction<string | undefined>) => {
         state.loading = false;
         state.success = false;
         state.error = action.payload || 'Erreur inconnue';
       })
-     
-      .addCase(AddDevice.pending, (state) => { 
+
+      .addCase(AddDevice.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.success = false;
@@ -185,7 +175,7 @@ const repairSlice = createSlice({
         state.loading = false;
         state.success = true;
         state.temDevice = action.payload;
-        
+
         if (state.repairs.length > 0) {
           const lastRepair = state.repairs[state.repairs.length - 1];
           if (lastRepair && typeof lastRepair === 'object') {
@@ -201,7 +191,7 @@ const repairSlice = createSlice({
         state.error = action.payload || 'Erreur inconnue';
       })
 
-      .addCase(getRepairIncomplet.pending, (state) => { 
+      .addCase(getRepairIncomplet.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.success = false;
@@ -210,8 +200,8 @@ const repairSlice = createSlice({
         state.loading = false;
         state.success = true;
         state.repairs = action.payload;
-        
-         
+
+
       })
       .addCase(getRepairIncomplet.rejected, (state, action: PayloadAction<string | undefined>) => {
         state.loading = false;
@@ -219,7 +209,7 @@ const repairSlice = createSlice({
         state.error = action.payload || 'Erreur inconnue';
       })
 
-      .addCase(getOneRepair.pending, (state) => { 
+      .addCase(getOneRepair.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.success = false;
@@ -228,9 +218,43 @@ const repairSlice = createSlice({
         state.loading = false;
         state.success = true;
         state.oneRepair = action.payload;
-        
-       })
+
+      })
       .addCase(getOneRepair.rejected, (state, action: PayloadAction<string | undefined>) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload || 'Erreur inconnue';
+      })
+      
+      .addCase(UpdateOneRepair.pending, (state) => { 
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(UpdateOneRepair.fulfilled, (state, action: PayloadAction<RepairForm>) => {
+        state.loading = false;
+        state.success = true;
+        state.oneRepair = action.payload;
+
+      })
+      .addCase(UpdateOneRepair.rejected, (state, action: PayloadAction<string | undefined>) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload || 'Erreur inconnue';
+      })
+      
+      .addCase(UpdatePartFileRepair.pending, (state) => {  
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(UpdatePartFileRepair.fulfilled, (state, action: PayloadAction<RepairForm>) => {
+        state.loading = false;
+        state.success = true;
+        state.oneRepair = action.payload;
+
+      })
+      .addCase(UpdatePartFileRepair.rejected, (state, action: PayloadAction<string | undefined>) => {
         state.loading = false;
         state.success = false;
         state.error = action.payload || 'Erreur inconnue';

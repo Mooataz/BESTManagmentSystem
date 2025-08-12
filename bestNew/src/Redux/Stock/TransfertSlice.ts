@@ -5,7 +5,7 @@ import { getTotransfert } from "../Actions/stock/EtatStockActions";
 
 interface TransfertState {
     Transfert: TransfertPR[];
-    
+
     loading: boolean;
     success: boolean;
     error: string | null;
@@ -13,13 +13,13 @@ interface TransfertState {
 
 const initialState: TransfertState = {
     Transfert: [],
-   
+
     loading: false,
     success: false,
     error: null,
 };
 
-const RemplissageStockSlice = createSlice({
+const TransfertSlice = createSlice({
     name: 'Transfert',
     initialState,
     reducers: {
@@ -47,23 +47,32 @@ const RemplissageStockSlice = createSlice({
                 state.error =
                     typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
             })
-            .addCase(UpdateOneTransfert.pending, (state) => {  
+            
+            .addCase(UpdateOneTransfert.pending, (state) => {
                 state.loading = true;
                 state.error = null;
                 state.success = false;
             })
             .addCase(UpdateOneTransfert.fulfilled, (state, action: PayloadAction<TransfertPR>) => {
-                state.loading = false;
-                state.success = true;
-                state.Transfert.push(action.payload);
-            })
+    state.loading = false;
+    state.success = true;
+
+    // Remplacer ou insérer le transfert dans le tableau existant
+    const index = state.Transfert.findIndex(t => t.id === action.payload.id);
+    if (index !== -1) {
+        state.Transfert[index] = action.payload;
+    } else {
+        state.Transfert.push(action.payload);
+    }
+})
             .addCase(UpdateOneTransfert.rejected, (state, action) => {
                 state.loading = false;
                 state.success = false;
                 state.error =
                     typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
             })
-            .addCase(GetSendTransfert.pending, (state) => {   
+
+            .addCase(GetSendTransfert.pending, (state) => {
                 state.loading = true;
                 state.error = null;
                 state.success = false;
@@ -71,7 +80,7 @@ const RemplissageStockSlice = createSlice({
             .addCase(GetSendTransfert.fulfilled, (state, action: PayloadAction<TransfertPR[]>) => {
                 state.loading = false;
                 state.success = true;
-                state.Transfert=action.payload;
+                state.Transfert = action.payload;
             })
             .addCase(GetSendTransfert.rejected, (state, action) => {
                 state.loading = false;
@@ -79,7 +88,8 @@ const RemplissageStockSlice = createSlice({
                 state.error =
                     typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
             })
-            .addCase(GetReceiveTransfert.pending, (state) => {   
+
+            .addCase(GetReceiveTransfert.pending, (state) => {
                 state.loading = true;
                 state.error = null;
                 state.success = false;
@@ -87,7 +97,7 @@ const RemplissageStockSlice = createSlice({
             .addCase(GetReceiveTransfert.fulfilled, (state, action: PayloadAction<TransfertPR[]>) => {
                 state.loading = false;
                 state.success = true;
-                state.Transfert=action.payload;
+                state.Transfert = action.payload;
             })
             .addCase(GetReceiveTransfert.rejected, (state, action) => {
                 state.loading = false;
@@ -100,5 +110,5 @@ const RemplissageStockSlice = createSlice({
     },
 });
 
-export const { clearError } = RemplissageStockSlice.actions;
-export default RemplissageStockSlice.reducer;
+export const { clearError } = TransfertSlice.actions;
+export default TransfertSlice.reducer;

@@ -1,5 +1,4 @@
 import { CreateTransfertDto } from './dto/create-transfert.dto';
-import { UpdateTransfertDto } from './dto/update-transfert.dto';
 import { Transfert } from './entities/transfert.entity';
 import { Repository } from 'typeorm';
 import { StockPart } from 'src/stock-parts/entities/stock-part.entity';
@@ -16,9 +15,9 @@ export declare class TransfertService {
     create(createTransfertDto: CreateTransfertDto): Promise<Transfert>;
     findAll(): Promise<Transfert[]>;
     findOne(id: number): Promise<Transfert>;
-    update(id: number, updateTransfertDto: UpdateTransfertDto): Promise<Transfert>;
+    update(id: number, data: any): Promise<Transfert>;
     remove(id: number): Promise<Transfert>;
     findByState(state: string): Promise<Transfert[]>;
     getFromBranch(branchId: number, type: string): Promise<any[]>;
-    getToBranch(branchId: number, type: string): Promise<Transfert[]>;
+    getToBranch(branchId: number, type: string, state: string): Promise<any[]>;
 }

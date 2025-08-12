@@ -437,5 +437,30 @@ const doc = new PDFDocument({ margin: 20 });
 
       
   }
+
+  async generateStockReport(branchId: number, parts: any[]): Promise<string> {
+    const uploadsDir = path.join(__dirname, '..', '..', 'uploads');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+    const filePath = path.join(uploadsDir, `stock-report-branch-${branchId}.pdf`);
+    const doc = new PDFDocument();
+    const writeStream = fs.createWriteStream(filePath);
+    doc.pipe(writeStream);
+    doc.fontSize(18).text(`Rapport de stock critique`, { align: 'center' });
+    doc.moveDown();
+    doc.fontSize(14).text(`Branche ID: ${branchId}`);
+    doc.moveDown();
+    parts.forEach((part, index) => {
+      doc.fontSize(12).text(
+        `${index + 1}. ${part.modelName} - ${part.partName}: ${part.count} unité(s)`
+      );
+    });
+    doc.end();
+    return new Promise((resolve, reject) => {
+      writeStream.on('finish', () => resolve(filePath));
+      writeStream.on('error', reject);
+    });
+  }
 }
 

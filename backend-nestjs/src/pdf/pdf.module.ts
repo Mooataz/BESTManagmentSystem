@@ -22,6 +22,7 @@ import { AppService } from 'src/app.service';
 import { CoreModule } from 'src/core/core.module';
 import { Legislation } from 'src/legislation/entities/legislation.entity';
 import { Branch } from 'src/branches/entities/branch.entity';
+import { LegislationService } from 'src/legislation/legislation.service';
 
 @Module({
   imports:[
@@ -38,7 +39,7 @@ import { Branch } from 'src/branches/entities/branch.entity';
     CoreModule,
     TypeOrmModule.forFeature([Repair, Customer, Device,Legislation, Branch])    ,       ], 
   controllers: [PdfController],
-  providers: [PdfService, RepairService ],
+  providers: [PdfService, RepairService, LegislationService ],
   exports:[PdfService]
 })
 export class PdfModule {}

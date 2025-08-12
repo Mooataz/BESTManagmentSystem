@@ -12,6 +12,7 @@ import React, { useState } from 'react';
 import { useNotification } from '../../../Componants/NotificationContext';
 import { useAppDispatch } from '../../../Redux/hooks';
 import type { RootState } from '../../../Redux/store';
+import theme from '../../../Theme/theme';
 
 interface FadeProps {
     children: React.ReactElement<any>;
@@ -107,7 +108,10 @@ export function AddBin() {
     }
     return (
         <div>
-            <Button variant="outlined" onClick={handleOpen}>AJOUTER CASE</Button>
+            <Button variant="outlined"sx={{
+                        borderColor: theme.palette.primary.main,
+                        marginLeft: '70%'
+                    }}  onClick={handleOpen}>AJOUTER CASE</Button>
             <Modal
                 aria-labelledby="spring-modal-title"
                 aria-describedby="spring-modal-description"

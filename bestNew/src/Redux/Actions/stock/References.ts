@@ -88,7 +88,35 @@ References,
   }
 );
 
+/* export const UpdateOneReference = createAsyncThunk<
+ References ,
+References,
+  AsyncThunkConfig
+>(
+  'References/UpdateOneReference',
+  async (data: Partial<References> & { id: number }  ) => {
+ 
+    try {
+      const response = await API.patch(`references/${body.id}`, body);
+  
+ 
+      return response.data.data;
+       
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Échec de l\'envoie'
+      );
+    }
+  }
+); */
 
-
+export const UpdateOneReference = createAsyncThunk(
+  'references/updateOne',
+  async (data: Partial<References> & { id: number }) => {
+    // appel API PATCH par exemple
+    const response = await API.patch(`/references/${data.id}`, data);
+    return response.data;
+  }
+);
 
  

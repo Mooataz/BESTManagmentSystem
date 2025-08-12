@@ -16,6 +16,8 @@ exports.RepairController = void 0;
 const common_1 = require("@nestjs/common");
 const repair_service_1 = require("./repair.service");
 const update_repair_dto_1 = require("./dto/update-repair.dto");
+const platform_express_1 = require("@nestjs/platform-express");
+const multer_1 = require("multer");
 const swagger_1 = require("@nestjs/swagger");
 let RepairController = class RepairController {
     repairService;
@@ -91,8 +93,21 @@ let RepairController = class RepairController {
             });
         }
     }
-    async update(id, updateRepairDto, res) {
+    async updateWithPartsFiles(id, updateRepairDto, res) {
+        const updatedRepair = await this.repairService.updateRepairWithParts(+id, updateRepairDto);
+        return res.status(common_1.HttpStatus.OK).json({
+            message: "Mise à jour réussie!",
+            status: common_1.HttpStatus.OK,
+            data: updatedRepair,
+        });
+    }
+    async update(id, body, res) {
         try {
+            const updateRepairDto = {
+                ...body,
+                accessoryIds: body.accessoryIds ? JSON.parse(body.accessoryIds) : undefined,
+                listFaultIds: body.listFaultIds ? JSON.parse(body.listFaultIds) : undefined,
+            };
             const updatedata = await this.repairService.update(+id, updateRepairDto);
             return res.status(common_1.HttpStatus.OK).json({
                 message: " updated Successfuly !",
@@ -201,13 +216,16 @@ let RepairController = class RepairController {
             });
         }
     }
-    async getByUserStep(userId, steps, res) {
+    async getByUserStep(branchId, userId, steps, res) {
         try {
-            const user = await this.repairService.FiltreByUserStep(userId, steps);
+            const numericBranchId = Number(branchId);
+            const numericUserId = Number(userId);
+            const result = await this.repairService.findByBranchAndStep(numericBranchId, steps);
+            const filterResult = result.filter(repair => repair.user?.id === numericUserId);
             return res.status(common_1.HttpStatus.OK).json({
-                message: 'Repairs found successfully!',
+                message: 'Réparations récupérées avec succès',
                 status: common_1.HttpStatus.OK,
-                data: user,
+                data: filterResult,
             });
         }
         catch (error) {
@@ -269,12 +287,28 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], RepairController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.Patch)(':id'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('files', 5, {
+        storage: (0, multer_1.diskStorage)({
+            destination: './upload/repairs',
+            filename: (_req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
+        }),
+    })),
+    (0, swagger_1.ApiConsumes)("multipart/form-data"),
+    (0, common_1.Patch)('updateWithPartsFiles/:id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, update_repair_dto_1.UpdateRepairDto, Object]),
+    __metadata("design:returntype", Promise)
+], RepairController.prototype, "updateWithPartsFiles", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object, Object]),
     __metadata("design:returntype", Promise)
 ], RepairController.prototype, "update", null);
 __decorate([
@@ -318,12 +352,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], RepairController.prototype, "getRepairByUser", null);
 __decorate([
-    (0, common_1.Get)('FilterByUserStep'),
-    __param(0, (0, common_1.Param)()),
-    __param(1, (0, common_1.Param)()),
-    __param(2, (0, common_1.Res)()),
+    (0, common_1.Get)('FilterUserStep/:branchId/:userId/:steps'),
+    __param(0, (0, common_1.Param)('branchId')),
+    __param(1, (0, common_1.Param)('userId')),
+    __param(2, (0, common_1.Param)('steps')),
+    __param(3, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, String, Object]),
+    __metadata("design:paramtypes", [String, String, String, Object]),
     __metadata("design:returntype", Promise)
 ], RepairController.prototype, "getByUserStep", null);
 exports.RepairController = RepairController = __decorate([

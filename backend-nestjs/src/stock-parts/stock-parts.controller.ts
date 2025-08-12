@@ -165,7 +165,7 @@ export class StockPartsController {
   } 
   
   @Get('stateStock')
-  async getStateStock ( @Res() res){
+  async getStateStock (  @Res() res){
     try {
       const allfind = await this.stockPartsService.stateStock()
       return res.status(HttpStatus.OK).json({

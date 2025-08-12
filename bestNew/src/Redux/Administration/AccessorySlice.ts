@@ -1,8 +1,7 @@
 import { createSlice   } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { Agency } from '../Types/Stock';
-import { getAgencies } from '../Actions/Administration/Agencies';
-import { getAccessory } from '../Actions/Administration/AccessoryActions';
+ import { getAccessory } from '../Actions/Administration/AccessoryActions';
 import type { Accessory } from '../Types/repairTypes';
 
 interface AccessoryState {

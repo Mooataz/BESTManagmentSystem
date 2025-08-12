@@ -1,11 +1,11 @@
 import { createSlice   } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { AddOneRaisons, getAllExpertiseRaisons, UpdateOneRaison } from '../Actions/Administration/RaisonsExpertiseActions';
+import { AddOneRaisons, getAllExpertiseRaisons, GetOneRaison, UpdateOneRaison } from '../Actions/Administration/RaisonsExpertiseActions';
 import type { TypeUnique } from '../Types/repairTypes';
 
 interface EmployèesState {
   ExpertiseRaisons: TypeUnique[]; // Pour stocker plusieurs réparations
-    // Pour la réparation actuelle
+    OneRaison: TypeUnique | null;
   loading: boolean;
   success: boolean;
   error: string | null;
@@ -13,7 +13,7 @@ interface EmployèesState {
 
 const initialState: EmployèesState = {
   ExpertiseRaisons: [],
-   
+   OneRaison: null,
   loading: false,
   success: false,
   error: null,
@@ -46,6 +46,7 @@ const ExpertiseReasonSlice = createSlice({
         state.success = false;
         state.error = action.payload || 'Erreur inconnue';
       })
+
       .addCase(AddOneRaisons.pending, (state) => { 
         state.loading = true;
         state.error = null;
@@ -61,6 +62,7 @@ const ExpertiseReasonSlice = createSlice({
         state.success = false;
         state.error = action.payload || 'Erreur inconnue';
       })
+
       .addCase(UpdateOneRaison.pending, (state) => {  
         state.loading = true;
         state.error = null;
@@ -72,6 +74,21 @@ const ExpertiseReasonSlice = createSlice({
         state.ExpertiseRaisons=action.payload;  
       })
       .addCase(UpdateOneRaison.rejected, (state, action: PayloadAction<string | undefined>) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload || 'Erreur inconnue';
+      })
+      .addCase(GetOneRaison.pending, (state) => {  
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(GetOneRaison.fulfilled, (state, action: PayloadAction<TypeUnique>) => {
+        state.loading = false;
+        state.success = true;
+        state.OneRaison=action.payload;  
+      })
+      .addCase(GetOneRaison.rejected, (state, action: PayloadAction<string | undefined>) => {
         state.loading = false;
         state.success = false;
         state.error = action.payload || 'Erreur inconnue';

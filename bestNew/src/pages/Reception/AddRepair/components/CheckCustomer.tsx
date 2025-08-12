@@ -86,7 +86,6 @@ export default function CheckCustomer({
   const handleSelectionCustomer = async (ids: number) => {
     const result = await dispatch(getOneCustomer(ids))
     const customer = unwrapResult(result);
-    console.log('Nom du client :', customer.name);
     setFormCustomer({ ...formCustomer, name: customer.name, phone: customer.phone, distributer: customer.distributer });
 
   };

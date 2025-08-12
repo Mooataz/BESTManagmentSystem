@@ -34,13 +34,13 @@ export declare class RepairService {
     create(createRepairDto: CreateRepairDto, userId: number): Promise<Repair>;
     findAll(): Promise<Repair[]>;
     findOne(id: number): Promise<Repair>;
-    update(id: number, updateRepairDto: UpdateRepairDto): Promise<Repair>;
     remove(id: number): Promise<Repair>;
     filterRepairByDevice(deviceId: number): Promise<Repair[]>;
     filterRepairByUser(userId: number): Promise<Repair[]>;
     filterByNewSerialNumber(newSerialNumber: number): Promise<Repair[]>;
     filterByActuellyBranch(actuellyBranch: number): Promise<Repair[]>;
     findByBranchAndStep(branchId: number, step: string): Promise<Repair[]>;
-    updateRepairWithParts(repairId: number, updateData: UpdateRepairDto): Promise<Repair>;
     FiltreByUserStep(userId: number, steps: string): Promise<Repair[]>;
+    update(id: number, updateRepairDto: UpdateRepairDto): Promise<Repair>;
+    updateRepairWithParts(id: number, updateRepairDto: UpdateRepairDto, files?: string[]): Promise<Repair>;
 }

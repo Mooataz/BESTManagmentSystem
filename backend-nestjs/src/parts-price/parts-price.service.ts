@@ -36,7 +36,7 @@ export class PartsPriceService {
   }
 
   async findAll():Promise<PartsPrice[]> {
-    const findAll = await this.partsPriceRepositry.find()
+    const findAll = await this.partsPriceRepositry.find({ relations:['model','allPart','levelRepair']})
     if (!findAll || findAll.length === 0){
       throw new NotFoundException('No data found')
     }

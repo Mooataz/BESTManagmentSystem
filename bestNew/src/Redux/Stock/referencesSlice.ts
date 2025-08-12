@@ -1,8 +1,8 @@
-import { createSlice   } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { References } from '../Types/Stock';
-import { AddOneReference, getByMaterialCode, getOneReference, getReferences } from '../Actions/stock/References';
-  //binSlice
+import { AddOneReference, getByMaterialCode, getOneReference, getReferences, UpdateOneReference } from '../Actions/stock/References';
+//binSlice
 interface ReferencesState {
   references: References[]; // Pour stocker plusieurs réparations
   oneReference: References | null; // Pour la réparation actuelle
@@ -38,15 +38,17 @@ const referencesSlice = createSlice({
       .addCase(getReferences.fulfilled, (state, action: PayloadAction<References[]>) => {
         state.loading = false;
         state.success = true;
-         state.references =action.payload;
-       })
+        state.references = action.payload;
+      })
       .addCase(getReferences.rejected, (state, action) => {
         state.loading = false;
         state.success = false;
         state.error =
-            typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
-        })
-    .addCase(AddOneReference.pending, (state) => { getOneReference
+          typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
+      })
+
+      .addCase(AddOneReference.pending, (state) => {
+        getOneReference
         state.loading = true;
         state.error = null;
         state.success = false;
@@ -54,15 +56,16 @@ const referencesSlice = createSlice({
       .addCase(AddOneReference.fulfilled, (state, action: PayloadAction<References[]>) => {
         state.loading = false;
         state.success = true;
-         state.references =action.payload;
-       })
+        state.references = action.payload;
+      })
       .addCase(AddOneReference.rejected, (state, action) => {
         state.loading = false;
         state.success = false;
         state.error =
-            typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
-        })
-        .addCase(getOneReference.pending, (state) => { 
+          typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
+      })
+
+      .addCase(getOneReference.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.success = false;
@@ -70,15 +73,16 @@ const referencesSlice = createSlice({
       .addCase(getOneReference.fulfilled, (state, action: PayloadAction<References>) => {
         state.loading = false;
         state.success = true;
-         state.oneReference =action.payload;
-       })
+        state.oneReference = action.payload;
+      })
       .addCase(getOneReference.rejected, (state, action) => {
         state.loading = false;
         state.success = false;
         state.error =
-            typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
-        })
-         .addCase(getByMaterialCode.pending, (state) => {  
+          typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
+      })
+
+      .addCase(getByMaterialCode.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.success = false;
@@ -86,20 +90,35 @@ const referencesSlice = createSlice({
       .addCase(getByMaterialCode.fulfilled, (state, action: PayloadAction<References>) => {
         state.loading = false;
         state.success = true;
-         state.oneReference =action.payload;
-       })
+        state.oneReference = action.payload;
+      })
       .addCase(getByMaterialCode.rejected, (state, action) => {
         state.loading = false;
         state.success = false;
         state.error =
-            typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
-        })
+          typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
+      })
+      .addCase(UpdateOneReference.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(UpdateOneReference.fulfilled, (state, action: PayloadAction<References>) => {
+        state.loading = false;
+        state.success = true;
+        state.oneReference = action.payload;
+      })
+      .addCase(UpdateOneReference.rejected, (state, action) => {
+        state.loading = false;
+        state.success = false;
+        state.error =
+          typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
+      })
 
 
-      
-      
+
   },
 });
 
-export const { clearError  } = referencesSlice.actions;
+export const { clearError } = referencesSlice.actions;
 export default referencesSlice.reducer;

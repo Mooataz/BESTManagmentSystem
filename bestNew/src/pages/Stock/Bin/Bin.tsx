@@ -22,26 +22,29 @@ import theme from '../../../Theme/theme';
 
 export function Bin() {
     const dispatch = useAppDispatch();
-    const user = useSelector((state: RootState) => state.auth.user);
-    const userr = useSelector((state: RootState) => state.user);
+    const userr = useSelector((state: RootState) => state.auth.user);
+    //const userr = useSelector((state: RootState) => state.user);
     const bin = useSelector((state: RootState) => state.bin.bin)
     const [open, setOpen] = React.useState(false);
     const { notify } = useNotification();
     const [formData, setFormData] = useState<{ id: number | null, name: string, branch: number }>({ id: null, name: '', branch: 0 });
     const [isLoading, setIsLoading] = useState(false);
+const getBranchId = (branch: number | { id: number } | undefined): number | undefined =>
+      typeof branch === 'number' ? branch : branch?.id;
 
+    const currentbranch = getBranchId(userr?.branch);
 
 
     React.useEffect(() => {
-        if (userr.branch?.id) {
-            dispatch(getBin(userr.branch.id))
+        if (currentbranch) {
+            dispatch(getBin(currentbranch))
         }
-    }, [userr.branch?.id, dispatch])
+    }, [currentbranch, dispatch])
 
 
 
     const handleOpenEdit = (row: Bin) => {
-        setFormData({ id: row.id || 0, name: row.name, branch: userr.branch?.id || 0 });
+        setFormData({ id: row.id || 0, name: row.name, branch: currentbranch || 0 });
         setOpen(true);
     };
 
@@ -51,12 +54,12 @@ export function Bin() {
         if (formData.id == null) return;
         setIsLoading(true);
         try {
-            const result = await dispatch(updateBin({ id: formData.id, name: formData.name, branch: userr.branch?.id || 0 }));
+            const result = await dispatch(updateBin({ id: formData.id, name: formData.name, branch: currentbranch || 0 }));
             if (updateBin.fulfilled.match(result)) {
                 notify('Mis à jour avec succès', 'success');
                 setOpen(false);
-                if (userr.branch?.id) {
-                    await dispatch(getBin(userr.branch.id));
+                if (currentbranch) {
+                    await dispatch(getBin(currentbranch));
                 }
             } else {
                 notify(result.payload as string || 'Erreur lors de la mise à jour', 'error');

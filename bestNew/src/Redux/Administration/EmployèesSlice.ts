@@ -1,7 +1,6 @@
 import { createSlice   } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { FormOneInput } from '../Types/administrationTypes';
- import { getusers, updateEmployee } from '../Actions/Administration/EmployèesActions';
+  import { getusers, updateEmployee, updatePassword } from '../Actions/Administration/EmployèesActions';
 import type { User } from '../Types/authenTypes';
 
  interface Employees{
@@ -24,16 +23,14 @@ interface Agency {
  
 interface EmployèesState {
   Employèes: User[]; // Pour stocker plusieurs réparations
-  currentEmployèes: FormOneInput | null; // Pour la réparation actuelle
-  loading: boolean;
+   loading: boolean;
   success: boolean;
   error: string | null;
 }
 
 const initialState: EmployèesState = {
   Employèes: [],
-  currentEmployèes: null,
-  loading: false,
+   loading: false,
   success: false,
   error: null,
 };
@@ -65,7 +62,7 @@ const EmployèesSlice = createSlice({
         state.success = false;
         state.error = action.payload || 'Erreur inconnue';
       })
-      .addCase(updateEmployee.pending, (state) => {
+      .addCase(updateEmployee.pending, (state) => { 
         state.loading = true;
         state.error = null;
         state.success = false;
@@ -76,6 +73,21 @@ const EmployèesSlice = createSlice({
         state.Employèes=action.payload;  
       })
       .addCase(updateEmployee.rejected, (state, action: PayloadAction<string | undefined>) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload || 'Erreur inconnue';
+      })
+      .addCase(updatePassword.pending, (state) => {  
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(updatePassword.fulfilled, (state, action: PayloadAction<User>) => {
+        state.loading = false;
+        state.success = true;
+        state.Employèes.push(action.payload);  
+      })
+      .addCase(updatePassword.rejected, (state, action: PayloadAction<string | undefined>) => {
         state.loading = false;
         state.success = false;
         state.error = action.payload || 'Erreur inconnue';

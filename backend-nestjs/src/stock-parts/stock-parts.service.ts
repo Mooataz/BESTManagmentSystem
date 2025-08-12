@@ -21,6 +21,10 @@ import { plainToInstance } from 'class-transformer';
 import { Company } from 'src/company/entities/company.entity';
 import { HistoryStockPart } from 'src/history-stock-part/entities/history-stock-part.entity';
 import { Tracability } from 'src/tracability/entities/tracability.entity';
+import { PdfService } from 'src/pdf/pdf.service';
+import { Legislation } from 'src/legislation/entities/legislation.entity';
+import { StockGateway } from './Stock.Gateway';
+import { User } from 'src/users/entities/user.entity';
 
  
 
@@ -34,9 +38,12 @@ export class StockPartsService {
                 @InjectRepository(Company) private readonly  companyRepositry:Repository<Company>,
                 @InjectRepository(HistoryStockPart) private readonly historyStockPartRepositry:Repository<HistoryStockPart>,
                 @InjectRepository(Tracability) private readonly tracabilityRepositry:Repository<Tracability>,
-                  private appService: AppService,
+                   @InjectRepository(User) private readonly UserRepositry:Repository<User>,
+                   private appService: AppService,
                   private modelService:ModelsService,
-                  private referenceService: ReferencesService ){}
+                  private referenceService: ReferencesService,
+                private PDFService: PdfService,
+               private StockGateway: StockGateway, ){}
 
   async create(createStockPartDto: CreateStockPartDto, userId: number):Promise<StockPart> {
     createStockPartDto.serialNumber =this.appService.cleanSpaces(createStockPartDto.serialNumber)
@@ -157,7 +164,7 @@ async findGoodReference(references:Reference[], branchId: number): Promise<Stock
 
 
 
-@Cron('08 23 * * 7')
+/* @Cron('00 10 * * 5') */
   async stateStock() {
     
    // Vérification du verrou en mémoire
@@ -197,7 +204,7 @@ async findGoodReference(references:Reference[], branchId: number): Promise<Stock
       //stockDetails: StockPart[];
     }[] = [];
   
-    for ( const branch of allBranch){
+    /* for ( const branch of allBranch){
       for (const model of models) {
         for (const part of model.allpart) {
             // Validation des IDs
@@ -235,7 +242,7 @@ async findGoodReference(references:Reference[], branchId: number): Promise<Stock
                   branchID:branch.id,
                   modelId: model.id,
                   partId: part.id,
-                  count: counter.length, /* stockDetails: counter */ });
+                  count: counter.length,  stockDetails: counter   });
 
                   // Ici ajouter Notification par firebase , la notification sera envoyer à l'Admin et StocKeeper de l'agence 
               }
@@ -245,7 +252,64 @@ async findGoodReference(references:Reference[], branchId: number): Promise<Stock
               
         }
       }
-    } 
+    }  */
+   for (const branch of allBranch) {
+  const branchCriticalParts: {
+    modelId: number;
+    modelName: string;
+    partId: number;
+    partName: string;
+    count: number;
+  }[] = [];
+  for (const model of models) {
+    for (const part of model.allpart) {
+      const counter = await this.findGoodReference(
+        await this.referenceService.findCompatibleReferences(model.id, part.id),
+        branch.id,
+      );
+      const count = Number(counter.length);
+      if (isNaN(count)) continue;
+      const quantityAlertStock = (
+        await this.stockPartRepositry
+          .createQueryBuilder('stockPart')
+          .leftJoin('stockPart.bin', 'bin')
+          .leftJoin('bin.branch', 'branch')
+          .leftJoin('branch.company', 'company')
+          .where('stockPart.id = :stockPartId', { stockPartId: part.id })
+          .select(['company.quantityAlertStock'])
+          .getRawOne()
+      )?.company_quantityAlertStock;
+      if (count <= quantityAlertStock) {
+        // :épingle: On ajoute les infos dans un tableau
+        branchCriticalParts.push({
+          modelId: model.id,
+          modelName: model.name,
+          partId: part.id,
+          partName: part.description,
+          count,
+        });
+      }
+    }
+  }
+  // Si cette branche a des pièces critiques, on génère le PDF + envoie notif
+  if (branchCriticalParts.length > 0) {
+    // :coche_blanche: Générer PDF
+    const pdfPath = await this.PDFService.generateStockReport(branch.id, branchCriticalParts);
+    // :haut_parleur: Notifier les utilisateurs
+    const usersToNotify = await this.UserRepositry
+      .createQueryBuilder('user')
+      .innerJoin('user.branch', 'branch')
+      .where('branch.id = :branchId', { branchId: branch.id })
+      .andWhere('user.role IN (:...roles)', { roles: ['Admin', 'StockKeeper'] })
+      .getMany();
+    const userIds = usersToNotify.map((u) => u.id);
+    await this.StockGateway.sendStockAlertToUsers(userIds, {
+      branchId: branch.id,
+      reportUrl: `/uploads/stock-report-branch-${branch.id}.pdf`, // :nouveau:
+      message: `:danger: Rapport de stock critique généré pour la branche ${branch.id}`,
+    });
+  }
+}
     console.log(`[${executionId}] Résultat:`, stockByReference);
      return stockByReference;
      

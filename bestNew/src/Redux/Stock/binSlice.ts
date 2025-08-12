@@ -46,6 +46,7 @@ const addBinSlice = createSlice({
         state.success = false;
         state.error = action.payload || 'Erreur inconnue';
       })
+
       .addCase(getBin.pending, (state) => { findByBinName
         state.loading = true;
         state.error = null;
@@ -55,14 +56,13 @@ const addBinSlice = createSlice({
         state.loading = false;
         state.success = true;
         state.bin = action.payload;
-       })
-      
-      
+       })  
       .addCase(getBin.rejected, (state, action: PayloadAction<string | undefined>) => {
         state.loading = false;
         state.success = false;
         state.error = action.payload || 'Erreur inconnue';
       })
+
       .addCase(findByBinName.pending, (state) => { 
         state.loading = true;
         state.error = null;
@@ -73,13 +73,12 @@ const addBinSlice = createSlice({
         state.success = true;
         state.BinByName = action.payload;
        })
-      
-      
       .addCase(findByBinName.rejected, (state, action: PayloadAction<string | undefined>) => {
         state.loading = false;
         state.success = false;
         state.error = action.payload || 'Erreur inconnue';
       })
+
       .addCase(findByBranchType.pending, (state) => { 
         state.loading = true;
         state.error = null;
@@ -90,8 +89,6 @@ const addBinSlice = createSlice({
         state.success = true;
         state.bin = action.payload;
        })
-      
-      
       .addCase(findByBranchType.rejected, (state, action: PayloadAction<string | undefined>) => {
         state.loading = false;
         state.success = false;

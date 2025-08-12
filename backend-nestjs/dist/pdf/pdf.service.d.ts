@@ -13,4 +13,5 @@ export declare class PdfService {
     generatRepairPdf(repair: Repair): Promise<Buffer>;
     private drawTwoColumnBox;
     generatAddStockPdf(ids: number[]): Promise<Buffer>;
+    generateStockReport(branchId: number, parts: any[]): Promise<string>;
 }

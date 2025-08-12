@@ -62,7 +62,7 @@ export default function SendToAssign() {
     }
   };
 
-const [clickedRowId, setClickedRowId] = React.useState<number | null>(null);
+const [clickedRowId, setClickedRowId] = React.useState<number | undefined>(undefined);
 
 const actions: TableAction[] = [
   {
@@ -77,7 +77,7 @@ const actions: TableAction[] = [
       setClickedRowId(row.id); // Déclenche le fond coloré
       await new Promise((res) => setTimeout(res, 1000));
       AssignRepairs(row);
-      setClickedRowId(null); // Reset la couleur après
+      setClickedRowId(undefined); // Reset la couleur après
     }
   }
 ];

@@ -14,11 +14,15 @@ import DynamicTable from '../../../Componants/Global/TableComponat';
 export default function AddTransfertpart() {
   const dispatch = useAppDispatch();
   const { notify } = useNotification();
-  const user = useSelector((state: RootState) => state.user);
-  const ListTransfert = useSelector((state: RootState) => state.stockParts.stockParts)
+  const user = useSelector((state: RootState) => state.auth.user);
+  const allStockPart = useSelector((state: RootState) => state.stockParts.stockParts)
+    const getBranchId = (branch: number | { id: number } | undefined): number | undefined =>
+      typeof branch === 'number' ? branch : branch?.id;
+
+    const currentbranch = getBranchId(user?.branch);
   const branches = useSelector((state: RootState) => {
     const allbranch = state.agencies.Agency
-    const currentbranch = user.branch?.id
+  
     return allbranch.filter(branch => branch.id !== currentbranch)
   })
 
@@ -31,24 +35,25 @@ export default function AddTransfertpart() {
 
   useEffect(() => {
     dispatch(getAgencies())
-  }, [dispatch, user?.id, user?.branch?.id])
+  }, [dispatch, user?.id, currentbranch])
+
   const [formtransfert, setFormtransfert] = useState<TransfertPR>({
     delivredBy: '',
     sendingDate: new Date(),
-    frombranch: user.branch?.id || 0,
-    sendUser: user.id || 0,
+    frombranch: currentbranch || 0,
+    sendUser: user?.id || 0,
     tobranch: 0,
     stockPartIds: [],
-    type: 'Pièces',
-    state: 'En cour d\'envoie',
+    type: 'Pieces',
+    state: 'Encours',
     typePart: '',
-    remark:''
+    remark: ''
 
   })
- 
+
   const [dataTransfert, setDataTansfert] = useState<TypeBranchTransfert>({
     typePart: formtransfert.typePart || '',
-    branchId: user.branch?.id || 0,
+    branchId: currentbranch || 0,
   })
 
   useEffect(() => {
@@ -57,49 +62,49 @@ export default function AddTransfertpart() {
     }
 
 
-  }, [user.branch?.id, dispatch, dataTransfert.typePart])
+  }, [currentbranch, dispatch, dataTransfert.typePart])
 
   const handleSubmit = async () => {
-  try {
-    const hasStockParts = (formtransfert.stockPartIds ?? []).length > 0;
+    try {
+      const hasStockParts = (formtransfert.stockPartIds ?? []).length > 0;
 
-    if (!hasStockParts) {
-      notify("Veuillez sélectionner au moins une pièce", "error");
-      return;
-    }
-
-    const payload: any = {
-      ...formtransfert,
-      sendingDate: new Date(formtransfert.sendingDate),
-      typePart: formtransfert.typePart || '',
-      stockPartIds: formtransfert.stockPartIds,
-
-      // ✅ Champs requis ou attendus par l'entité
-      remark: formtransfert.remark,                    // défaut obligatoire
-      receivedDate: null,           // champ nullable mais doit exister
-      receiveUser: null,            // champ nullable mais doit exister
-    };
-
-    // ❌ Supprime uniquement ce que le backend ne veut pas
-    delete payload.stockPart;
-    delete payload.repair;
-
-    const result = await dispatch(AddOneTransfert(payload));
-
-    if (AddOneTransfert.fulfilled.match(result)) {
-      if (user.branch?.id) {
-        dispatch(GetSendTransfert(user.branch.id));
+      if (!hasStockParts) {
+        notify("Veuillez sélectionner au moins une pièce", "error");
+        return;
       }
-      dispatch(getTotransfert(dataTransfert))
-      notify('Transfert ajouté avec succès', 'success');
-    } else {
-      notify(result.payload as string || 'Erreur lors de l’ajout', 'error');
+
+      const payload: any = {
+        ...formtransfert,
+        sendingDate: new Date(),
+        typePart: formtransfert.typePart || '',
+        stockPartIds: formtransfert.stockPartIds,
+
+        // ✅ Champs requis ou attendus par l'entité
+        remark: formtransfert.remark,                    // défaut obligatoire
+        receivedDate: null,           // champ nullable mais doit exister
+        receiveUser: null,            // champ nullable mais doit exister
+      };
+
+      // ❌ Supprime uniquement ce que le backend ne veut pas
+      delete payload.stockPart;
+      delete payload.repair;
+
+      const result = await dispatch(AddOneTransfert(payload));
+
+      if (AddOneTransfert.fulfilled.match(result)) {
+        if (currentbranch) {
+          dispatch(GetSendTransfert(currentbranch));
+        }
+        dispatch(getTotransfert(dataTransfert))
+        notify('Transfert ajouté avec succès', 'success');
+      } else {
+        notify(result.payload as string || 'Erreur lors de l’ajout', 'error');
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
+      notify(errorMessage, "error");
     }
-  } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
-    notify(errorMessage, "error");
-  }
-};
+  };
 
 
 
@@ -111,7 +116,7 @@ export default function AddTransfertpart() {
 
   });
   const filteredRows = useMemo(() => {
-    return ListTransfert.filter((row: any) => {
+    return allStockPart.filter((row: any) => {
 
       return (
 
@@ -129,14 +134,14 @@ export default function AddTransfertpart() {
 
       );
     });
-  }, [ListTransfert, filters]);
+  }, [allStockPart, filters]);
 
 
   const handleFilterChange = (field: string, value: string[]) => {
     setFilters({ ...filters, [field]: value });
   };
   const getUniqueOptions = (key: keyof typeof filters): string[] => {
-    const values = ListTransfert.flatMap((row: any) => {
+    const values = allStockPart.flatMap((row: any) => {
       switch (key) {
         case 'materialCode':
           return row.reference?.materialCode ? [row.reference.materialCode] : [];
@@ -304,24 +309,3 @@ const underlineInputStyles = {
 
 };
 
-{/*
-     
- 
-   
-    const handleSubmit = async () => {
-        try {
-            await dispatch(AddOneTransfert(formtransfert)).then(() => {
-                /* dispatch(getAllExpertiseRaisons())  
-                
-                notify('Raison ajouter avec success');
-
-            })
-        } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
-            notify(errorMessage, "error");
-        }
-    }
-
-    
-
-    */}

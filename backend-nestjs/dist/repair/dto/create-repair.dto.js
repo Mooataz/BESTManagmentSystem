@@ -21,6 +21,16 @@ class CreateRepairDto {
     accessoryIds;
     listFaultIds;
     customerRequestIds;
+    files;
+    notesCustomerIds;
+    expertiseReasonsIds;
+    repairActionIds;
+    warrenty;
+    approveRepair;
+    newSerialNumber;
+    advancePayment;
+    user;
+    partsNeed;
 }
 exports.CreateRepairDto = CreateRepairDto;
 __decorate([
@@ -64,4 +74,60 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Array)
 ], CreateRepairDto.prototype, "customerRequestIds", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: [String] }),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreateRepairDto.prototype, "files", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Array }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreateRepairDto.prototype, "notesCustomerIds", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Array }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreateRepairDto.prototype, "expertiseReasonsIds", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Array }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreateRepairDto.prototype, "repairActionIds", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Boolean }),
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateRepairDto.prototype, "warrenty", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Boolean }),
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateRepairDto.prototype, "approveRepair", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Number, }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateRepairDto.prototype, "newSerialNumber", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Number }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], CreateRepairDto.prototype, "advancePayment", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: Number, }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], CreateRepairDto.prototype, "user", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ type: [Number] }),
+    (0, class_validator_1.IsArray)(),
+    (0, class_validator_1.IsNumber)({}, { each: true }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Array)
+], CreateRepairDto.prototype, "partsNeed", void 0);
 //# sourceMappingURL=create-repair.dto.js.map

@@ -1,53 +1,78 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import DynamicTable from '../../../Componants/Global/TableComponat'
 import { useAppDispatch } from '../../../Redux/hooks';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../../Redux/store';
 import { GetSendTransfert } from '../../../Redux/Actions/stock/TransfertAction';
+import type { TableAction } from '../../../Redux/Types/repairTypes';
+import { useNotification } from '../../../Componants/NotificationContext';
+import { BiShowAlt } from 'react-icons/bi';
+import theme from '../../../Theme/theme';
+import ShowPart from './ShowPart';
+import type { getFormStock, TransfertPR } from '../../../Redux/Types/Stock';
 
 export default function ListSendingTransfert() {
     const dispatch = useAppDispatch();
     const transfert = useSelector((state: RootState) => state.Transfert.Transfert);
-    const user = useSelector((state: RootState) => state.user)
+    const user = useSelector((state: RootState) => state.user);
+    const branchId = user.branch?.id;
 
     useEffect(() => {
-        if (user.branch?.id) {
-            dispatch(GetSendTransfert({branchId: user.branch?.id, type:'Pièces'}))
-        }
+    
+    if (branchId) {
+        dispatch(GetSendTransfert({ branchId, type: 'Pieces' }));
+    }
+}, [dispatch, branchId]);
 
-    }, [dispatch, user.branch?.id])
-    console.log('transfert',transfert)
+    const [open, setOpen] = React.useState(false);
+    const { notify } = useNotification();
+    const [formData, setFormData] = useState<TransfertPR>();
+
+    const handleOpenEdit = (row: any) => {
+        setFormData(row);
+        setOpen(true);
+    };
+
+    const handleClose = () => setOpen(false);
+
+    const actions: TableAction[] = [
+        {
+            icon: <BiShowAlt style={{ color: theme.palette.primary.main }} />,
+            onClick: (row: Record<string, any>) => handleOpenEdit(row),
+        },
+    ];
+ 
     return (
         <div>
             <DynamicTable
                 rows={transfert}
                 columnLabels={{
-                    'id': 'Code',
-                    'sendingDate': 'Crèe le',
-                    'sendUserName': 'Par',
-                    'toBranchName': 'à agence',
-                    'receivedDate': 'Accepter le',
-                    'receiveUserName': 'Accepte par',
-                    'state': 'ètat',
-                    'typePart':'Type pièce',
-                    'remark': 'Remarque',
-                    'delivredBy':'Livrer par',
-                    'stockPart':'List'
+                    transfertId: 'Code',
+                    sendingDate: 'Crèe le',
+                    sendUserName: 'Par',
+                    toBranchName: 'à agence',
+                    receivedDate: 'Accepter le',
+                    receiveUserName: 'Accepte par',
+                    state: 'ètat',
+                    type: 'Type pièce',
+                    remark: 'Remarque',
+                    delivredBy: 'Livrer par',
                 }}
                 columnsToShow={[
-                    'id',
+                    'transfertId',
                     'sendingDate',
                     'sendUserName',
                     'toBranchName',
                     'receivedDate',
                     'receiveUserName',
                     'state',
-                    'typePart',
+                    'type',
                     'remark',
                     'delivredBy',
-                    'stockPart'
                 ]}
+                actions={actions}
             />
+            <ShowPart open={open} onClose={handleClose} data={formData} />
         </div>
-    )
+    );
 }

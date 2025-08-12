@@ -14,19 +14,24 @@ import { useNotification } from '../../Componants/NotificationContext';
 import EditRepairModel from './EditRepairModel';
 import theme from '../../Theme/theme';
 import { CreateRepairPDF } from '../../Redux/Actions/PDFActions';
+import { TbListDetails } from "react-icons/tb";
+import ShowDetails from './ShowDetails';
 
 
 export default function ListRepair() {
   const dispatch = useAppDispatch();
-  const userr = useSelector((state: RootState) => state.user);
+  const userr = useSelector((state: RootState) => state.auth.user);
   const repairs = useSelector((state: RootState) => state.repair.repairs)
+  if (!userr?.id || !userr.branch) return;
+  const branchId = typeof userr.branch === 'object' ? userr.branch.id : userr.branch;
+  if (!branchId || isNaN(userr.id)) return;
 
   React.useEffect(() => {
-    if (userr.branch?.id) {
-      dispatch(getRepairsByBranch(userr.branch?.id))
+    if (branchId) {
+      dispatch(getRepairsByBranch(branchId))
 
     }
-  }, [dispatch, userr.branch?.id])
+  }, [dispatch, branchId])
 
 
 
@@ -42,6 +47,13 @@ export default function ListRepair() {
     setOpen(true);
 
   }
+   const [openDetails, setOpenDetails] = React.useState(false);
+   const handleCloseDetails = () => setOpenDetails(false);
+  const handelOpenDetailes = (id: number) => {
+    setRow(id);
+    setOpenDetails(true);
+
+  }
   const actions: TableAction[] = [{
     icon: <EditIcon style={{ color: theme.palette.primary.main }} />,
     onClick: (row: any) => handelOpenEdit(row.id)
@@ -49,15 +61,27 @@ export default function ListRepair() {
   {
     icon: <PictureAsPdfIcon style={{ color: theme.palette.primary.main  }} />,
     onClick: (row: any) => CreateRepairPDF(row.id)
+  },
+  {
+    icon: <TbListDetails  style={{ color: theme.palette.primary.main  }} />,
+    onClick: (row: any) => handelOpenDetailes(row.id)
   }]
 
 
-
+const getLastStep = (history: any[] = []) => {
+  if (!Array.isArray(history) || history.length === 0) return '-';
+  
+  const sorted = [...history].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  return sorted[0]?.step ?? '-';
+};
   return (
     <div style={{ padding: '20px' }}>
       <Typography sx={{ textAlign: 'left', fontWeight: 'bold', marginBottom: '3%' , color:theme.palette.secondary.main  }} >List des réparations</Typography   >
       <DynamicTable
-        rows={repairs}
+        rows={repairs.map((r) => ({
+    ...r,
+    lastStep: getLastStep(r.historyRepair)
+  }))} 
 
         columnLabels={{
           'id': 'Reparation',
@@ -67,7 +91,8 @@ export default function ListRepair() {
           'device.serialenumber': 'Imei',
           'device.model.brand.name': 'Marque',
           'device.model.name': 'Modéle',
-          'deviceStateReceive': 'État appareille'
+          'deviceStateReceive': 'État appareille',
+           lastStep: 'Dernier état',
         }}
 
         columnsToShow={['id',
@@ -77,7 +102,9 @@ export default function ListRepair() {
           'device.serialenumber',
           'device.model.brand.name',
           'device.model.name',
-          'deviceStateReceive']}
+          'deviceStateReceive',
+         'lastStep'
+      ]}
 
         actions={actions} />
 
@@ -85,6 +112,12 @@ export default function ListRepair() {
       <EditRepairModel
         open={open}
         onClose={handleClose}
+        idRepair={row}
+        isLoading={isLoading}
+      />
+      <ShowDetails
+        open={openDetails}
+        onClose={handleCloseDetails}
         idRepair={row}
         isLoading={isLoading}
       />

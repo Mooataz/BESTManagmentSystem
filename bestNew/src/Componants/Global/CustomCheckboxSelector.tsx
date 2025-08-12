@@ -35,16 +35,7 @@ export const CustomCheckboxSelector: React.FC<CustomCheckboxSelectorProps> = ({
     onChange(Array.from(newSet).map(i => data.find(d => d.id === i)?.[returnField]));
   };
 
-  const toggleSelectAll = () => {
-    if (selectedIds.size === data.length) {
-      setSelectedIds(new Set());
-      onChange([]);
-    } else {
-      const allIds = new Set(data.slice(0, maxSelection).map(d => d.id));
-      setSelectedIds(allIds);
-      onChange(Array.from(allIds).map(i => data.find(d => d.id === i)?.[returnField]));
-    }
-  };
+
 
   return (
   

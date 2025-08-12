@@ -23,15 +23,20 @@ const branch_entity_1 = require("../branches/entities/branch.entity");
 const company_entity_1 = require("../company/entities/company.entity");
 const tracability_entity_1 = require("../tracability/entities/tracability.entity");
 const history_stock_part_entity_1 = require("../history-stock-part/entities/history-stock-part.entity");
+const pdf_service_1 = require("../pdf/pdf.service");
+const pdf_entity_1 = require("../pdf/entities/pdf.entity");
+const legislation_entity_1 = require("../legislation/entities/legislation.entity");
+const Stock_Gateway_1 = require("./Stock.Gateway");
+const user_entity_1 = require("../users/entities/user.entity");
 let StockPartsModule = class StockPartsModule {
 };
 exports.StockPartsModule = StockPartsModule;
 exports.StockPartsModule = StockPartsModule = __decorate([
     (0, common_1.Module)({
-        imports: [models_module_1.ModelsModule, references_module_1.ReferencesModule, typeorm_1.TypeOrmModule.forFeature([stock_part_entity_1.StockPart, model_entity_1.Model, reference_entity_1.Reference, all_part_entity_1.AllPart, branch_entity_1.Branch, bin_entity_1.Bin, company_entity_1.Company, tracability_entity_1.Tracability, history_stock_part_entity_1.HistoryStockPart])],
+        imports: [models_module_1.ModelsModule, references_module_1.ReferencesModule, typeorm_1.TypeOrmModule.forFeature([stock_part_entity_1.StockPart, Stock_Gateway_1.StockGateway, model_entity_1.Model, user_entity_1.User, reference_entity_1.Reference, all_part_entity_1.AllPart, branch_entity_1.Branch, bin_entity_1.Bin, company_entity_1.Company, tracability_entity_1.Tracability, history_stock_part_entity_1.HistoryStockPart, pdf_entity_1.Pdf, legislation_entity_1.Legislation])],
         controllers: [stock_parts_controller_1.StockPartsController],
-        providers: [stock_parts_service_1.StockPartsService, app_service_1.AppService],
-        exports: [typeorm_1.TypeOrmModule, stock_parts_service_1.StockPartsService]
+        providers: [stock_parts_service_1.StockPartsService, app_service_1.AppService, pdf_service_1.PdfService, Stock_Gateway_1.StockGateway],
+        exports: [typeorm_1.TypeOrmModule, stock_parts_service_1.StockPartsService, pdf_service_1.PdfService, Stock_Gateway_1.StockGateway]
     })
 ], StockPartsModule);
 //# sourceMappingURL=stock-parts.module.js.map

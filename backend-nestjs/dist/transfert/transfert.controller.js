@@ -73,9 +73,9 @@ let TransfertController = class TransfertController {
             });
         }
     }
-    async getByBranchId(branchId, type, res) {
+    async getByBranchId(branchId, type, state, res) {
         try {
-            const allfind = await this.transfertService.getToBranch(branchId, type);
+            const allfind = await this.transfertService.getToBranch(branchId, type, state);
             return res.status(common_1.HttpStatus.OK).json({
                 message: "Founded Successfuly !",
                 status: common_1.HttpStatus.OK,
@@ -186,12 +186,13 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TransfertController.prototype, "getFromBranchId", null);
 __decorate([
-    (0, common_1.Get)('/findToBranchId/:branchId/:type'),
+    (0, common_1.Get)('/findToBranchId/:branchId/:type/:state'),
     __param(0, (0, common_1.Param)('branchId')),
     __param(1, (0, common_1.Param)('type')),
-    __param(2, (0, common_1.Res)()),
+    __param(2, (0, common_1.Param)('state')),
+    __param(3, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, String, Object]),
+    __metadata("design:paramtypes", [Number, String, String, Object]),
     __metadata("design:returntype", Promise)
 ], TransfertController.prototype, "getByBranchId", null);
 __decorate([

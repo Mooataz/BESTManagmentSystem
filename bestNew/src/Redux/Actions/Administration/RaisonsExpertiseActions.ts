@@ -64,7 +64,25 @@ export const UpdateOneRaison = createAsyncThunk<
       return response.data.data;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message || "Échec de la mise à jour"
+        error.response?.data?.message || "Échec de la mise à jour" 
+      );
+    }
+  }
+);
+
+export const GetOneRaison = createAsyncThunk<
+  TypeUnique,
+  number,
+  AsyncThunkConfig
+>(
+  'expertiseReasons/GetOneRaison',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await API.get(`expertise-reasons/${id}`   );
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Échec rècuperation"  
       );
     }
   }

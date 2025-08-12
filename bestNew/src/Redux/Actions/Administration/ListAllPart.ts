@@ -28,7 +28,7 @@ import type { AsyncThunkConfig, TypeUnique } from "../../Types/repairTypes";
     }
   }
 );
-
+  
 export const getOnePart = createAsyncThunk< 
   FormAllParts ,   
  number,

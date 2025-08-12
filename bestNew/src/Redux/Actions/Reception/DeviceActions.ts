@@ -46,3 +46,26 @@ export const deviceHasOpenRepair = createAsyncThunk<
     }
   }
 );
+
+// Typage
+type UpdateDevicePayload = {
+  id: number;
+} & Partial<Pick<Device, 'serialenumber' | 'purchaseDate' | 'model'>>;
+
+export const UpdateOneDevice = createAsyncThunk<
+  Device,
+  UpdateDevicePayload,
+  AsyncThunkConfig
+>(
+  'device/update',
+  async ({ id, ...payload }, { rejectWithValue }) => {
+    try {
+      const response = await API.patch(`devices/${id}`, payload); // ← id dans URL, pas dans le body
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Échec de l\'envoi'
+      );
+    }
+  }
+);

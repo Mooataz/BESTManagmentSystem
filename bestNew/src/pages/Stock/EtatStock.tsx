@@ -12,11 +12,17 @@ import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../../Redux/hooks';
 import { getAllStockPartBranch } from '../../Redux/Actions/stock/EtatStockActions';
 import DynamicTable from '../../Componants/Global/TableComponat';
+import theme from '../../Theme/theme';
  
 export default function EtatStock() {
   const dispatch = useAppDispatch();
-  const userr = useSelector((state: RootState) => state.user);
+  const userr = useSelector((state: RootState) => state.auth.user);
   const allStockPart = useSelector((state: RootState) => state.stockParts.stockPartsBranch);
+  const getBranchId = (branch: number | { id: number } | undefined): number | undefined =>
+      typeof branch === 'number' ? branch : branch?.id;
+
+    const currentbranch = getBranchId(userr?.branch);
+
   const [filters, setFilters] = useState({
     materialCode: [] as string[],
     description: [] as string[],
@@ -25,10 +31,10 @@ export default function EtatStock() {
     caseType: [] as string[],
   });
   React.useEffect(() => {
-    if (userr.branch?.id) {
-      dispatch(getAllStockPartBranch(userr.branch.id));
+    if (currentbranch) {
+      dispatch(getAllStockPartBranch(currentbranch));
     }
-  }, [userr.branch?.id, dispatch]);
+  }, [currentbranch, dispatch]);
 
  
   const handleFilterChange = (field: string, value: string[]) => {
@@ -141,7 +147,13 @@ export default function EtatStock() {
         {renderMultiSelect('Case', 'caseName')}
         {renderMultiSelect('Type case', 'caseType')}
         <Grid sx={{ display: 'flex', alignItems: 'center' }}>
-          <Button onClick={handleExport} variant="outlined" color="primary" fullWidth>
+          <Button 
+                onClick={handleExport} 
+                variant="outlined" 
+                sx={{
+                  borderColor:theme.palette.secondary.main
+                }}
+                fullWidth>
             Exporter Excel
           </Button>
         </Grid>

@@ -30,7 +30,7 @@ import axios from "axios";
 
   export const getOneModel = createAsyncThunk< 
   Model,   
- Number,
+ number,
   AsyncThunkConfig 
 >(
   'models/OneModel',

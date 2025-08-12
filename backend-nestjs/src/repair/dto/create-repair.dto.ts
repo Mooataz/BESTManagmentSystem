@@ -39,7 +39,12 @@ export class CreateRepairDto {
     @IsOptional()
     customerRequestIds: number[];
 
-   /*  @ApiProperty({ type: Array  })
+      
+    @ApiProperty({ type: [String] })
+    @IsArray()
+    @IsOptional()
+    files: string[];
+   @ApiProperty({ type: Array  })
     @IsOptional()
     notesCustomerIds: number[];
 
@@ -49,41 +54,38 @@ export class CreateRepairDto {
 
     @ApiProperty({ type: Array  })
     @IsOptional()
-    repairActionIds: number[]; */
+    repairActionIds: number[];  
 
-       /*  @ApiProperty({ type: Boolean   })
+         @ApiProperty({ type: Boolean   })
     @IsBoolean()
     @IsOptional()
-    warrenty: boolean;
+    warrenty?: boolean;
 
     @ApiProperty({type: Boolean })
     @IsBoolean()
     @IsOptional()
     approveRepair: boolean;
 
-    @ApiProperty({ type: [String] })
-    @IsArray()
-    @IsOptional()
-    files: string[]; */
+     
 
-    /* @ApiProperty({type: Number,})
+      @ApiProperty({type: Number,})
     @IsNumber()
     @IsOptional()
     newSerialNumber: string;
 
     @ApiProperty({type: Number })
     @IsOptional()
-    advancePayment: number; */
+    advancePayment: number;  
 
-   /*  @ApiProperty({type: Number,})
+     @ApiProperty({type: Number,})
     @IsOptional()
-    user: number; */
+    user: number;  
 
-     /*  @ApiProperty({ type: [Number]  })
+        @ApiProperty({ type: [Number]  })
     @IsArray()
     @IsNumber({}, { each: true})
     @IsOptional()
-    partsNeed: number[];  */
+    partsNeed: number[];   
 
     
 }

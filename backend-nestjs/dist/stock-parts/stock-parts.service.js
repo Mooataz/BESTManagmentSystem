@@ -22,13 +22,15 @@ const bin_entity_1 = require("../bin/entities/bin.entity");
 const models_service_1 = require("../models/models.service");
 const references_service_1 = require("../references/references.service");
 const branch_entity_1 = require("../branches/entities/branch.entity");
-const schedule_1 = require("@nestjs/schedule");
 const fs = require("fs/promises");
 const path = require("path");
 const os = require("os");
 const company_entity_1 = require("../company/entities/company.entity");
 const history_stock_part_entity_1 = require("../history-stock-part/entities/history-stock-part.entity");
 const tracability_entity_1 = require("../tracability/entities/tracability.entity");
+const pdf_service_1 = require("../pdf/pdf.service");
+const Stock_Gateway_1 = require("./Stock.Gateway");
+const user_entity_1 = require("../users/entities/user.entity");
 let StockPartsService = class StockPartsService {
     stockPartRepositry;
     branchRepositry;
@@ -36,21 +38,27 @@ let StockPartsService = class StockPartsService {
     companyRepositry;
     historyStockPartRepositry;
     tracabilityRepositry;
+    UserRepositry;
     appService;
     modelService;
     referenceService;
+    PDFService;
+    StockGateway;
     LOCK_FILE = path.join(os.tmpdir(), 'stock-calculation.lock');
     isRunning = false;
-    constructor(stockPartRepositry, branchRepositry, binRepositry, companyRepositry, historyStockPartRepositry, tracabilityRepositry, appService, modelService, referenceService) {
+    constructor(stockPartRepositry, branchRepositry, binRepositry, companyRepositry, historyStockPartRepositry, tracabilityRepositry, UserRepositry, appService, modelService, referenceService, PDFService, StockGateway) {
         this.stockPartRepositry = stockPartRepositry;
         this.branchRepositry = branchRepositry;
         this.binRepositry = binRepositry;
         this.companyRepositry = companyRepositry;
         this.historyStockPartRepositry = historyStockPartRepositry;
         this.tracabilityRepositry = tracabilityRepositry;
+        this.UserRepositry = UserRepositry;
         this.appService = appService;
         this.modelService = modelService;
         this.referenceService = referenceService;
+        this.PDFService = PDFService;
+        this.StockGateway = StockGateway;
     }
     async create(createStockPartDto, userId) {
         createStockPartDto.serialNumber = this.appService.cleanSpaces(createStockPartDto.serialNumber);
@@ -182,42 +190,46 @@ let StockPartsService = class StockPartsService {
             const models = await this.modelService.findAll();
             var stockByReference = [];
             for (const branch of allBranch) {
+                const branchCriticalParts = [];
                 for (const model of models) {
                     for (const part of model.allpart) {
-                        const branchId = Number(branch.id);
-                        const modelId = Number(model.id);
-                        const partId = Number(part.id);
-                        if (isNaN(branchId))
-                            throw new Error(`ID de branche invalide: ${branch.id}`);
-                        if (isNaN(modelId))
-                            throw new Error(`ID de modèle invalide: ${model.id}`);
-                        if (isNaN(partId))
-                            throw new Error(`ID de pièce invalide: ${part.id}`);
-                        const findCompRefe = await this.referenceService.findCompatibleReferences(model.id, part.id);
-                        const counter = await this.findGoodReference(findCompRefe, branch.id);
+                        const counter = await this.findGoodReference(await this.referenceService.findCompatibleReferences(model.id, part.id), branch.id);
                         const count = Number(counter.length);
-                        if (isNaN(count)) {
-                            console.error('Compteur invalide pour:', { branchId, modelId, partId });
+                        if (isNaN(count))
                             continue;
-                        }
-                        const stockPartWithCompany = await this.stockPartRepositry
+                        const quantityAlertStock = (await this.stockPartRepositry
                             .createQueryBuilder('stockPart')
                             .leftJoin('stockPart.bin', 'bin')
                             .leftJoin('bin.branch', 'branch')
                             .leftJoin('branch.company', 'company')
                             .where('stockPart.id = :stockPartId', { stockPartId: part.id })
                             .select(['company.quantityAlertStock'])
-                            .getRawOne();
-                        const quantityAlertStock = stockPartWithCompany?.company_quantityAlertStock;
-                        if (counter.length <= quantityAlertStock) {
-                            stockByReference.push({
-                                branchID: branch.id,
+                            .getRawOne())?.company_quantityAlertStock;
+                        if (count <= quantityAlertStock) {
+                            branchCriticalParts.push({
                                 modelId: model.id,
+                                modelName: model.name,
                                 partId: part.id,
-                                count: counter.length,
+                                partName: part.description,
+                                count,
                             });
                         }
                     }
+                }
+                if (branchCriticalParts.length > 0) {
+                    const pdfPath = await this.PDFService.generateStockReport(branch.id, branchCriticalParts);
+                    const usersToNotify = await this.UserRepositry
+                        .createQueryBuilder('user')
+                        .innerJoin('user.branch', 'branch')
+                        .where('branch.id = :branchId', { branchId: branch.id })
+                        .andWhere('user.role IN (:...roles)', { roles: ['Admin', 'StockKeeper'] })
+                        .getMany();
+                    const userIds = usersToNotify.map((u) => u.id);
+                    await this.StockGateway.sendStockAlertToUsers(userIds, {
+                        branchId: branch.id,
+                        reportUrl: `/uploads/stock-report-branch-${branch.id}.pdf`,
+                        message: `:danger: Rapport de stock critique généré pour la branche ${branch.id}`,
+                    });
                 }
             }
             console.log(`[${executionId}] Résultat:`, stockByReference);
@@ -245,12 +257,6 @@ let StockPartsService = class StockPartsService {
     }
 };
 exports.StockPartsService = StockPartsService;
-__decorate([
-    (0, schedule_1.Cron)('08 23 * * 7'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], StockPartsService.prototype, "stateStock", null);
 exports.StockPartsService = StockPartsService = __decorate([
     (0, common_1.Injectable)({ scope: common_1.Scope.DEFAULT }),
     __param(0, (0, typeorm_1.InjectRepository)(stock_part_entity_1.StockPart)),
@@ -259,7 +265,9 @@ exports.StockPartsService = StockPartsService = __decorate([
     __param(3, (0, typeorm_1.InjectRepository)(company_entity_1.Company)),
     __param(4, (0, typeorm_1.InjectRepository)(history_stock_part_entity_1.HistoryStockPart)),
     __param(5, (0, typeorm_1.InjectRepository)(tracability_entity_1.Tracability)),
+    __param(6, (0, typeorm_1.InjectRepository)(user_entity_1.User)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,
@@ -267,6 +275,8 @@ exports.StockPartsService = StockPartsService = __decorate([
         typeorm_2.Repository,
         app_service_1.AppService,
         models_service_1.ModelsService,
-        references_service_1.ReferencesService])
+        references_service_1.ReferencesService,
+        pdf_service_1.PdfService,
+        Stock_Gateway_1.StockGateway])
 ], StockPartsService);
 //# sourceMappingURL=stock-parts.service.js.map

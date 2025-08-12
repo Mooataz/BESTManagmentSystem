@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateDeviceDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 class CreateDeviceDto {
-    serialeNumber;
+    serialenumber;
     purchaseDate;
 }
 exports.CreateDeviceDto = CreateDeviceDto;
@@ -22,7 +22,7 @@ __decorate([
         description: "Required"
     }),
     __metadata("design:type", String)
-], CreateDeviceDto.prototype, "serialeNumber", void 0);
+], CreateDeviceDto.prototype, "serialenumber", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         type: Date,

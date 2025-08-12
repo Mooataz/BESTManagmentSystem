@@ -1,4 +1,4 @@
 export declare class CreateDeviceDto {
-    serialeNumber?: string;
+    serialenumber: string;
     purchaseDate: Date;
 }

@@ -55,7 +55,7 @@ const handelOpenEdit = (employe: any) => {
 
         columnLabels={{
           'id': 'Id',
-          'name': 'Nom client',
+          'name': 'Nom',
           'phone': 'Téléphone',
           'createdDate': 'Date d\'inscription',
           'status': 'Status',

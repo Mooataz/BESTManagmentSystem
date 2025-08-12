@@ -32,8 +32,8 @@ let DevicesService = class DevicesService {
         this.appService = appService;
     }
     async create(createDeviceDto) {
-        if (createDeviceDto.serialeNumber?.length) {
-            createDeviceDto.serialeNumber = this.appService.cleanSpaces(createDeviceDto.serialeNumber);
+        if (createDeviceDto.serialenumber?.length) {
+            createDeviceDto.serialenumber = this.appService.cleanSpaces(createDeviceDto.serialenumber);
         }
         ;
         const createNew = this.deviceRepositry.create({ ...createDeviceDto });

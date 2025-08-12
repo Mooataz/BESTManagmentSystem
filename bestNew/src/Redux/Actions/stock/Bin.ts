@@ -24,7 +24,7 @@ export const addBin = createAsyncThunk<
  BinCreateDto,
   AsyncThunkConfig
 >(
-  'bin',
+  'bin/AddOneBin',
   async (body, { rejectWithValue }) => {
  
     try {

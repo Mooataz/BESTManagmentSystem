@@ -7,7 +7,7 @@ export declare class TransfertController {
     create(createTransfertDto: CreateTransfertDto, res: any): Promise<any>;
     getByState(state: string, res: any): Promise<any>;
     getFromBranchId(branchId: number, type: string, res: any): Promise<any>;
-    getByBranchId(branchId: number, type: string, res: any): Promise<any>;
+    getByBranchId(branchId: number, type: string, state: string, res: any): Promise<any>;
     findAll(res: any): Promise<any>;
     findOne(id: number, res: any): Promise<any>;
     update(id: number, updateTransfertDto: UpdateTransfertDto, res: any): Promise<any>;

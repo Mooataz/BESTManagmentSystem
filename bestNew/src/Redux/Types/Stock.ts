@@ -1,4 +1,4 @@
-import type { FormAllParts } from "./administrationTypes";
+import type { FormAllParts, LevelRepairForm } from "./administrationTypes";
 import type { User } from "./authenTypes";
 import type { Model } from "./repairTypes";
 
@@ -36,7 +36,14 @@ export interface FormStock {
     reference: number;
     userId?: number;
 }
-
+export interface ApproveStockForm {
+  id?: number;
+  type?: string;
+  date?: Date;
+  state?: string;
+  idPartRepair?: number;
+  stockPart?:FormStock
+}
 export interface getFormStock {
     id?: number;
     bin: GetBin;
@@ -44,8 +51,11 @@ export interface getFormStock {
     serialnumber: string;
     reference: GetReferences;
     userId?: User;
+     
 }
+export interface StockPartItem{
 
+}
 export interface GetReferences {
     id?: number;
     materialCode: string;
@@ -65,24 +75,35 @@ export interface TransfertPR {
     id?: number;
     delivredBy?: string;
     
-    sendingDate: Date;
-    frombranch: number;
-    sendUser: number;
+    sendingDate?: Date;
+    frombranch?: number;
+    sendUser?: number;
     
     receivedDate?: Date;
-    tobranch: number;
+    tobranch?: number;
     receiveUser?: number;
     
-    type: string;
-    state: string;
+    type?: string;
+    state?: string;
     remark?: string;
     
     typePart?:string;
     repairIds?: number[];
-    stockPartIds?: number[];
+    stockPartIds?: number[]  ;
+    stockPart?: FormStock[];
+    bin?: number;
+    actuellybranch?:number
 }
 
 export interface TypeBranchTransfert {
   typePart: string;
   branchId: number;
+}
+
+export interface PartPriceForm {
+    id?: number;
+    price?: number;
+    model?: number | Model;
+    allPart?: number | FormAllParts;
+    levelRepair?: number | LevelRepairForm;
 }

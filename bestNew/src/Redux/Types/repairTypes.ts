@@ -1,59 +1,62 @@
 import type { AppDispatch } from "../store";
-export interface DataGetBranchStep  {
-    branch: number | undefined;
-    step:string}
+import type { User } from "./authenTypes";
+import type { ApproveStockForm, FormStock } from "./Stock";
+export interface DataGetBranchStep {
+  branch: number | undefined;
+  step: string
+}
 export interface Customer {
   id?: number;
   name: string;
   phone: number;
-   distributer?: Distributor | number;
+  distributer?: Distributor | number;
 }
 export interface Distributor {
-    id?: number; 
-    name: string; 
-    phone: number; 
-    email: string; 
-    location: string; 
-    taxRegisterNumber: string;
+  id?: number;
+  name: string;
+  phone: number;
+  email: string;
+  location: string;
+  taxRegisterNumber: string;
 }
-export  interface Device {
-id?: number;
-serialenumber? : string;
-purchaseDate? : Date ;
-model : number ;
+export interface Device {
+  id?: number;
+  serialenumber?: string;
+  purchaseDate?: Date;
+  model?: number | Model;
 }
-export interface Model{
-    id?:number;
-    name?: string  | undefined;
-    brand?: Marque | number[] | number;
-    picture?: string | File;
-    typeModel?:TypeModel | number[] | number;
-    allpart?: TypeModel[] | number[] 
-    
+export interface Model {
+  id?: number;
+  name?: string | undefined;
+  brand?: Marque | number[] | number;
+  picture?: string | File;
+  typeModel?: TypeModel | number[] | number;
+  allpart?: TypeModel[] | number[]
+
 }
 export interface Marque {
 
   id?: number;
   name?: string;
-  logo?: string   | File  ;
+  logo?: string | File;
   status?: string;
 
 }
 export interface TypeModel {
-    id?: number;
-    description: string;
+  id?: number;
+  description: string;
 }
 
-export interface TypeUnique{
-  id?:number;
-  name:string;
+export interface TypeUnique {
+  id?: number;
+  name: string;
 }
 
 export type TypeForm = {
   id?: number;
-  accessory:TypeUnique[];
-  listFault:TypeUnique[];
-  customerRequest:TypeUnique[];
+  accessory: TypeUnique[];
+  listFault: TypeUnique[];
+  customerRequest: TypeUnique[];
   deviceStateReceive: string;
   remark: string;
   actuellybranch: number;
@@ -61,46 +64,52 @@ export type TypeForm = {
   customer: Customer
 }
 export interface Accessory {
-    id: number; name: string;
+  id: number; name: string;
 }
- 
+
 export interface CustomerRequest {
-    id: number; name: string;
+  id: number; name: string;
 }
 // types.ts
 // types/repairTypes.ts
 export interface RepairForm {
   id?: number;
-  customer?: number;
+  customer?: number | Customer;
   device?: number;
-  remark?: string;
+  remark?: string;//CBON
   deviceStateReceive?: string;
   actuellybranch?: number;
   accessoryIds?: number[];
   listFaultIds?: number[];
   customerRequestIds?: number[];
   userId?: number | null;
-  warrenty?: boolean;
+  warrenty?: boolean;// cbon
   approveRepair?: boolean;
   newSerialNumber?: string;
-  files?: string[];
-  partsNeed?: number[] ;
-  notesCustomer ?: number[];
-  expertiseReason ?: number[];
-  repairAction ?: number[];
+  files?: string[] | File[];//
+  partsNeed?: number[]  | string  ;//
+  notesCustomer?: number[] | TypeUnique[];//cbon
+  expertiseReason?: number[] |TypeUnique[];//cbon
+  repairAction?: number[] | TypeModel[];//
+  newserialnumber?: string;
+  historyRepair?: StateHistoryRepair[]
+  listFault?: TypeUnique[];
+  accessory?: TypeUnique[];
+  customerRequest?: TypeUnique[];
+  approveStock?: ApproveStockForm[];
 }
 
 
 export interface RepairFormInput {
-  accessoryIds: number[];
-  listFaultIds: number[];
-  customerRequestIds: number[];
-  deviceStateReceive: string;
-  remark: string;
-  actuellyBranch: number;
-  device: number;
-  customer: number;
-  userId: number;
+  accessoryIds: number[];
+  listFaultIds: number[];
+  customerRequestIds: number[];
+  deviceStateReceive: string;
+  remark: string;
+  actuellyBranch: number;
+  device: number;
+  customer: number;
+  userId: number;
 }
 
 export interface AsyncThunkConfig {
@@ -110,33 +119,43 @@ export interface AsyncThunkConfig {
   rejectValue: string;
 }
 
- export interface FormHistoryRepair {
+export interface FormHistoryRepair {
   date: Date;
   step: string;
   repair: number;
-  user: { id: number } ;
- }
+  user: { id: number };
+}
+export interface StateHistoryRepair {
+  date: Date;
+  step: string;
+
+  tracability: Tracability;
+}
+export interface Tracability {
+  id: number;
+  user: User;
+}
 
 
- export type TableAction = {
-   icon: React.ReactNode;
-   onClick: (row: Record<string, any>) => void;
- };
- 
- /* export type TableProps = { 
-   rows: Record<string, any>[];
-   columnsToShow?: string[];
-   columnLabels?: Record<string, string>;
-   actions?: TableAction[];
-   clickedRowId?:number |null;
- }; */
+export type TableAction = {
+  icon: React.ReactNode;
+  onClick: (row: Record<string, any>) => void;
+};
 
- export interface TableProps {
+/* export type TableProps = { 
+  rows: Record<string, any>[];
+  columnsToShow?: string[];
+  columnLabels?: Record<string, string>;
+  actions?: TableAction[];
+  clickedRowId?:number |null;
+}; */
+
+export interface TableProps {
   rows: any[];
   columnLabels: { [key: string]: string };
   columnsToShow: string[];
   clickedRowId?: number;
-  actions?: { icon: React.ReactNode; onClick: (row: any) => void }[];
+  actions?: TableAction[] | ((row: any) => TableAction[]);
   onChecked?: (selectedIds: number[]) => void;
-  enableChecked?: boolean; // ✅ Ajout optionnel
+  enableChecked?: boolean;
 }

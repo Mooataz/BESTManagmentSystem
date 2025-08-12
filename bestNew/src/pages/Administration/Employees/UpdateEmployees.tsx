@@ -107,7 +107,7 @@ const branchs = useSelector( (state:RootState) => state.agencies.Agency)
     name: 'color-radio-button-demo',
     inputProps: { 'aria-label': item },
   });
- const handleSelectionAgencie = (ids : number) => {
+  const handleSelectionAgencie = (ids : number) => {
 
     setBranch((prev) => ({
     ...prev!,
