@@ -54,7 +54,7 @@ const handleNavigationRepairedRepair = async (id: number  ) => {
         fontWeight: 'bold',
         marginBottom: '3%',
         color: theme.palette.secondary.main
-      }} >Reçoit les produit</Typography   >
+      }} >List des rèparations en cours</Typography   >
   
 
   

@@ -43,14 +43,19 @@ const DynamicTable: React.FC<TableProps> = ({
   const [Lines, setLines] = useState(10);
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
-
-  useEffect(() => {
+useEffect(() => {
+  if (!rows.length) {
+    setSelectedIds([]);
+    onChecked?.([]);
+  }
+}, [rows.length]);
+  /* useEffect(() => {
     setSelectedIds([]);
     // Décaler onChecked à la boucle d'event suivante pour éviter les effets indésirables
     setTimeout(() => {
       if (onChecked) onChecked([]);
     }, 0);
-  }, [rows]);
+  }, [rows]); */
 
   const columns = rows.length > 0 ? Object.keys(rows[0]) : [];
   const visibleColumns =
@@ -94,7 +99,8 @@ const DynamicTable: React.FC<TableProps> = ({
       }}
     ><PiEmptyThin />{'  - - -  Aucune donnée à afficher  - - -  '} <PiEmptyThin /></Box>;
   }
-
+ 
+  
   return (
     <> <br /><br /><br />
       <Table sx={{ minWidth: 650 }}>
@@ -191,19 +197,7 @@ const DynamicTable: React.FC<TableProps> = ({
                 );
               })}
 
-              {/* {actions && (
-                <TableCell style={{ border: '1px solid #ccc', padding: '8px' }}>
-                  {actions.map((action, index) => (
-                    <span
-                      key={index}
-                      onClick={() => action.onClick(row)}
-                      style={{ marginLeft: '20px', cursor: 'pointer' }}
-                    >
-                      {action.icon}
-                    </span>
-                  ))}
-                </TableCell>
-              )} */}
+            
 
               {actions && (
                 <TableCell style={{ border: '1px solid #ccc', padding: '8px' }}>
@@ -248,6 +242,12 @@ const DynamicTable: React.FC<TableProps> = ({
           color="primary"
           sx={{ marginTop: '3%', marginLeft: '144px' }}
         />
+        <Box
+      sx={{
+        color: 'gray',
+        marginTop: '3%', marginLeft: '50px'
+      }}
+    > {`Total: ${rows.length}` }   </Box>
       </Box>
     </>
   );

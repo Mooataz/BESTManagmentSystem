@@ -130,7 +130,7 @@ export default function MenuContent() {
       children: [
         { label: 'ReçoitAffectation', page: 'ReçoiAffectation', icon: <BsEarbuds /> },
         { label: 'listTotal', page: 'listTotal', icon: <BsEarbuds /> },
-        { label: 'SentQc', page: 'EnvoyéVersCQ', icon: <BsEarbuds /> },
+       // { label: 'SentQc', page: 'EnvoyéVersCQ', icon: <BsEarbuds /> },
       ]
     },
 
@@ -142,7 +142,7 @@ export default function MenuContent() {
         { label: 'Affectation', page: 'Affectation', icon: <BsEarbuds /> },
         { label: 'Réaffectation', page: 'Réaffectation', icon: <BsEarbuds /> },
         { label: 'Accepter CQ', page: 'AccepteQC', icon: <BsEarbuds /> }, 
-        { label: 'Envoyérécuperer', page: 'EnvoyéRécuperer', icon: <BsEarbuds /> },
+        { label: 'Validation CQ', page: 'ValidationCQ', icon: <BsEarbuds /> },
         { label: 'Transfertproduit', page: 'TransfertProduit', icon: <BsEarbuds /> },
         
 

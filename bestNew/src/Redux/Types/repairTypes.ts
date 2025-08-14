@@ -75,7 +75,7 @@ export interface CustomerRequest {
 export interface RepairForm {
   id?: number;
   customer?: number | Customer;
-  device?: number;
+  device?: number | Device;
   remark?: string;//CBON
   deviceStateReceive?: string;
   actuellybranch?: number;
@@ -159,3 +159,12 @@ export interface TableProps {
   onChecked?: (selectedIds: number[]) => void;
   enableChecked?: boolean;
 }
+ export interface OutputListForm {
+  id?: number;
+  date: Date;
+  remark?: string;
+  repairIds?: number[] ;
+  repair?:RepairForm[]
+  customer: number | Customer;
+  user: number;
+ }

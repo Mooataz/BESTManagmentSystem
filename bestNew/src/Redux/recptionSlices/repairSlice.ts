@@ -158,7 +158,6 @@ const repairSlice = createSlice({
         state.loading = false;
         state.success = true;
         state.tempCustomer = action.payload;
-        console.log('Repair slice- customer', state.tempCustomer)
       })
       .addCase(AddCustomer.rejected, (state, action: PayloadAction<string | undefined>) => {
         state.loading = false;

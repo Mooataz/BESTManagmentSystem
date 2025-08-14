@@ -13,19 +13,20 @@ import { getByBranchStep } from '../../Redux/Actions/Reception/repairAction';
 import theme from '../../Theme/theme';
 export default function SendToAssign() {
   const dispatch = useAppDispatch();
-     const userr = useSelector((state: RootState) => state.user);
+     const userr = useSelector((state: RootState) => state.auth.user);
  // const user = useSelector((state: RootState) => state.auth.user);
   const { currentRepair, repairs, loading, error } = useSelector((state: RootState) => state.repair)
    const { notify } = useNotification();
   const [results, setResults] = useState<RepairForm[]>([]);
- 
- 
+ if (!userr?.id || !userr.branch) return;
+   const branchId = typeof userr.branch === 'object' ? userr.branch.id : userr.branch;
+  if (!branchId || isNaN(userr.id)) return;
   React.useEffect(() => {
     const getToAssign = async () => {
 
 
-      if (!userr?.branch?.id) return;
-      const resultAction = await dispatch(getByBranchStep({ branch: userr.branch?.id, step: 'Création' }))
+      if (!branchId) return;
+      const resultAction = await dispatch(getByBranchStep({ branch: branchId, step: 'Création' }))
      
       if (getByBranchStep.fulfilled.match(resultAction)) {
         setResults(resultAction.payload);
@@ -39,10 +40,10 @@ export default function SendToAssign() {
 
 
     getToAssign();
-  }, [userr?.branch?.id, dispatch, error]);
+  }, [branchId, dispatch, error]);
  
   const AssignRepairs = async (row: any) => {
-    if (!userr?.branch?.id) return;
+    if (!branchId) return;
 
     const resultAction = await dispatch(addHistoryRepair({
       date: new Date(),
@@ -53,7 +54,7 @@ export default function SendToAssign() {
 
     if (addHistoryRepair.fulfilled.match(resultAction)) {
       // Réactualiser la liste après succès
-      const refresh = await dispatch( getByBranchStep({ branch: userr.branch.id, step: 'Création' }) ) ;
+      const refresh = await dispatch( getByBranchStep({ branch: branchId, step: 'Création' }) ) ;
       if (getByBranchStep.fulfilled.match(refresh)) {
         setResults(refresh.payload);
       }

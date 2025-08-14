@@ -54,6 +54,10 @@ import ShowRepair from '../../Reparation/ShowRepair';
 import RepairedRepair from '../../Reparation/RepairedRepair';
 import ListRepairActions from '../../Administration/RepairActions/ListRepairActions';
 import AccepteQC from '../../Coordinate/AccepteQC';
+import Validation from '../../Coordinate/Validation';
+import ReceiveCQ from '../../Reception/ReceiveCQ';
+import Recuperation from '../../Reception/Recuperation';
+import ListOutPut from '../../Reception/ListOutPut';
 
 const xThemeComponents = {
   ...chartsCustomizations,
@@ -123,6 +127,8 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
               <Route path="EnvoyeAffectation" element={<SendToAssign />} />
               <Route path="ReçoiReception" element={<RecieveReception />} />
               <Route path="AccepteQC" element={<AccepteQC />} />
+              <Route path="RecevoireQC" element={<ReceiveCQ />} /> 
+<Route path="EtatRécuperation" element={<ListOutPut />} />
 
 
               <Route path='case' element={<Bin />} />
@@ -139,7 +145,8 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
               <Route path='listTotal' element={<ListReparation />} />
               <Route path="ShowRepair/:id" element={<ShowRepair />} />
               <Route path="RepairedRepair/:id" element={<RepairedRepair />} />
-
+              <Route path="ValidationCQ" element={<Validation />} />
+              <Route path="Récupererproduit" element={<Recuperation />} />
               <Route path='TypeModéle' element={<TypeModel />} />
               <Route path="accessoires" element={<Accessoires />} />
               <Route path='Modéles' element={<ListModel />} />

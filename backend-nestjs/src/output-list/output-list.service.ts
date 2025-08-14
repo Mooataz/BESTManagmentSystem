@@ -61,7 +61,13 @@ async create(createOutputListDto: CreateOutputListDto): Promise<OutputList> {
     return allfind  }
 
   async findOne(id: number): Promise<OutputList> {
-    const Onefin= await this.outputListRepositry.findOne({ where: { id } })
+    const Onefin= await this.outputListRepositry.findOne({ where: { id },
+        relations: ['customer', 'customer.distributer',
+        'device', 'device.model', 'device.model.brand', 'device.model.allpart', 'device.model.typeModel',
+        'repair','repair.customer',  
+        'user',
+          ], // 👈 ajoute les relations nécessaires ici
+    })
     if ( !Onefin){
       throw new NotFoundException("There is no user data Available")
     }
@@ -69,14 +75,23 @@ async create(createOutputListDto: CreateOutputListDto): Promise<OutputList> {
 
 async findByBranchId(branchId: number): Promise<OutputList[]> {
   const findAll = await this.outputListRepositry
-        .createQueryBuilder("outputList")
-        .leftJoinAndSelect("outputList.user", "user")
-        .where("user.branch = :branchId", { branchId })
-        .getMany();
+    .createQueryBuilder("outputList")
+    .leftJoinAndSelect("outputList.user", "user")
+    .leftJoinAndSelect("outputList.customer", "customer")
+    .leftJoinAndSelect("outputList.repair", "repair")
+    .leftJoinAndSelect("repair.device", "device")
+    .leftJoinAndSelect("device.model", "model")
+    .leftJoinAndSelect("model.brand", "brand")
+    .where("user.branch = :branchId", { branchId })
+    .getMany();
+
   if (!findAll || findAll.length === 0) {
-        throw new NotFoundException("There is no data Available") }
-    return findAll
-} 
+    throw new NotFoundException("There is no data Available");
+  }
+
+  return findAll;
+}
+
 
 async findByUserId(userId: number): Promise<OutputList[]> {
   const findAll = await this.outputListRepositry
@@ -99,45 +114,7 @@ async findByCustomerId(customerId: number): Promise<OutputList[]> {
         throw new NotFoundException("There is no data Available") }
     return findAll
 }
-  /* async update(id: number, updateOutputListDto: UpdateOutputListDto): Promise<OutputList> {
-    await this.outputListRepositry.update(id,updateOutputListDto);
-    const updatedata = await this.outputListRepositry.findOne({where :{ id }})
-    if (!updatedata) {
-      throw new NotFoundException('data Not found for update = failed')
-    }
-
-    return updatedata  } */
-/*     async update(id: number, updateOutputListDto: UpdateOutputListDto): Promise<OutputList> {
-      const outputList = await this.outputListRepositry.findOne({ where: { id } });
   
-      if (!outputList) {
-          throw new NotFoundException(`OutputList with id ${id} not found`);
-      }
-  
-      // Vérifier si `customer` est fourni et récupérer son objet complet
-      let customer = await this.customerRepository.findOne({ where: { id: updateOutputListDto.customer } });
-if (!customer) {
-    customer = undefined; // Évite l'erreur de type
-}
-
-      if (updateOutputListDto.customer) {
-          customer = await this.customerRepository.findOne({
-              where: { id: updateOutputListDto.customer }
-          });
-  
-          if (!customer) {
-              throw new NotFoundException(`Customer with id ${updateOutputListDto.customer} not found`);
-          }
-      }
-  
-      // Mettre à jour avec l'objet `customer`
-      await this.outputListRepositry.update(id, {
-          ...updateOutputListDto,
-          customer  // Remplace l'ID par l'objet Customer
-      });
-  
-      return this.outputListRepositry.findOne({ where: { id } });
-  } */
   
   async remove(id: number): Promise<OutputList> {
     const deletedata = await this.outputListRepositry.findOne ({where: {id}});

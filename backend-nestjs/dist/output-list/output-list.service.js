@@ -66,7 +66,13 @@ let OutputListService = class OutputListService {
         return allfind;
     }
     async findOne(id) {
-        const Onefin = await this.outputListRepositry.findOne({ where: { id } });
+        const Onefin = await this.outputListRepositry.findOne({ where: { id },
+            relations: ['customer', 'customer.distributer',
+                'device', 'device.model', 'device.model.brand', 'device.model.allpart', 'device.model.typeModel',
+                'repair', 'repair.customer',
+                'user',
+            ],
+        });
         if (!Onefin) {
             throw new common_1.NotFoundException("There is no user data Available");
         }
@@ -76,6 +82,11 @@ let OutputListService = class OutputListService {
         const findAll = await this.outputListRepositry
             .createQueryBuilder("outputList")
             .leftJoinAndSelect("outputList.user", "user")
+            .leftJoinAndSelect("outputList.customer", "customer")
+            .leftJoinAndSelect("outputList.repair", "repair")
+            .leftJoinAndSelect("repair.device", "device")
+            .leftJoinAndSelect("device.model", "model")
+            .leftJoinAndSelect("model.brand", "brand")
             .where("user.branch = :branchId", { branchId })
             .getMany();
         if (!findAll || findAll.length === 0) {

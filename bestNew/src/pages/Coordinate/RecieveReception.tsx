@@ -13,21 +13,23 @@ import theme from '../../Theme/theme';
 export default function RecieveReception() {
   const dispatch = useAppDispatch();
   const { notify } = useNotification();
-   const userr = useSelector((state: RootState) => state.user);
+   const userr = useSelector((state: RootState) => state.auth.user);
   const repairs = useSelector((state: RootState) => state.repair.repBranchStep)
-   
+    if (!userr?.id || !userr.branch) return;
+   const branchId = typeof userr.branch === 'object' ? userr.branch.id : userr.branch;
+  if (!branchId || isNaN(userr.id)) return;
   React.useEffect(() => {
 
 
-     if (userr.branch?.id) {
-      dispatch ( getByBranchStep({ branch: userr.branch.id, step: 'Envoyé à affecter' }) )
+     if (branchId) {
+      dispatch ( getByBranchStep({ branch: branchId, step: 'Envoyé à affecter' }) )
      }
     
-  }, [dispatch, userr.branch?.id])
+  }, [dispatch, branchId])
  
 
     const AccepetAssign = async (row: any) => {
-      if (!userr?.branch?.id) return;
+      if (!branchId) return;
   
       dispatch( addHistoryRepair({
         date: new Date(),
@@ -35,7 +37,7 @@ export default function RecieveReception() {
         user: { id: userr.id || 0 },
         repair: row.id
       }) ) 
-      .then( () => dispatch ( getByBranchStep({ branch: userr?.branch?.id || 0, step: 'Envoyé à affecter' }) ));
+      .then( () => dispatch ( getByBranchStep({ branch: branchId || 0, step: 'Envoyé à affecter' }) ));
   
     
     };

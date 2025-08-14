@@ -32,7 +32,8 @@ import accessoryReducer from './ModelAndAccessory/AccessorySlice';
 import TypeModelReducer from './ModelAndAccessory/TypeModelSlice';
 import DeviceRducer from './Customer/DeviceSlice';
 import PartPriceReducer from './Stock/PartPriceSlice';
-import RepairActionReducer from './Administration/ActionRepairSlice'
+import RepairActionReducer from './Administration/ActionRepairSlice';
+import OutputListReducer from './recptionSlices/OutPutSlice'
 //store
 const rootReducer = combineReducers({
       repair: repairReducer,
@@ -64,6 +65,7 @@ const rootReducer = combineReducers({
       device: DeviceRducer,
       PartPrice: PartPriceReducer,
       RepairAction: RepairActionReducer,
+      OutputList: OutputListReducer,
 
 });
 const persistConfig = {
@@ -72,7 +74,8 @@ const persistConfig = {
   whitelist: ['auth','user','userr','repair','bin','references','models','allParts',
               'company','agencies','customer', 'accessory', 'listfault','CustomerRequest',
               'Employèes','Marques','stockParts','expertiseReasons','DemandeClient','NotesCustomer',
-              'LevelRepair','Transfert','OtherCost', 'TypeModel', 'device', 'PartPrice','RepairAction'
+              'LevelRepair','Transfert','OtherCost', 'TypeModel', 'device', 'PartPrice','RepairAction',
+              'OutputList'
   ] // Seulement persister l'auth si nécessaire
 }
 const persistedReducer = persistReducer(persistConfig,rootReducer)

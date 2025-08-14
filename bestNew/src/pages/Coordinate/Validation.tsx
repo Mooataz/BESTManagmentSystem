@@ -33,11 +33,11 @@ export default function Validation() {
 
    React.useEffect(() => {
       // Si userr ou userr.branch est absent → on sort
-      if (!branchId) return;
+      if (!userr?.id || !userr?.branch) return;
   
       dispatch(getByBranchStep({
         branch: branchId,
-        step: 'Envoyé à CQ'
+        step: 'CQ'
       }))
         .then((resultAction) => {
           if (getByBranchStep.fulfilled.match(resultAction)) {
@@ -50,7 +50,8 @@ export default function Validation() {
           }
         });
   
-    }, [dispatch, branchId]);
+    }, [dispatch, userr, notify]);
+
    const handelApproved = async (row: any) => {
     if (!userr?.id) return;
     const resultAction = await dispatch(addHistoryRepair({
