@@ -6,7 +6,7 @@ import StepLabel from '@mui/material/StepLabel';
 import { Typography } from '@mui/material';
 import type { FormHistoryRepair, RepairForm, StateHistoryRepair } from '../../Redux/Types/repairTypes';
 type RepairFormState = {
-    rows: StateHistoryRepair[]
+    rows: StateHistoryRepair[] 
 
 }
 export default function ShowStepper({ rows }: RepairFormState) {

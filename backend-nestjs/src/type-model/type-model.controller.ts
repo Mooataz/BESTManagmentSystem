@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, Req, HttpException } from '@nestjs/common';
 import { TypeModelService } from './type-model.service';
 import { CreateTypeModelDto } from './dto/create-type-model.dto';
 import { UpdateTypeModelDto } from './dto/update-type-model.dto';
@@ -9,7 +9,7 @@ export class TypeModelController {
 
   @Post()
   async create( @Body() createTypeModelDto: CreateTypeModelDto,
-                @Res() res, @Req() req: Request) {
+                @Res() res: any, @Req() req: Request) {
                   /* const user = req.user; */
     try {
       const newType = await this.typeModelService.create(createTypeModelDto/* , user */)
@@ -18,17 +18,21 @@ export class TypeModelController {
         status:HttpStatus.CREATED,
         data:newType
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     
     try {
       const allTypes = await this.typeModelService.findAll()
@@ -37,19 +41,23 @@ export class TypeModelController {
         status:HttpStatus.OK,
         data:allTypes
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
     
   }
 
   @Get(':id')
   async findOne( @Param('id') id: number,
-                 @Res() res) {
+                 @Res() res: any) {
    
     try {
       const oneType = await this.typeModelService.findOne(+id)
@@ -58,19 +66,23 @@ export class TypeModelController {
         status:HttpStatus.OK,
         data:oneType
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 
   @Patch(':id')
   async update( @Param('id') id: number, 
                 @Body() updateTypeModelDto: UpdateTypeModelDto,
-                @Res() res) {
+                @Res() res: any) {
     try {
       const updateType = await this.typeModelService.update(+id, updateTypeModelDto)
       return res.status(HttpStatus.OK).json({
@@ -78,18 +90,22 @@ export class TypeModelController {
         status:HttpStatus.OK,
         data:updateType
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 
   @Delete(':id')
   async remove( @Param('id') id: number,
-                @Res() res) {
+                @Res() res: any) {
     try {
       const deleteType = await this.typeModelService.remove(+id)
       return res.status(HttpStatus.OK).json({
@@ -97,12 +113,16 @@ export class TypeModelController {
         status:HttpStatus.OK,
         data:deleteType
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, HttpException } from '@nestjs/common';
 import { CustomerRequestService } from './customer-request.service';
 import { CreateCustomerRequestDto } from './dto/create-customer-request.dto';
 import { UpdateCustomerRequestDto } from './dto/update-customer-request.dto';
@@ -9,7 +9,7 @@ export class CustomerRequestController {
 
   @Post()
   async create(@Body() createCustomerRequestDto: CreateCustomerRequestDto,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const newcreate = await this.customerRequestService.create(createCustomerRequestDto)
       return res.status(HttpStatus.CREATED).json({
@@ -18,16 +18,20 @@ export class CustomerRequestController {
         data:newcreate
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+    
+      throw error
     }
   }
 
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     try {
       const allfind = await this.customerRequestService.findAll()
       return res.status(HttpStatus.OK).json({
@@ -35,18 +39,22 @@ export class CustomerRequestController {
         status:HttpStatus.OK,
         data:allfind
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+    }catch (error) {
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const Onefind = await this.customerRequestService.findOne(+id)
       return res.status(HttpStatus.OK).json({
@@ -55,18 +63,22 @@ export class CustomerRequestController {
         data:Onefind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Patch(':id')
   async update(@Param('id') id: number,
     @Body() updateCustomerRequestDto: UpdateCustomerRequestDto,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const updatedata = await this.customerRequestService.update(+id, updateCustomerRequestDto)
       return res.status(HttpStatus.OK).json({
@@ -75,17 +87,21 @@ export class CustomerRequestController {
         data:updatedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Delete(':id')
   async remove(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const deletedata = await this.customerRequestService.remove(+id)
       return res.status(HttpStatus.OK).json({
@@ -93,12 +109,16 @@ export class CustomerRequestController {
         status:HttpStatus.OK,
         data:deletedata
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+    }catch (error) {
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 }

@@ -5,46 +5,46 @@ export class CreateInvoiceDto {
         type: String,
         description: "Required"
     })
-    paymentMethod: string;
+    paymentMethod?: string;
     
     @ApiProperty({
         type: Date,
         description: "Required"
     })
-    date: Date;
+    date?: Date;
 
     @ApiProperty({
         type: String,
         description: "Required"
     })
-    state: string;
+    state?: string;
 
     @ApiProperty({
         type: Number,
 
         description: "Required"
     })
-    totalPrice: number;
+    totalPrice?: number;
  
     @ApiProperty({
         type: Array,
 
         description: "Required"
     })
-    otherCost: number[];
+    otherCost?: number[];
 
     @ApiProperty({
         type: Number,
 
         description: "Required"
     })
-    repair: number;
+    repair?: number;
 
     @ApiProperty({
         type: Number,
 
         description: "Required"
     })
-    user: number;
+    user?: number;
 
 }

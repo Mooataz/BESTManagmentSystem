@@ -8,7 +8,7 @@ export class CreateCompanyDto {
         })
     @IsString()
     @IsEmpty()
-    name: string;
+    name!: string;
 
     @ApiProperty({
         type:String,
@@ -16,7 +16,7 @@ export class CreateCompanyDto {
     })
     @IsString()
     @IsEmpty()
-    headquarterslocation: string;
+    headquarterslocation?: string;
 
     @ApiProperty({
         type:String,
@@ -24,7 +24,7 @@ export class CreateCompanyDto {
     })
     @IsString()
     @IsEmpty()
-    taxRegisterNumber: string;
+    taxRegisterNumber?: string;
 
     @ApiProperty({
         type:Number,
@@ -32,25 +32,25 @@ export class CreateCompanyDto {
     })
     @IsNumber()
     @IsEmpty()
-    rib: number;
+    rib?: number;
 
     @ApiProperty({
         type:String,
         description: "Required"
     })
     @IsEmpty()
-    logo: string;
+    logo?: string;
 
     @ApiProperty({
         type:String,
         description: "Required"
     })
     @IsEmpty()
-    bank : string;
+    bank? : string;
     
     @ApiProperty({
         type:Number,
         description: "Required"
     })
-    quantityAlertStock: number;
+    quantityAlertStock?: number;
 }

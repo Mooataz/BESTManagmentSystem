@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Res, HttpException } from '@nestjs/common';
 import { DistributeurService } from './distributeur.service';
 import { CreateDistributeurDto } from './dto/create-distributeur.dto';
 import { UpdateDistributeurDto } from './dto/update-distributeur.dto';
@@ -10,7 +10,7 @@ export class DistributeurController {
  
 
   @Post()
-  async create(@Body() createDistributeurDto: CreateDistributeurDto, @Res() res) {
+  async create(@Body() createDistributeurDto: CreateDistributeurDto, @Res() res: any) {
     
     try {
       const newDistributeur = await this.distributeurService.create(createDistributeurDto)
@@ -20,16 +20,20 @@ export class DistributeurController {
         data:newDistributeur
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+    
+      throw error
     }
   }
 
   @Get()
-  async findAll( @Res() res) {
+  async findAll( @Res() res: any) {
     try {
       const allDistributeurs = await this.distributeurService.findAll()
       return res.status(HttpStatus.OK).json({
@@ -38,16 +42,20 @@ export class DistributeurController {
         data:allDistributeurs
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number ,@Res() res) {
+  async findOne(@Param('id') id: number ,@Res() res: any) {
     try {
       const OneDistributeur = await this.distributeurService.findOne(+id)
       return res.status(HttpStatus.OK).json({
@@ -56,16 +64,20 @@ export class DistributeurController {
         data:OneDistributeur
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() updateDistributeurDto: UpdateDistributeurDto,  @Res() res) {
+  async update(@Param('id') id: number, @Body() updateDistributeurDto: UpdateDistributeurDto,  @Res() res: any) {
     try {
       const updatedata = await this.distributeurService.update(id,updateDistributeurDto)
       return res.status(HttpStatus.OK).json({
@@ -74,16 +86,20 @@ export class DistributeurController {
         data:updatedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: number,  @Res() res) {
+  async remove(@Param('id') id: number,  @Res() res: any) {
     try {
       const deletedata = await this.distributeurService.remove(+id)
       return res.status(HttpStatus.OK).json({
@@ -91,12 +107,16 @@ export class DistributeurController {
         status:HttpStatus.OK,
         data:deletedata
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+    }catch (error) {
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 }

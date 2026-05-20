@@ -8,7 +8,7 @@ export class CreateDistributeurDto {
         })
     @IsString()
     @IsNotEmpty()
-    name: string;
+    name!: string;
 
     @ApiProperty({
         type:Number,
@@ -16,7 +16,7 @@ export class CreateDistributeurDto {
     })
     @IsNumber()
     @IsEmpty()
-    phone : number;
+    phone ?: number;
 
     @ApiProperty({
         type:String,
@@ -24,7 +24,7 @@ export class CreateDistributeurDto {
     })
     @IsEmail()
     @IsEmpty()
-    email: string;
+    email?: string;
 
     @ApiProperty({
         type:String,
@@ -32,7 +32,7 @@ export class CreateDistributeurDto {
     })
     @IsString()
     @IsEmpty()
-    location: string;
+    location?: string;
 
     @ApiProperty({
         type:String,
@@ -40,5 +40,5 @@ export class CreateDistributeurDto {
     })
     @IsString()
     @IsEmpty()
-    taxRegisterNumber: string;
+    taxRegisterNumber?: string;
 }

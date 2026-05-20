@@ -79,7 +79,13 @@ const newCreate =  this.stockPartRepositry.create(createStockPartDto);
     return findAll;  }
 
   async findOne(id: number):Promise<StockPart> {
-    const findOne = await this.stockPartRepositry.findOne({ where : { id } })
+    const findOne = await this.stockPartRepositry.findOne({ where : { id },
+    relations:[
+      'bin',
+      'reference','reference.model','reference.model.brand','reference.allpart',
+      'historyStockPart','historyStockPart.tracability','historyStockPart.tracability.user'
+    ]
+    })
     if (!findOne){
       throw new NotFoundException('No data available')
     }
@@ -162,179 +168,26 @@ async findGoodReference(references:Reference[], branchId: number): Promise<Stock
   return goodPart ;
 }
 
-
-
-/* @Cron('00 10 * * 5') */
-  async stateStock() {
-    
-   // Vérification du verrou en mémoire
-   if (this.isRunning) {
-    console.log('Calcul déjà en cours (verrou mémoire)');
-    return;
-  }
-
-  // Verrou fichier pour multi-instances
-  try {
-    const fd = await fs.open(this.LOCK_FILE, 'wx');
-    await fd.close();
-  } catch (error) {
-    if (error.code === 'EEXIST') {
-      console.log('Calcul déjà en cours (verrou fichier)');
-      return;
-    }
-    throw error;
-  }
-
-  this.isRunning = true;
-  const executionId = Date.now();
-
-  try {
-    console.log(`[${executionId}] Début du calcul du stock`);
-    
-    // ... votre logique de calcul existante ...
-    console.log( 'debut:') 
-    const allBranch = await this.branchRepositry.find();
-    const models = await this.modelService.findAll();
-  
-    var stockByReference: {
-      branchID: number;
-      modelId: number;
-      partId: number;
-      count: number;
-      //stockDetails: StockPart[];
-    }[] = [];
-  
-    /* for ( const branch of allBranch){
-      for (const model of models) {
-        for (const part of model.allpart) {
-            // Validation des IDs
-            const branchId = Number(branch.id);
-            const modelId = Number(model.id);
-            const partId = Number(part.id);
-
-            if (isNaN(branchId)) throw new Error(`ID de branche invalide: ${branch.id}`);
-            if (isNaN(modelId)) throw new Error(`ID de modèle invalide: ${model.id}`);
-            if (isNaN(partId)) throw new Error(`ID de pièce invalide: ${part.id}`);
-          const findCompRefe = await this.referenceService.findCompatibleReferences(model.id, part.id);
-          const counter = await this.findGoodReference(findCompRefe, branch.id);
-              // Validation du compteur
-              const count = Number(counter.length);
-              if (isNaN(count)) {
-                console.error('Compteur invalide pour:', { branchId, modelId, partId });
-                continue; // ou throw selon votre besoin
-              }
-            
-               
-              const stockPartWithCompany = await this.stockPartRepositry
-                .createQueryBuilder('stockPart')
-                .leftJoin('stockPart.bin', 'bin')
-                .leftJoin('bin.branch', 'branch')
-                .leftJoin('branch.company', 'company')
-                .where('stockPart.id = :stockPartId', { stockPartId: part.id }) // Remplace "id" par l'ID réel du stockPart
-                .select(['company.quantityAlertStock'])
-                .getRawOne();
-
-              const quantityAlertStock = stockPartWithCompany?.company_quantityAlertStock;
-              //console.log('quantityAlertStock:', quantityAlertStock);
-
-              if(counter.length <= quantityAlertStock){
-                stockByReference.push({
-                  branchID:branch.id,
-                  modelId: model.id,
-                  partId: part.id,
-                  count: counter.length,  stockDetails: counter   });
-
-                  // Ici ajouter Notification par firebase , la notification sera envoyer à l'Admin et StocKeeper de l'agence 
-              }
-
-
-             
-              
-        }
-      }
-    }  */
-   for (const branch of allBranch) {
-  const branchCriticalParts: {
-    modelId: number;
-    modelName: string;
-    partId: number;
-    partName: string;
-    count: number;
-  }[] = [];
-  for (const model of models) {
-    for (const part of model.allpart) {
-      const counter = await this.findGoodReference(
-        await this.referenceService.findCompatibleReferences(model.id, part.id),
-        branch.id,
-      );
-      const count = Number(counter.length);
-      if (isNaN(count)) continue;
-      const quantityAlertStock = (
-        await this.stockPartRepositry
-          .createQueryBuilder('stockPart')
-          .leftJoin('stockPart.bin', 'bin')
-          .leftJoin('bin.branch', 'branch')
-          .leftJoin('branch.company', 'company')
-          .where('stockPart.id = :stockPartId', { stockPartId: part.id })
-          .select(['company.quantityAlertStock'])
-          .getRawOne()
-      )?.company_quantityAlertStock;
-      if (count <= quantityAlertStock) {
-        // :épingle: On ajoute les infos dans un tableau
-        branchCriticalParts.push({
-          modelId: model.id,
-          modelName: model.name,
-          partId: part.id,
-          partName: part.description,
-          count,
-        });
-      }
-    }
-  }
-  // Si cette branche a des pièces critiques, on génère le PDF + envoie notif
-  if (branchCriticalParts.length > 0) {
-    // :coche_blanche: Générer PDF
-    const pdfPath = await this.PDFService.generateStockReport(branch.id, branchCriticalParts);
-    // :haut_parleur: Notifier les utilisateurs
-    const usersToNotify = await this.UserRepositry
-      .createQueryBuilder('user')
-      .innerJoin('user.branch', 'branch')
-      .where('branch.id = :branchId', { branchId: branch.id })
-      .andWhere('user.role IN (:...roles)', { roles: ['Admin', 'StockKeeper'] })
-      .getMany();
-    const userIds = usersToNotify.map((u) => u.id);
-    await this.StockGateway.sendStockAlertToUsers(userIds, {
-      branchId: branch.id,
-      reportUrl: `/uploads/stock-report-branch-${branch.id}.pdf`, // :nouveau:
-      message: `:danger: Rapport de stock critique généré pour la branche ${branch.id}`,
+async AddHistorytockPart(id: number, userId: number, step: string):Promise<number>{
+  const history = this.historyStockPartRepositry.create({
+      date: new Date(),
+      step: step,
+      stockPart: { id:id },
     });
-  }
-}
-    console.log(`[${executionId}] Résultat:`, stockByReference);
-     return stockByReference;
-     
 
-     
-  } catch (error) {
-    console.error(`[${executionId}] Erreur lors du calcul:`, error);
-        throw {
-          message: 'Erreur lors du calcul du stock',
-          status: 500,
-          data: null
-        };
-  } finally {
-    this.isRunning = false;
-    try {
-      await fs.unlink(this.LOCK_FILE);
-    } catch (cleanupError) {
-      if (cleanupError.code !== 'ENOENT') {
-        console.error('Erreur lors du nettoyage du verrou:', cleanupError);
-      }
-    }
-  }
-      
-    
-  }
+    const savedHistory = await this.historyStockPartRepositry.save(history);
+
+
+     const tracability = this.tracabilityRepositry.create({
+      historyStockPart: { id: savedHistory.id },
+      user: { id: userId },
+    });
+    await this.tracabilityRepositry.save(tracability);
+    return id
+}
+
+
+  
 }
 
 

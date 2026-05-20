@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, Query, ConflictException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, Query, ConflictException, HttpException } from '@nestjs/common';
 import { ReferencesService } from './references.service';
 import { CreateReferenceDto } from './dto/create-reference.dto';
 import { UpdateReferenceDto } from './dto/update-reference.dto';
@@ -11,7 +11,7 @@ export class ReferencesController {
 
   @Post()
   async create(@Body() createReferenceDto: CreateReferenceDto,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const newcreate = await this.referencesService.create(createReferenceDto)
       return res.status(HttpStatus.CREATED).json({
@@ -20,19 +20,20 @@ export class ReferencesController {
         data:newcreate
       })
     } catch (error) {
-      if (error.code === '23505') {
-              throw new ConflictException('reference already exists');
-            }
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+    
+      throw error
     }
   }
 
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     try {
       
       const findAll = await this.referencesService.findAll()
@@ -42,17 +43,21 @@ export class ReferencesController {
         data:findAll
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const findOne = await this.referencesService.findOne(+id)
       return res.status(HttpStatus.OK).json({
@@ -61,18 +66,22 @@ export class ReferencesController {
         data:findOne
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
    @Patch(':id')
   async update(@Param('id') id: number,
     @Body() updateReferenceDto: UpdateReferenceDto,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const update = await this.referencesService.update(+id, updateReferenceDto)
       return res.status(HttpStatus.OK).json({
@@ -81,17 +90,21 @@ export class ReferencesController {
         data:update
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+
+      throw error
     }
   } 
 
   @Delete(':id')
   async remove(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const deleteType = await this.referencesService.remove(+id)
       return res.status(HttpStatus.OK).json({
@@ -100,18 +113,22 @@ export class ReferencesController {
         data:deleteType
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get('getCompatibleReferences/:modelId/:partId')
   async getCompatibleReferences(@Param('modelId') modelId: number,
                                 @Param('partId') partId: number,
-                                @Res() res ) {
+                                @Res() res: any) {
     try {
       const findReferences = await this.referencesService.findCompatibleReferences(modelId, partId)
       return res.status(HttpStatus.OK).json({
@@ -120,12 +137,16 @@ export class ReferencesController {
         data:findReferences
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }    
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}    
   }
 
     
@@ -134,7 +155,7 @@ export class ReferencesController {
   @ApiOperation({ summary: 'Find reference by material code' })
   async findReferenceByMaterialCode(
     @Param('code') code: string,
-    @Res() res
+    @Res() res: any
 ) {
  
                                    
@@ -147,12 +168,16 @@ export class ReferencesController {
         data:findReferences
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }    
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}    
   } 
  
 

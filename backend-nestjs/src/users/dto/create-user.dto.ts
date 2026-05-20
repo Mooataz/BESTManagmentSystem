@@ -12,7 +12,7 @@ export class CreateUserDto {
     })
     @IsString()
     @IsNotEmpty()
-    name : string;
+    name! : string;
 
     @ApiProperty({
         type:Number,
@@ -20,7 +20,7 @@ export class CreateUserDto {
     })
     @IsNumber()
     @IsNotEmpty()
-    phone : number;
+    phone! : number;
 
    
 
@@ -29,7 +29,7 @@ export class CreateUserDto {
         description: "Required"
     })
     @IsNotEmpty()
-    login : string;
+    login! : string;
 
     @ApiProperty({
         type:String,
@@ -37,7 +37,7 @@ export class CreateUserDto {
     })
     @IsString()
     @IsNotEmpty()
-    password : string;
+    password! : string;
 
     @ApiProperty({
         type:Date,
@@ -45,7 +45,7 @@ export class CreateUserDto {
     })
     @IsDate()
     @IsNotEmpty()
-    createdDate : Date;
+    createdDate! : Date;
 
     @ApiProperty({
         type:String,
@@ -53,7 +53,7 @@ export class CreateUserDto {
     })
     @IsString()
     @IsNotEmpty()
-    status : string;
+    status! : string;
     
     @ApiProperty({
         type:[String],
@@ -61,7 +61,7 @@ export class CreateUserDto {
     })
     @IsArray()
     @IsString({ each: true })
-    role : string;
+    role! : string;
 
  
 

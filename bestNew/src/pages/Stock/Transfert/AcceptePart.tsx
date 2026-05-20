@@ -1,4 +1,4 @@
-import { Backdrop, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Fade, Input, Modal, Slide } from '@mui/material';
+import { Backdrop, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Fade, Input, Modal, Slide, Typography } from '@mui/material';
 import type { TransitionProps } from '@mui/material/transitions';
 import React, { useEffect, useState } from 'react'
 import type { TransfertPR } from '../../../Redux/Types/Stock';
@@ -10,6 +10,11 @@ import { GetReceiveTransfert, UpdateOneTransfert } from '../../../Redux/Actions/
 import axios from 'axios';
 import { findByBranchType } from '../../../Redux/Actions/stock/Bin';
 import { CustomAutocomplete } from '../../../Componants/Global/CustomAutocomplete';
+import theme from '../../../Theme/theme';
+import DynamicTable from '../../../Componants/Global/TableComponat';
+import ShowPart from './ShowPart';
+import type { TableAction } from '../../../Redux/Types/repairTypes';
+import { BiShowAlt } from 'react-icons/bi';
 type EditeProps = {
     open: boolean;
     onClose: () => void;
@@ -36,39 +41,28 @@ const Transition = React.forwardRef(function Transition(
 ) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
-export default function AcceptePart({
-    open,
-    onClose,
-    transfert,
-    onSubmit,
-    isLoading
-}: EditeProps) {
-    const API = axios.create({
-        baseURL: 'http://localhost:3000/',
-        withCredentials: true,
-    });
-    const type = 'Pieces';
-    const state = 'Encours';
+export default function AcceptePart() {
+
+    const type = 'Pièces';
+    const state = 'En cours';
     const [transferts, setTransferts] = useState<TransfertPR[]>([]);
-    const loadTransferts = async () => {
-        try {
-            const response = await API.get(`/transfert/findToBranchId/${branchId}/${type}/${state}`);
-            const resReq = response.data.data
-            if (resReq === 0) {
-                notify('Aucun transferts en attente', 'success');
-            } else {
-                setTransferts(response.data.data);
-            }
-            // à adapter selon ton backend
-        } catch (error) {
-            notify('Aucun transferts en attente', 'success');
-        }
-    };
+
+
     const dispatch = useAppDispatch();
     const { notify } = useNotification();
-    const user = useSelector((state: RootState) => state.user);
-    const branchId = user.branch?.id;
-    const bins = useSelector((state: RootState) => state.bin.bin)
+    const userr = useSelector((state: RootState) => state.auth.user);
+    const transfertAccept = useSelector((state: RootState) => state.Transfert.Transfert)
+    const bins = useSelector((state: RootState) => state.bin.bin);
+
+    if (!userr?.id || !userr.branch) return;
+    const branchId = typeof userr.branch === 'object' ? userr.branch.id : userr.branch;
+    if (!branchId || isNaN(userr.id)) return;
+    React.useEffect(() => {
+        if (branchId) {
+            dispatch(GetReceiveTransfert({ branchId, type, state }))
+        }
+    }, [dispatch, branchId])
+
     const [formtransfert, setFormtransfert] = useState<TransfertPR>(/* {
             delivredBy: '',
             sendingDate: new Date(),
@@ -82,83 +76,67 @@ export default function AcceptePart({
             remark:''
         
           } */)
-            const handleSelectionBin = (ids: number ) => {
-        setFormtransfert({ ...formtransfert, bin: ids });
 
+const [open, setOpen] = React.useState(false);
+const handleClose = () => setOpen(false);
+const [formData, setFormData] = useState<TransfertPR>();
+    const handleOpenEdit = (row: any) => {
+        setFormData(row);
+        setOpen(true);
     };
-    useEffect(() => {
-        const branchId = user.branch?.id;
-        const type = formtransfert?.typePart === 'Bon' ? 'Bon' : 'Défectueux';
+    const actions: TableAction[] = [
+        {
+            icon: <BiShowAlt style={{ color: theme.palette.primary.main }} />,
+            onClick: (row: Record<string, any>) => handleOpenEdit(row),
+        },
+    ];
 
-        if (branchId !== undefined) {
-            dispatch(findByBranchType({ id: branchId, type }));
-        }
-    }, [dispatch, formtransfert, user.branch?.id]);
 
-    useEffect(() => {
-        if (transfert) {
-            setFormtransfert({
-                id: transfert.id,
-                receivedDate: new Date(),
-                receiveUser: user.id || 0,
-                state: 'Accepter',
-            });
-        }
-    }, [transfert]);
-    const handleSubmit = async () => {
-
-if(formtransfert?.bin === null || formtransfert?.bin === undefined) {
-    notify('Choisir la case', 'error');
-    return;
-}
-        try {
-            const result = await dispatch(UpdateOneTransfert(formtransfert));
-            if (UpdateOneTransfert.fulfilled.match(result)) {
-                notify('Transfert accepter avec succès', 'success');
-                loadTransferts()
-                dispatch(GetReceiveTransfert({
-                    branchId,
-                    type: 'Pieces',
-                    state: 'Accepter'
-                }));
-            } else {
-                notify(result.payload as string || 'Erreur d\'acceptation transfert', 'error');
-            }
-        } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
-            notify(errorMessage, "error");
-        }
-
-    }
-     
     return (
-        <Dialog
-            open={open}
-            slots={{
-                transition: Transition,
-            }}
-            keepMounted
-            onClose={onClose}
-            aria-describedby="alert-dialog-slide-description"
-        >
-            <DialogTitle>{`Accepter un transfert des pièces sont ètat est: ${formtransfert?.typePart}`}</DialogTitle>
-            <DialogContent>
-                 
-                <CustomAutocomplete
-                    data={bins}
-                    displayFields={['name']}
-                    idField="id"
-                    label="case"
-                    multiple={false}
-                     
-                    onChange={handleSelectionBin}
-                    
-                />
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose}>Accepter</Button>
+        <Box>
 
-            </DialogActions>
-        </Dialog>
+            <Typography sx={{
+                textAlign: 'left',
+                color: theme.palette.secondary.main,
+                width: '200px',
+                fontWeight: 'bold',
+                marginBottom: '3%'
+            }}> Accepter des pièces transférées.</Typography>
+
+            <DynamicTable
+                rows={transfertAccept}
+
+                columnLabels={{
+                    transfertId: 'Code',
+                    sendingDate: 'Crèe le',
+                    sendUserName: 'Par',
+                    toBranchName: 'à agence',
+                    receivedDate: 'Accepter le',
+                    receiveUserName: 'Accepte par',
+                    state: 'ètat',
+                    type: 'Type pièce',
+                    remark: 'Remarque',
+                    delivredBy: 'Livrer par',
+                }}
+                columnsToShow={[
+                    'transfertId',
+                    'sendingDate',
+                    'sendUserName',
+                    'toBranchName',
+                    'receivedDate',
+                    'receiveUserName',
+                    'state',
+                    'type',
+                    'remark',
+                    'delivredBy',
+                ]}
+            actions={actions} 
+
+            />
+            {/*
+            <ShowPart open={open} onClose={handleClose} data={formData} />
+            */}
+
+        </Box>
     )
 }

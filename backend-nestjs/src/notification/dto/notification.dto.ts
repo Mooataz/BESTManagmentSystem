@@ -7,10 +7,10 @@ export class CreateNotificationDto{
     @ApiProperty({ type: String, description: "Required"})
     @IsString()
     @IsNotEmpty()
-    title: string;
+    title!: string;
 
     @ApiProperty({ type: String, description: "Required"})
     @IsString()
     @IsNotEmpty()
-    body: string;
+    body!: string;
 }

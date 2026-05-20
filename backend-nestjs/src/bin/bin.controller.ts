@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, ConflictException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, ConflictException, HttpException } from '@nestjs/common';
 import { BinService } from './bin.service';
 import { CreateBinDto } from './dto/create-bin.dto';
 import { UpdateBinDto } from './dto/update-bin.dto';
@@ -9,7 +9,7 @@ export class BinController {
 
   @Post()
   async create(@Body() createBinDto: CreateBinDto,
-    @Res() res) {
+    @Res() res:any) {
     try {
       const newCreate = await this.binService.create(createBinDto)
       return res.status(HttpStatus.CREATED).json({
@@ -18,19 +18,27 @@ export class BinController {
         data:newCreate
       })
     } catch (error) {
-      if (error.code === '23505') {
+    
+    if (error instanceof HttpException) {
+      if (error.name === '23505') {
               throw new ConflictException('Case déja utilisé');
             }
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
   }
+  }
+
+
+
   @Get('/find/:branchId')
   async getByBranchId(@Param('branchId') branchId: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const allfind = await this.binService.findByBranchId(branchId)
        
@@ -39,17 +47,21 @@ export class BinController {
         status:HttpStatus.OK,
         data:allfind
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
  @Get('/findName/:name')
   async getByName(@Param('name') name: string,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const allfind = await this.binService.findByName(name)
        
@@ -58,18 +70,22 @@ export class BinController {
         status:HttpStatus.OK,
         data:allfind
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
   @Get('/find/:branchId/:type')
   async getByBranchIdAndType( @Param('branchId') branchId: number,
                               @Param('type') type: string,
-                              @Res() res) {
+                              @Res() res: any) {
     try {
       const allfind = await this.binService.findByBranchIdAndType(branchId, type)
       return res.status(HttpStatus.OK).json({
@@ -77,16 +93,20 @@ export class BinController {
         status:HttpStatus.OK,
         data:allfind
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     try {
       const allfind = await this.binService.findAll()
       return res.status(HttpStatus.OK).json({
@@ -94,18 +114,22 @@ export class BinController {
         status:HttpStatus.OK,
         data:allfind
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const onefind = await this.binService.findOne(+id)
       return res.status(HttpStatus.OK).json({
@@ -113,19 +137,23 @@ export class BinController {
         status:HttpStatus.OK,
         data:onefind
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 
   @Patch(':id')
   async update(@Param('id') id: number,
     @Body() updateBinDto: UpdateBinDto,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const updateType = await this.binService.update(+id, updateBinDto)
       return res.status(HttpStatus.OK).json({
@@ -133,21 +161,22 @@ export class BinController {
         status:HttpStatus.OK,
         data:updateType
       })
-    } catch (error) {
-      if (error.code === '23505') {
-              throw new ConflictException('Case déja utilisé');
-            }
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 
   @Delete(':id')
   async remove(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const deleteType = await this.binService.remove(+id)
       return res.status(HttpStatus.OK).json({
@@ -155,12 +184,16 @@ export class BinController {
         status:HttpStatus.OK,
         data:deleteType
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }  catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 }

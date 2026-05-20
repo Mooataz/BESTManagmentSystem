@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseInterceptors, UploadedFiles, UseGuards, Req, Query, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseInterceptors, UploadedFiles, UseGuards, Req, Query, BadRequestException, ParseIntPipe, HttpException } from '@nestjs/common';
 import { RepairService } from './repair.service';
 import { CreateRepairDto } from './dto/create-repair.dto';
 import { UpdateRepairDto } from './dto/update-repair.dto';
@@ -79,7 +79,7 @@ export class RepairController {
   async create(  
     @Body()  body: any, /* createRepairDto:   CreateRepairDto */     
     //@UploadedFiles() files: Express.Multer.File[],
-    @Res() res,
+    @Res() res: any,
   ) {
     try {
        
@@ -94,18 +94,22 @@ export class RepairController {
         data: newCreate,
       });
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null,
-      });
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+    
+      throw error
     }
   }
 @Get('byBranchAndStep')
 async findByBranchAndStep(
    @Query('branchId') branchId: number,
   @Query('step') step: string,   
-  @Res() res
+  @Res() res: any
 ) {
   
 try {
@@ -117,17 +121,21 @@ try {
         data:allfind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
 
   
 }
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     try {
       const allfind = await  this.repairService.findAll()
       return res.status(HttpStatus.OK).json({
@@ -136,17 +144,23 @@ try {
         data:allfind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
   }
+
+  throw error
+}
+
+    }
+   
 
   @Get(':id')
   async findOne(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const onefind = await this.repairService.findOne(+id)
       return res.status(HttpStatus.OK).json({
@@ -155,12 +169,16 @@ try {
         data:onefind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
 @UseInterceptors(
@@ -168,46 +186,36 @@ try {
     storage: diskStorage({
       destination: './upload/repairs',
       filename: (_req, file, cb) =>
-        cb(null, `${Date.now()}-${file.originalname}`),
+        cb(null, `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`),
     }),
   }),
 )
- @ApiConsumes("multipart/form-data")
+@ApiConsumes('multipart/form-data')
 @Patch('updateWithPartsFiles/:id')
 async updateWithPartsFiles(
   @Param('id') id: number,
   @Body() updateRepairDto: UpdateRepairDto,
-  //@UploadedFiles() files: Express.Multer.File[],
-  @Res() res: Response
+  @UploadedFiles() files?: Express.Multer.File[],
 ) {
-  // Validate files before processing
+  const fileNames = (files ?? []).map(file => file.filename);
 
-/* const filePaths = (files || [])
-  .filter(file => file && typeof file.filename === 'string' && file.filename.trim() !== '')
-  .map(file => {
-    if (!file.filename.match(/^[a-zA-Z0-9\-._]+$/)) {
-      throw new BadRequestException(...'');
-    }
-    return file.filename;
-  }); */
- 
   const updatedRepair = await this.repairService.updateRepairWithParts(
-    +id, 
-    updateRepairDto, 
-   /*  filePaths */
+    +id,
+    updateRepairDto,
+    fileNames,
   );
 
-  return res.status(HttpStatus.OK).json({
-    message: "Mise à jour réussie!",
-    status: HttpStatus.OK,
+  return {
+    message: 'Mise à jour réussie',
     data: updatedRepair,
-  });
+  };
 }
+
  @Patch(':id')
   async update(@Param('id') id: number,
     @Body() body: any,
     //@UploadedFiles() files: Express.Multer.File[],
-    @Res() res) {
+    @Res() res: any) {
     try {
       const updateRepairDto = {
       ...body,
@@ -226,17 +234,21 @@ async updateWithPartsFiles(
         data:updatedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }   
  
   @Delete(':id')
   async remove(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const deletedata = await this.repairService.remove(+id)
       return res.status(HttpStatus.OK).json({
@@ -245,16 +257,21 @@ async updateWithPartsFiles(
         data:deletedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
   }
 
+  throw error
+}
+    }
+ 
+
   @Get('filter-by-device/:deviceId')
-  async getRepairByDevice(@Param('deviceId') deviceId: string, @Res() res) {
+  async getRepairByDevice(@Param('deviceId') deviceId: string, @Res() res: any) {
     try {
       const id = parseInt(deviceId, 10);
       if (isNaN(id)) {
@@ -268,17 +285,22 @@ async updateWithPartsFiles(
         data: devices,
       });
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null,
-      });
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
   }
+
+  throw error
+}
+    }
+ 
 
   @Get('/findByNewSerialNumber/:branchId')
   async getByNewSerialNumber(@Param('newSerialNumber') newSerialNumber: number,
-                      @Res() res) {
+                      @Res() res: any) {
     try {
       const allfind = await this.repairService.filterByNewSerialNumber(newSerialNumber)
       return res.status(HttpStatus.OK).json({
@@ -286,16 +308,22 @@ async updateWithPartsFiles(
         status:HttpStatus.OK,
         data:allfind })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
 
   @Get('/findByActuellyBranch/:actuellyBranch')
-  async getByActuellyBranch(@Param('actuellyBranch') actuellyBranch: number,
-                      @Res() res) {
+  async getByActuellyBranch(@Param('actuellyBranch', ParseIntPipe) actuellyBranch: number,
+                      @Res() res: any) {
     try {
       const allfind = await this.repairService.filterByActuellyBranch(actuellyBranch)
       return res.status(HttpStatus.OK).json({
@@ -303,14 +331,20 @@ async updateWithPartsFiles(
         status:HttpStatus.OK,
         data:allfind })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get('filter-by-user/:userId')
-  async getRepairByUser(@Param('userId') userId: string, @Res() res) {
+  async getRepairByUser(@Param('userId') userId: string, @Res() res: any) {
     try {
       const id = parseInt(userId, 10);
       if (isNaN(id)) {
@@ -324,20 +358,25 @@ async updateWithPartsFiles(
         data: user,
       });
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null,
-      });
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
   }
+
+  throw error
+}
+    }
+ 
 
  @Get('FilterUserStep/:branchId/:userId/:steps')
 async getByUserStep(
   @Param('branchId') branchId: string,
   @Param('userId') userId: string,
   @Param('steps') steps: string,
-  @Res() res
+  @Res() res: any
 ) {
   try {
     const numericBranchId = Number(branchId);
@@ -353,16 +392,14 @@ async getByUserStep(
       data: filterResult,
     });
   } catch (error) {
-    return res.status(HttpStatus.BAD_REQUEST).json({
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
       message: error.message,
-      status: HttpStatus.BAD_REQUEST,
+      status: error.getStatus(),
       data: null,
     });
   }
 }
-
-
-
- 
     
+}
 }

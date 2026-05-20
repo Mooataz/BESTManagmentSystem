@@ -7,19 +7,19 @@ export class CreateBinDto {
         description: "Required"
     })
     @IsNotEmpty()
-    name: string;
+    name!: string;
 
     @ApiProperty({
         type: String,
         description: "Required"
     })
     @IsNotEmpty()
-    type: string;
+    type!: string;
 
     @ApiProperty({
         type: Number,
         description: "Required"
     })
     @IsNotEmpty()
-    branch: number;
+    branch!: number;
 }

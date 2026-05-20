@@ -8,29 +8,29 @@ export class CreateOutputListDto {
     })
     @IsDate()
     @IsNotEmpty()
-    date : Date;
+    date? : Date;
 
     @ApiProperty({
         type:String,
         description: "Required"
     })
-    remark : string;
+    remark? : string;
 
     @ApiProperty({
         type: Array,
         description: "Required"
     })
-    repairIds: number[]; 
+    repairIds?: number[]; 
 
     @ApiProperty({
         type:Number,
         description: "Required"
     })
-    customer: number;
+    customer?: number;
 
     @ApiProperty({
         type:Number,
         description: "Required"
     })
-    user: number;
+    user!: number;
 }

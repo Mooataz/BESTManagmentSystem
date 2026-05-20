@@ -4,29 +4,29 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export class Company {
         @PrimaryGeneratedColumn()
-        id: number;
+        id!: number;
 
         @Column()
-        name: string;
+        name?: string;
     
         @Column()
-        headquarterslocation: string;
+        headquarterslocation?: string;
     
         @Column({unique:true})
-        taxRegisterNumber: string;
+        taxRegisterNumber?: string;
     
         @Column({ type: 'bigint' })
-        rib: Number;
+        rib?: Number;
 
         @Column()
-        bank : string;
+        bank ?: string;
     
         @Column({ nullable: true })
-        logo: string;
+        logo?: string;
 
         @Column()
-        quantityAlertStock: number;
+        quantityAlertStock?: number;
 
         @OneToMany(() => Branch,Branch => Branch.company)
-        branches:Branch[]
+        branches?:Branch[]
 }

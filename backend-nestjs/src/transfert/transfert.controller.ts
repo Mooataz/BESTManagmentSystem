@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, HttpException } from '@nestjs/common';
 import { TransfertService } from './transfert.service';
 import { CreateTransfertDto } from './dto/create-transfert.dto';
 import { UpdateTransfertDto } from './dto/update-transfert.dto';
@@ -9,7 +9,7 @@ export class TransfertController {
 
   @Post()
   async create(@Body() createTransfertDto: CreateTransfertDto,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const newDevice = await this.transfertService.create(createTransfertDto)
       return res.status(HttpStatus.CREATED).json({
@@ -18,18 +18,22 @@ export class TransfertController {
         data: newDevice
       })
 
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
         message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 
   @Get('/findByState/:state')
   async getByState(@Param('state') state: string,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const allfind = await this.transfertService.findByState(state)
       return res.status(HttpStatus.OK).json({
@@ -37,18 +41,22 @@ export class TransfertController {
         status: HttpStatus.OK,
         data: allfind
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
         message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 
   @Get('/findFromBranchId/:branchId/:type')
   async getFromBranchId(@Param('branchId') branchId: number, @Param('type') type: string,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const allfind = await this.transfertService.getFromBranch(branchId, type)
       return res.status(HttpStatus.OK).json({
@@ -56,19 +64,23 @@ export class TransfertController {
         status: HttpStatus.OK,
         data: allfind
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
         message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
   @Get('/findToBranchId/:branchId/:type/:state')
   async getByBranchId(@Param('branchId') branchId: number,
                       @Param('type') type: string,
                       @Param('state') state: string,
-                      @Res() res) {
+                      @Res() res: any) {
     try {
       const allfind = await this.transfertService.getToBranch(branchId, type, state)
       return res.status(HttpStatus.OK).json({
@@ -76,18 +88,22 @@ export class TransfertController {
         status: HttpStatus.OK,
         data: allfind
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
         message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 
 
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     try {
       const findAll = await this.transfertService.findAll()
       return res.status(HttpStatus.OK).json({
@@ -95,18 +111,22 @@ export class TransfertController {
         status: HttpStatus.OK,
         data: findAll
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
         message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const findOne = await this.transfertService.findOne(+id)
       return res.status(HttpStatus.OK).json({
@@ -114,19 +134,23 @@ export class TransfertController {
         status: HttpStatus.OK,
         data: findOne
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
+    }  catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
         message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 
   @Patch(':id')
   async update(@Param('id') id: number,
     @Body() updateTransfertDto: UpdateTransfertDto,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const updatedata = await this.transfertService.update(+id, updateTransfertDto)
       return res.status(HttpStatus.OK).json({
@@ -134,19 +158,22 @@ export class TransfertController {
         status: HttpStatus.OK,
         data: updatedata
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
         message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
+        status: error.getStatus(),
+        data: null,
       })
-
     }
+  
+    throw error
+  }
   }
 
   @Delete(':id')
   async remove(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const deletedata = await this.transfertService.remove(+id);
       return res.status(HttpStatus.OK).json({
@@ -154,13 +181,16 @@ export class TransfertController {
         status: HttpStatus.OK,
         data: deletedata
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
         message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
+        status: error.getStatus(),
+        data: null,
       })
-
     }
+  
+    throw error
+  }
   }
 }

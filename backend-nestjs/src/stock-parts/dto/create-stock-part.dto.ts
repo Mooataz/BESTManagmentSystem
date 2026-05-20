@@ -6,13 +6,13 @@ export class CreateStockPartDto {
         type:String,
         description: "Required"
     })
-    serialNumber : string;
+    serialNumber? : string;
 
     @ApiProperty({
         type:String,
         description: "Required"
     })
-    remark : string;
+    remark ?: string;
   
      
 }

@@ -7,7 +7,7 @@ import type { RootState } from '../../../Redux/store';
 import type { TransfertPR, TypeBranchTransfert } from '../../../Redux/Types/Stock';
 import { getAgencies } from '../../../Redux/Actions/Administration/AgenciesActions';
 import { CustomAutocomplete } from '../../../Componants/Global/CustomAutocomplete';
-import { getTotransfert } from '../../../Redux/Actions/stock/EtatStockActions';
+import { AddhistoryOnePart, getTotransfert } from '../../../Redux/Actions/stock/EtatStockActions';
 import { AddOneTransfert, GetSendTransfert } from '../../../Redux/Actions/stock/TransfertAction';
 import DynamicTable from '../../../Componants/Global/TableComponat';
 
@@ -16,13 +16,13 @@ export default function AddTransfertpart() {
   const { notify } = useNotification();
   const user = useSelector((state: RootState) => state.auth.user);
   const allStockPart = useSelector((state: RootState) => state.stockParts.stockParts)
-    const getBranchId = (branch: number | { id: number } | undefined): number | undefined =>
-      typeof branch === 'number' ? branch : branch?.id;
+  const getBranchId = (branch: number | { id: number } | undefined): number | undefined =>
+    typeof branch === 'number' ? branch : branch?.id;
 
-    const currentbranch = getBranchId(user?.branch);
+  const currentbranch = getBranchId(user?.branch);
   const branches = useSelector((state: RootState) => {
     const allbranch = state.agencies.Agency
-  
+
     return allbranch.filter(branch => branch.id !== currentbranch)
   })
 
@@ -44,8 +44,8 @@ export default function AddTransfertpart() {
     sendUser: user?.id || 0,
     tobranch: 0,
     stockPartIds: [],
-    type: 'Pieces',
-    state: 'Encours',
+    type: 'Pièces',
+    state: 'En cours',
     typePart: '',
     remark: ''
 
@@ -85,7 +85,7 @@ export default function AddTransfertpart() {
         receiveUser: null,            // champ nullable mais doit exister
       };
 
-      // ❌ Supprime uniquement ce que le backend ne veut pas
+
       delete payload.stockPart;
       delete payload.repair;
 
@@ -97,6 +97,21 @@ export default function AddTransfertpart() {
         }
         dispatch(getTotransfert(dataTransfert))
         notify('Transfert ajouté avec succès', 'success');
+
+        await Promise.all(
+          (formtransfert.stockPartIds ?? []).map((idPart: number) =>
+            dispatch(
+              AddhistoryOnePart({
+                id: idPart,
+                userId: user?.id || 0,
+                step: `Transfert de agence ${formtransfert.frombranch}`,
+              })
+            )
+          )
+        );
+
+
+        
       } else {
         notify(result.payload as string || 'Erreur lors de l’ajout', 'error');
       }

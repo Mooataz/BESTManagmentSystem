@@ -13,6 +13,9 @@ import { useAppDispatch } from '../../Redux/hooks';
 import { getAllStockPartBranch } from '../../Redux/Actions/stock/EtatStockActions';
 import DynamicTable from '../../Componants/Global/TableComponat';
 import theme from '../../Theme/theme';
+import type { TableAction } from '../../Redux/Types/repairTypes';
+import { TbListDetails } from 'react-icons/tb';
+import ShowHistoryPart from './ShowHistoryPart';
  
 export default function EtatStock() {
   const dispatch = useAppDispatch();
@@ -137,6 +140,21 @@ export default function EtatStock() {
       </FormControl>
     </Grid>
   );
+ const [row, setRow] = useState(0);
+    const actions: TableAction[] = [ 
+   
+ 
+  {
+    icon: <TbListDetails  style={{ color: theme.palette.primary.main  }} />,
+    onClick: (row: any) => handelOpenDetailes(row.id)
+  }]
+   const [openDetails, setOpenDetails] = React.useState(false);
+   const handleCloseDetails = () => setOpenDetails(false);
+  const handelOpenDetailes = (id: number) => {
+    setRow(id);
+    setOpenDetails(true);
+
+  }
   return (
     <Box>
       <Typography variant="h5" gutterBottom>État de stock</Typography>
@@ -180,7 +198,17 @@ export default function EtatStock() {
           'bin.type',
           'remark'
         ]}
+         actions={actions}
       />
+
+<ShowHistoryPart
+              open={openDetails}
+              onClose={handleCloseDetails}
+              idPart={row}
+               
+            />
+
+       
     </Box>
   );
 }

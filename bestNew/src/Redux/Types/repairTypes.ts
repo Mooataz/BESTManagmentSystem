@@ -99,7 +99,10 @@ export interface RepairForm {
   approveStock?: ApproveStockForm[];
 }
 
-
+export interface UploadRepairFilesPayload {
+  id: number;
+  data: FormData;
+}
 export interface RepairFormInput {
   accessoryIds: number[];
   listFaultIds: number[];
@@ -142,13 +145,7 @@ export type TableAction = {
   onClick: (row: Record<string, any>) => void;
 };
 
-/* export type TableProps = { 
-  rows: Record<string, any>[];
-  columnsToShow?: string[];
-  columnLabels?: Record<string, string>;
-  actions?: TableAction[];
-  clickedRowId?:number |null;
-}; */
+ 
 
 export interface TableProps {
   rows: any[];

@@ -4,17 +4,17 @@ import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export class OtherCost {
     @PrimaryGeneratedColumn()
-    id : number;
+    id! : number;
 
     @Column('float')
-    price: number;
+    price?: number;
 
     @Column()
-    name : string;
+    name? : string;
 
     @Column()
-    status: string;
+    status?: string;
 
     @ManyToMany( () => Invoice, (invoice) => invoice.otherCost)
-    invoice: Invoice; 
+    invoice?: Invoice; 
 }

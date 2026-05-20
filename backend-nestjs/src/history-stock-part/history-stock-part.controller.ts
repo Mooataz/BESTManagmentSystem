@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, HttpException } from '@nestjs/common';
 import { HistoryStockPartService } from './history-stock-part.service';
 import { CreateHistoryStockPartDto } from './dto/create-history-stock-part.dto';
 import { UpdateHistoryStockPartDto } from './dto/update-history-stock-part.dto';
@@ -9,7 +9,7 @@ export class HistoryStockPartController {
 
   @Post()
   async create(@Body() /* createHistoryStockPartDto: CreateHistoryStockPartDto */ data:any,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const newcreate = await this.historyStockPartService.create(data)
       return res.status(HttpStatus.CREATED).json({
@@ -17,15 +17,20 @@ export class HistoryStockPartController {
         status:HttpStatus.CREATED,
         data:newcreate})
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null})
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
   @Get('/find/:stockPartId')
   async getByStockPartId(@Param('stockPartId') stockPartId: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const allfind = await this.historyStockPartService.findByStockPartId(stockPartId)
       return res.status(HttpStatus.OK).json({
@@ -34,15 +39,19 @@ export class HistoryStockPartController {
         data:allfind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     try {
       const allfind = await this.historyStockPartService.findAll()
       return res.status(HttpStatus.OK).json({
@@ -51,17 +60,21 @@ export class HistoryStockPartController {
         data:allfind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const Onefind = await this.historyStockPartService.findOne(+id)
       return res.status(HttpStatus.OK).json({
@@ -70,18 +83,22 @@ export class HistoryStockPartController {
         data:Onefind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Patch(':id')
   async update(@Param('id') id: number,
     @Body() updateHistoryStockPartDto: UpdateHistoryStockPartDto,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const updatedata = await this.historyStockPartService.update(+id, updateHistoryStockPartDto)
       return res.status(HttpStatus.OK).json({
@@ -90,17 +107,21 @@ export class HistoryStockPartController {
         data:updatedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Delete(':id')
   async remove(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const deletedata = await this.historyStockPartService.remove(+id)
       return res.status(HttpStatus.OK).json({
@@ -109,11 +130,15 @@ export class HistoryStockPartController {
         data:deletedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+    
+      throw error
     }
   }
 }

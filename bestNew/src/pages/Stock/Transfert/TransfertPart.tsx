@@ -9,6 +9,7 @@ import TabPanel from '@mui/lab/TabPanel';
 import { Typography } from '@mui/material';
 import theme from '../../../Theme/theme';
 import ListSendingTransfert from './ListSendingTransfert';
+import AcceptePart from './AcceptePart';
  
 export default function TransfertPart() {
     const [value, setValue] = React.useState('1');
@@ -28,14 +29,17 @@ export default function TransfertPart() {
          <Box sx={{ width: '1500px', typography: 'body1' }}>
       <TabContext value={value} >
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <TabList onChange={handleChange} aria-label="lab API tabs example"     sx={{width:'fullWidth'   , marginLeft:'30%'  }}  >
-            <Tab label="List d'envoie" value="1" sx={{width:'700px' }}/>
-            <Tab label="Appliquez un transfert." value="2" sx={{width:'700px'}}/>
+          <TabList onChange={handleChange} aria-label="lab API tabs example"     
+          sx={{width:'fullWidth'   , marginLeft:'10%'  }}  >
+            <Tab label="List d'envoie"            value="1" sx={{width:'700px' }}/>
+            <Tab label="Accepter un transfert."   value="2" sx={{width:'700px'}}/>
+            <Tab label="Appliquez un transfert."  value="3" sx={{width:'700px'}}/>
             
           </TabList> 
         </Box>
         <TabPanel value="1"  ><ListSendingTransfert /></TabPanel>
-        <TabPanel value="2" ><AddTransfertpart /></TabPanel>
+        <TabPanel value="2"  ><AcceptePart /></TabPanel>
+        <TabPanel value="3" ><AddTransfertpart /></TabPanel>
          
       </TabContext>
     </Box>

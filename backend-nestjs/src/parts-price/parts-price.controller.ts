@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, HttpException } from '@nestjs/common';
 import { PartsPriceService } from './parts-price.service';
 import { CreatePartsPriceDto } from './dto/create-parts-price.dto';
 import { UpdatePartsPriceDto } from './dto/update-parts-price.dto';
@@ -9,7 +9,7 @@ export class PartsPriceController {
 
   @Post()
   async create(@Body() createPartsPriceDto: CreatePartsPriceDto,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const newPrice = await this.partsPriceService.create(createPartsPriceDto)
       return res.status(HttpStatus.CREATED).json({
@@ -18,16 +18,20 @@ export class PartsPriceController {
         data:newPrice
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+    
+      throw error
     }
   }
 
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     
     try {
       const allTypes = await this.partsPriceService.findAll()
@@ -37,17 +41,21 @@ export class PartsPriceController {
         data:allTypes
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const allTypes = await this.partsPriceService.findOne(+id)
       return res.status(HttpStatus.OK).json({
@@ -56,18 +64,22 @@ export class PartsPriceController {
         data:allTypes
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Patch(':id')
   async update(@Param('id') id: number,
     @Body() updatePartsPriceDto: UpdatePartsPriceDto,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const allTypes = await this.partsPriceService.update(+id, updatePartsPriceDto)
       return res.status(HttpStatus.OK).json({
@@ -76,17 +88,21 @@ export class PartsPriceController {
         data:allTypes
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Delete(':id')
   async remove(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     
     try {
       const allTypes = await this.partsPriceService.remove(+id)
@@ -96,19 +112,23 @@ export class PartsPriceController {
         data:allTypes
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get(':modelId/:allPartId')
   async findPartsPriceByModelAndAllPart(
                                           @Param('modelId') modelId: number,
                                           @Param('allPartId') allPartId: number,
-                                          @Res() res
+                                          @Res() res: any
                                         ) {
  
 
@@ -123,12 +143,16 @@ export class PartsPriceController {
         data:partsPrice
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 }
 

@@ -4,11 +4,11 @@ import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export class CustomerRequest {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column()
-    name: string;
+    name?: string;
     
     @ManyToMany(() => Repair, (repair) => repair.customerRequest)
-    repair: Repair[];
+    repair?: Repair[];
 }

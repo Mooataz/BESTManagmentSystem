@@ -13,16 +13,20 @@ import type { TableAction } from '../../../Redux/Types/repairTypes';
 import { Button } from '@mui/material';
 import axios from 'axios';
 import AcceptePart from './AcceptePart';
+import { AddhistoryOnePart } from '../../../Redux/Actions/stock/EtatStockActions';
 
 export default function EnAttente() {
-    const user = useSelector((state: RootState) => state.user);
+    const user = useSelector((state: RootState) => state.auth.user);
     const dispatch = useAppDispatch();
     const transfert = useSelector((state: RootState) => state.Transfert.Transfert);
     const [open, setOpen] = useState(false);
     const [formData, setFormData] = useState<any>(null);
     const { notify } = useNotification();
-    const branchId = user.branch?.id;
+    //const branchId = user?.branch?.id?;
+ const getBranchId = (branch: number | { id: number } | undefined): number | undefined =>
+    typeof branch === 'number' ? branch : branch?.id;
 
+  const branchId = getBranchId(user?.branch);
     const API = axios.create({
         baseURL: 'http://localhost:3000/',
         withCredentials: true,
@@ -70,15 +74,25 @@ export default function EnAttente() {
             id: row.transfertId,
             state: 'Accepter',
             receivedDate: new Date(),
-            receiveUser: user.id || 0
+            receiveUser: user?.id || 0
         };
         try {
             await dispatch(UpdateOneTransfert(valueupdate)).unwrap();
             notify('Transfert accepté', 'success');
 
             loadTransferts()
-            /*  (GetReceiveTransfert({ branchId, type: 'Pieces', state: 'Encours' }));
-  */
+                     await Promise.all(
+                       (formtransfert.stockPartIds ?? []).map((idPart: number) =>
+                         dispatch(
+                           AddhistoryOnePart({
+                             id: idPart,
+                             userId: user?.id || 0,
+                             step: `Transfert accepter agence ${formtransfert.tobranch}`,
+                           })
+                         )
+                       )
+                     );
+             
         } catch (error) {
             notify('Erreur lors de l’acceptation', 'error');
         }

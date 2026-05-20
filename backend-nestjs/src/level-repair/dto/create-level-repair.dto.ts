@@ -5,13 +5,13 @@ export class CreateLevelRepairDto {
         type: String,
         description: "Required" 
     })
-    name: string;
+    name!: string;
 
     @ApiProperty({
         type: Number,
 
         description: "Required"
     })
-    price: number;
+    price!: number;
     
 }

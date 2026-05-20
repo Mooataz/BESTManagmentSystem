@@ -58,6 +58,7 @@ import Validation from '../../Coordinate/Validation';
 import ReceiveCQ from '../../Reception/ReceiveCQ';
 import Recuperation from '../../Reception/Recuperation';
 import ListOutPut from '../../Reception/ListOutPut';
+import Reaffectation from '../../Coordinate/Reaffectation';
 
 const xThemeComponents = {
   ...chartsCustomizations,
@@ -127,10 +128,10 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
               <Route path="EnvoyeAffectation" element={<SendToAssign />} />
               <Route path="ReçoiReception" element={<RecieveReception />} />
               <Route path="AccepteQC" element={<AccepteQC />} />
-              <Route path="RecevoireQC" element={<ReceiveCQ />} /> 
-<Route path="EtatRécuperation" element={<ListOutPut />} />
+              <Route path="RecevoireQC" element={<ReceiveCQ />} />
+              <Route path="EtatRécuperation" element={<ListOutPut />} />
 
-
+              <Route path="Réaffectation" element={<Reaffectation />} />
               <Route path='case' element={<Bin />} />
               <Route path='Reférences' element={<References />} />
               <Route path="RemplissageStock" element={<RemplissageStock />} />

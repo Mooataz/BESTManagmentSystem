@@ -11,51 +11,51 @@ import { ChildEntity, Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMan
 
 export class User {
     @PrimaryGeneratedColumn()
-    id : number;
+    id? : number;
 
     @Column()
-    name : string;
+    name? : string;
 
     @Column()
-    phone : number;
+    phone? : number;
 
     @Column()
-    password : string;
+    password? : string;
 
     @Column()
-    createdDate : Date;
+    createdDate? : Date;
 
     @Column()
-    status : string;
+    status? : string;
     
     @Column({ unique: true })
-    login : string;
+    login? : string;
 
     @Column("simple-array", { nullable: true })
-    role: string[]; 
+    role?: string[]; 
 
 
     @ManyToOne (() => Branch,(branch) => branch.user)
-    branch:Branch;
+    branch?:Branch;
  
 
     @OneToMany( () => Repair,(repair) => repair.user)
-    repair : Repair[]; 
+    repair? : Repair[]; 
 
     @OneToMany( () => Tracability, (tracability) => tracability.user)
-    tracability: Tracability[];
+    tracability?: Tracability[];
 
     @OneToMany( () => OutputList, (outputList) => outputList.user)
-    outputList : OutputList[];
+    outputList? : OutputList[];
 
     @OneToMany( () => Invoice, (invoice) => invoice.user)
-    invoice: Invoice[];
+    invoice?: Invoice[];
     
     @OneToMany( () => Sale, (sale) => sale.user)
-    sale: Sale[];
+    sale?: Sale[];
 
     @Column({nullable: true, default: null, type: 'varchar'})
-    refreshToken: string | null
+    refreshToken?: string | null
 
    
 }

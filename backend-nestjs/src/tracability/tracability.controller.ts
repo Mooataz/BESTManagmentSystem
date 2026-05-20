@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, Query, ParseIntPipe, HttpException } from '@nestjs/common';
 import { TracabilityService } from './tracability.service';
 import { CreateTracabilityDto } from './dto/create-tracability.dto';
 import { UpdateTracabilityDto } from './dto/update-tracability.dto';
@@ -9,7 +9,7 @@ export class TracabilityController {
 
   @Post()
   async create(@Body() createTracabilityDto: CreateTracabilityDto,
-    @Res() res) {
+    @Res() res:any) {
     try {
       const newcreate = await this.tracabilityService.create(createTracabilityDto)
       return res.status(HttpStatus.CREATED).json({
@@ -19,16 +19,20 @@ export class TracabilityController {
       })
 
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
-      })
-    }
+        if (error instanceof HttpException) {
+          return res.status(error.getStatus()).json({
+            message: error.message,
+            status: error.getStatus(),
+            data: null,
+          })
+        }
+      
+        throw error
+      }
   }
 
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res:any) {
 
     try {
       const findAll = await this.tracabilityService.findAll()
@@ -38,18 +42,22 @@ export class TracabilityController {
         data: findAll
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
         message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
 
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number,
-    @Res() res) {
+    @Res() res:any) {
     try {
       const findOne = await this.tracabilityService.findOne(+id)
       return res.status(HttpStatus.OK).json({
@@ -58,18 +66,22 @@ export class TracabilityController {
         data: findOne
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
         message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 
   @Patch(':id')
   async update(@Param('id') id: number,
     @Body() updateTracabilityDto: UpdateTracabilityDto,
-    @Res() res) {
+    @Res() res:any) {
     try {
       const updatedata = await this.tracabilityService.update(+id, updateTracabilityDto)
       return res.status(HttpStatus.OK).json({
@@ -78,18 +90,21 @@ export class TracabilityController {
         data: updatedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
         message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
+        status: error.getStatus(),
+        data: null,
       })
-
     }
+  
+    throw error
+  }
   }
 
   @Delete(':id')
   async remove(@Param('id') id: number,
-    @Res() res) {
+    @Res() res:any) {
     try {
       const deletedata = await this.tracabilityService.remove(+id)
       return res.status(HttpStatus.OK).json({
@@ -98,17 +113,21 @@ export class TracabilityController {
         data: deletedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
         message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 
   @Get(':historyRepairId')
   async getByHistoryRepairId(@Param('historyRepairId', ParseIntPipe) historyRepairId: number,
-                                @Res() res ) {
+                                @Res() res:any ) {
     try {
       const findtracability = await this.tracabilityService.findByHistoryRepairId(historyRepairId)
       return res.status(HttpStatus.OK).json({
@@ -117,17 +136,21 @@ export class TracabilityController {
         data:findtracability
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
-    }    
+    }
+  
+    throw error
+  }   
   }
 
   @Get(':historyRepairId')
   async getByHistoryStockPartId(@Param('historyStockPartId', ParseIntPipe) historyStockPartId: number,
-                                @Res() res ) {
+                                @Res() res:any ) {
     try {
       const findtracability = await this.tracabilityService.findByHistoryStockPartId(historyStockPartId)
       return res.status(HttpStatus.OK).json({
@@ -136,11 +159,15 @@ export class TracabilityController {
         data:findtracability
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
-    }    
+    }
+  
+    throw error
+  }    
   }
 }

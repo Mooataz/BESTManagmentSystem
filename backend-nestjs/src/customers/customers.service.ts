@@ -82,55 +82,30 @@ export class CustomersService {
  
  
 
-async findByName(name: string, phone: number, distributer): Promise<Customer> {
-  try {
-     
+async findByName(
+  name: string,
+  phone: number,
+  distributerId: number | null,
+): Promise<Customer> {
+  const customer = await this.customerRepositry.findOne({
+    where: { name, phone },
+  });
 
-    const customer = await this.customerRepositry.findOne({
-      where: { name, phone },
+  if (!customer) {
+    const newCustomer = this.customerRepositry.create({
+      name,
+      phone,
+      ...(distributerId
+        ? { distributer: { id: distributerId } }
+        : {}),
     });
 
-    if (distributer === undefined || distributer === null) {
-      distributer = 0;
-    }
-
-    if (!customer) {
-      const newCustomer = this.customerRepositry.create({ name, phone, distributer });
-      await this.customerRepositry.save(newCustomer);
-      
-      return newCustomer;
-    }
-
-    return customer;
-  } catch (error) {
-     throw error;
+    return await this.customerRepositry.save(newCustomer);
   }
+
+  return customer;
 }
-/* async UpdateByName(data:Customer): Promise<Customer> {
-  let {name, phone,distributer} =data
-  try {
-     
-
-    const customer = await this.customerRepositry.findOne({
-      where: { name,  phone },
-    });
-
-     
-
-    if (!customer) {
-      const newCustomer = this.customerRepositry.create({ name, phone, distributer });
-      await this.customerRepositry.save(newCustomer);
-      return newCustomer;
-    }else{
-      const newCustomer = await this.customerRepositry.update(data.id, customer);
-      return newCustomer;
-    }
-
-     
-  } catch (error) {
-     throw error;
-  }
-} */
+ 
 
 }
 

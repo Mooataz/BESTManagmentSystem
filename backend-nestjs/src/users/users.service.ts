@@ -112,29 +112,34 @@ async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
   }
 
 
-async findToAssign( branchId: number, admin: boolean ): Promise<User[]> {
-  // Vérification que branchId est un nombre valide
   
- 
- 
-  const allowedRoles = admin ? ['Technicien', 'Administrateur'] : ['Technicien'];
-  const users = await this.userRepositry.find({
-    where: [
-      // Cas où admin = true : filtre "Technicien" par branchId et "Administrateur" sans branche
-      ...(admin ? [
-        // Les techniciens filtrés par branchId
-        { status: 'Autoriser', role: 'Technicien', branch: { id: branchId } },
-        // Les administrateurs sans restriction de branche
-        { status: 'Autoriser', role: 'Administrateur' },
-      ] : [
-        // Cas où admin = false : uniquement les techniciens dans la bonne branche
-        { status: 'Autoriser', role: 'Technicien', branch: { id: branchId } },
-      ]),
-    ],
-    relations: ['branch'],
-  }); 
+ async findToAssign(branchId: number, admin: boolean): Promise<User[]> {
+  // Requête pour les techniciens autorisés de la branche
+  const queryTech = this.userRepositry
+    .createQueryBuilder('user')
+    .leftJoinAndSelect('user.branch', 'branch')
+    .where("user.role LIKE :technician", { technician: '%Technicien%' })
+    .andWhere("user.status = :status", { status: 'Autoriser' })
+    .andWhere("branch.id = :branchId", { branchId });
 
-  return users
+  // Requête pour les administrateurs autorisés (toutes branches)
+  const queryAdmin = this.userRepositry
+    .createQueryBuilder('user')
+    .leftJoinAndSelect('user.branch', 'branch')
+    .where("user.role LIKE :adminRole", { adminRole: '%Administrateur%' })
+    .andWhere("user.status = :status", { status: 'Autoriser' });
+
+  if (admin) {
+    const [techniciens, administrateurs] = await Promise.all([
+      queryTech.getMany(),
+      queryAdmin.getMany(),
+    ]);
+
+    // Fusionner les deux tableaux et éviter les doublons potentiels
+    return [...techniciens, ...administrateurs];
+  } else {
+    return await queryTech.getMany();
+  }
 }
 
 

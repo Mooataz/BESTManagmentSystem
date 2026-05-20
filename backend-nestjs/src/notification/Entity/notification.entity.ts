@@ -4,11 +4,11 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export class Notification{
     @PrimaryGeneratedColumn()
-    id : number;
+    id! : number;
 
     @Column()
-    title: string;
+    title?: string;
 
     @Column()
-    body: string;
+    body?: string;
 }

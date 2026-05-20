@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Res, HttpException } from '@nestjs/common';
 import { BranchesService } from './branches.service';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
@@ -11,7 +11,7 @@ export class BranchesController {
  
   @Post()
   async create(@Body() createBranchDto: CreateBranchDto, 
-  @Res() res) {
+  @Res() res: any) {
    
     try {
       const newcreate = await this.branchesService.create(createBranchDto)
@@ -21,16 +21,20 @@ export class BranchesController {
         data:newcreate
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+    
+      throw error
     }
   }
 
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     try {
       const allfind = await this.branchesService.findAll()
       return res.status(HttpStatus.OK).json({
@@ -39,16 +43,20 @@ export class BranchesController {
         data:allfind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number, @Res() res) {
+  async findOne(@Param('id') id: number, @Res() res: any) {
     
     try {
       const Onefind = await this.branchesService.findOne(+id)
@@ -58,16 +66,20 @@ export class BranchesController {
         data:Onefind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() updateBranchDto: UpdateBranchDto, @Res() res) {
+  async update(@Param('id') id: number, @Body() updateBranchDto: UpdateBranchDto, @Res() res: any) {
     try {
       const updatedata = await this.branchesService.update(+id, updateBranchDto)
       return res.status(HttpStatus.OK).json({
@@ -76,16 +88,20 @@ export class BranchesController {
         data:updatedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: number, @Res() res) {
+  async remove(@Param('id') id: number, @Res() res: any) {
     
     try {
       const deletedata = await this.branchesService.remove(+id)
@@ -95,11 +111,15 @@ export class BranchesController {
         data:deletedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 }

@@ -7,17 +7,17 @@ import { Column, Entity, JoinTable, ManyToOne, PrimaryGeneratedColumn, Unique } 
 @Unique( ['allPart','model'])
 export class PartsPrice {
     @PrimaryGeneratedColumn()
-    id : number;
+    id? : number;
 
     @Column('float')
-    price: number;
+    price?: number;
 
     @ManyToOne( () => Model, (model) => model.partsPrice)
-    model : Model;
+    model? : Model;
 
     @ManyToOne( () => AllPart, (allPart) => allPart.partsPrice)
-    allPart : AllPart;
+    allPart? : AllPart;
 
     @ManyToOne ( () => LevelRepair, (levelRepair) => levelRepair.partsPrice)
-    levelRepair: LevelRepair;
+    levelRepair?: LevelRepair;
 }

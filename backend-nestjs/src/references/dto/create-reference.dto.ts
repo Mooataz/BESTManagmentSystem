@@ -8,25 +8,25 @@ export class CreateReferenceDto {
     })
     
     @IsNotEmpty()
-    materialCode: string;
+    materialCode?: string;
 
     @ApiProperty({
         type: String,
         description: "Required"
     })
     @IsOptional()
-    description: string;
+    description?: string;
 
     @ApiProperty({
         type: Array,
         description: "Required"
     })
-    modelIds: number[];
+    modelIds?: number[];
     
     @ApiProperty({
         type: Number,
         description: "Required"
     })
-    allpart: number;
+    allpart?: number;
     
 }

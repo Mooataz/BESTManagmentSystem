@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpStatus, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateLoginDTO } from './dto/create-login.dto';
 import { AccessTokenGuard } from 'src/guards/accessToken.guard';
@@ -46,7 +46,7 @@ res.cookie('access_token', token.accessToken, {
   }
 
   @Get('id')
- async getUserId(@Param('id') id: number, @Res() res){
+ async getUserId(@Param('id') id: number, @Res() res: any){
 
  }
   
@@ -74,7 +74,7 @@ getMe(@Req() req: Request) {
   })
   async updatePassword (  @Param('userId') userId: number, 
                           @Body() passwordDTO:{currentPassword: string; newPassword: string},
-                          @Res() res){
+                          @Res() res: any){
  try {
       const updateType = await this.authService.updatePassword(userId, passwordDTO.currentPassword, passwordDTO.newPassword)
       return res.status(HttpStatus.OK).json({
@@ -82,12 +82,16 @@ getMe(@Req() req: Request) {
         status:HttpStatus.OK,
         data:updateType
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
                          }
 }

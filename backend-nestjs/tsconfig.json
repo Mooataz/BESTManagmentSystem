@@ -1,21 +1,38 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
     "target": "ES2023",
-    "sourceMap": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+
+    "baseUrl": ".",
+    "paths": {
+      "#/*": ["src/*"],
+      "#modules/*": ["src/modules/*"],
+      "#common/*": ["src/common/*"]
+    },
+
+    "rootDir": "./src",
     "outDir": "./dist",
-    "baseUrl": "./",
+
+    "declaration": true,
+    "sourceMap": true,
+    "removeComments": true,
     "incremental": true,
-    "skipLibCheck": true,
+
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+
+    "strict": true,
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "skipLibCheck": true,
+
+   //"ignoreDeprecations": "5.0"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

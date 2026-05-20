@@ -5,23 +5,23 @@ import { Column, Entity, JoinTable, ManyToOne, OneToMany, PrimaryGeneratedColumn
 @Entity()
 export class OutputList {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column()
-    date: Date;
+    date?: Date;
 
     
 
     @Column()
-    remark: string;
+    remark?: string;
 
     @OneToMany(() => Repair, (repair) => repair.outputList)
     @JoinTable()
-    repair: Repair[];
+    repair?: Repair[];
 
     @ManyToOne(() => Customer, (customer) => customer.outputList)
-    customer: Customer;
+    customer?: Customer;
 
     @ManyToOne(() => User, (user) => user.outputList)
-    user: User;
+    user?: User;
 }

@@ -351,6 +351,7 @@ export class RepairService {
 if (!updateRepairDto || typeof updateRepairDto !== 'object') {
   throw new BadRequestException('Invalid update data');
 }
+
   const existingRepair = await this.repairRepositry.findOne({
     where: { id },
     relations: [
@@ -359,7 +360,23 @@ if (!updateRepairDto || typeof updateRepairDto !== 'object') {
       'notesCustomer', 'expertiseReason', 'repairAction'
     ]
   });
+if (updateRepairDto.repairAction) {
+  existingRepair!.repairAction =
+    await this.repairActionRepositry.findBy({
+      id: In(updateRepairDto.repairAction),
+    });
+}
 
+if (updateRepairDto.notesCustomer) {
+  existingRepair!.notesCustomer =
+    await this.notesCustomerRepositry.findBy({
+      id: In(updateRepairDto.notesCustomer),
+    });
+}
+
+if (updateRepairDto.partsNeed) {
+  existingRepair!.partsNeed = updateRepairDto.partsNeed;
+}
   if (!existingRepair) {
     throw new NotFoundException('Repair not found');
   }
@@ -439,34 +456,44 @@ if (!updateRepairDto || typeof updateRepairDto !== 'object') {
 
 
   async updateRepairWithParts(
-    id: number,
-    updateRepairDto: UpdateRepairDto,
-    files?: string[],
-  ): Promise<Repair> {
-    const repair = await this.repairRepositry.findOne({ where: { id } });
+  id: number,
+  updateRepairDto: UpdateRepairDto,
+  files?: string[],
+): Promise<Repair> {
+  const repair = await this.repairRepositry.findOne({ where: { id } });
 
-    if (!repair) {
-      throw new NotFoundException(`Repair with id ${id} not found`);
-    }
+  if (!repair) {
+    throw new NotFoundException(`Repair with id ${id} not found`);
+  }
 
-    // Supprimer les anciens fichiers si de nouveaux sont fournis
-    if (files && files.length > 0) {
-      if (repair.files && repair.files.length > 0) {
-        for (const oldFile of repair.files) {
-          const filePath = path.join(__dirname, '../../upload/repairs', oldFile);
-          if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
-          }
+  // ✅ Gestion fichiers (optionnelle)
+  if (files && files.length > 0) {
+    // Supprimer anciens fichiers
+    if (Array.isArray(repair.files)) {
+      for (const oldFile of repair.files) {
+        const filePath = path.join(
+          process.cwd(),
+          'upload/repairs',
+          oldFile,
+        );
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
         }
       }
-
-      repair.files = files;
     }
-
-    Object.assign(repair, updateRepairDto);
-
-    return await this.repairRepositry.save(repair);
+    repair.files = files;
   }
+
+  // ✅ MAJ PARTIELLE : ignorer undefined
+  Object.entries(updateRepairDto || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      (repair as any)[key] = value;
+    }
+  });
+
+  return await this.repairRepositry.save(repair);
+}
+
 
 
 

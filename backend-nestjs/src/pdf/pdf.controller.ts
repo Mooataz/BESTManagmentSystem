@@ -40,9 +40,9 @@ async generateRepairsPdf(
 
 
 @Post()
-async generateAddStockPartPDF(@Body() body: any, @Res() res) {
+async generateAddStockPartPDF(@Body() body: any, @Res() res:any) {
   try {
-    const pdfBuffer = await this.pdfService.generatAddStockPdf(body);
+    const pdfBuffer = await this.pdfService.generatRepairPdf(body);
     
     res.set({
       'Content-Type': 'application/pdf',

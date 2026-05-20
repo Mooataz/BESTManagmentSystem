@@ -4,9 +4,9 @@ import { Column, Entity, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "t
 @Entity()
 export class Permission {
     @PrimaryGeneratedColumn()
-        id : number;
+        id? : number;
     @Column()
-        description : string;
+        description? : string;
 
    /*  @ManyToMany( () => User,user =>user.permissions)
     user : User[]  */

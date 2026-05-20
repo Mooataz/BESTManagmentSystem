@@ -5,12 +5,12 @@ export class CreateHistoryStockPartDto {
         type: Date,
         description: "Required"
     })
-    date: Date;
+    date?: Date;
 
     @ApiProperty({
         type: String,
         description: "Required"
     })
-    step: string;
+    step?: string;
 
 }

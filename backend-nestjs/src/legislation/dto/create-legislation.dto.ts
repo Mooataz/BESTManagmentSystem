@@ -8,6 +8,6 @@ export class CreateLegislationDto {
     })
     @IsString()
     @IsNotEmpty()
-    name: string;
+    name!: string;
 
 }

@@ -48,3 +48,46 @@ export const getTotransfert = createAsyncThunk<
     }
   }
 ); 
+       
+export const getOnePart = createAsyncThunk<
+  getFormStock,
+  number,
+  AsyncThunkConfig
+>(
+  'stockPart/getOnePart',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await API.get(`stock-parts/${id}`);
+
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Échec de la récupération '
+      );
+    }
+  }
+);
+
+interface AddHistoryParams {
+  id: number;
+  userId: number;
+  step: string;
+}
+export const AddhistoryOnePart = createAsyncThunk<
+  getFormStock,
+  AddHistoryParams,
+  AsyncThunkConfig
+>(
+  'stockPart/AddhistoryOnePart',
+  async ({ id, userId, step }, { rejectWithValue }) => {
+    try {
+      const response = await API.get(`AddHistorytockPart/${id}/${userId}/${step}`);
+
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Échec de la récupération '
+      );
+    }
+  }
+);

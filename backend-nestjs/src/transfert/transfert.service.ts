@@ -200,7 +200,7 @@ async update(id: number, data: any): Promise<Transfert> {
         this.branchRepositry.findOne({ where: { id: t.frombranch } }),
         this.branchRepositry.findOne({ where: { id: t.tobranch } }),
       ]);
-      const stockPartsDetail = t.stockPart.map(sp => ({
+      const stockPartsDetail = t.stockPart?.map(sp => ({
         id: sp.id,
         serialnumber: sp.serialnumber,
         remark: sp.remark,
@@ -254,7 +254,7 @@ async update(id: number, data: any): Promise<Transfert> {
         this.branchRepositry.findOne({ where: { id: t.frombranch } }),
         this.branchRepositry.findOne({ where: { id: t.tobranch } }),
       ]);
-      const stockPartsDetail = t.stockPart.map(sp => ({
+      const stockPartsDetail = t.stockPart?.map(sp => ({
         id: sp.id,
         serialnumber: sp.serialnumber,
         remark: sp.remark,

@@ -242,23 +242,20 @@ const repairSlice = createSlice({
         state.error = action.payload || 'Erreur inconnue';
       })
       
-      .addCase(UpdatePartFileRepair.pending, (state) => {  
-        state.loading = true;
-        state.error = null;
-        state.success = false;
-      })
-      .addCase(UpdatePartFileRepair.fulfilled, (state, action: PayloadAction<RepairForm>) => {
-        state.loading = false;
-        state.success = true;
-        state.oneRepair = action.payload;
-
-      })
-      .addCase(UpdatePartFileRepair.rejected, (state, action: PayloadAction<string | undefined>) => {
-        state.loading = false;
-        state.success = false;
-        state.error = action.payload || 'Erreur inconnue';
-      })
-      ;
+     .addCase(UpdatePartFileRepair.pending, (state) => {
+  state.loading = true;
+  state.error = null;
+})
+.addCase(UpdatePartFileRepair.fulfilled, (state) => {
+  state.loading = false;
+  state.success = true;
+})
+.addCase(UpdatePartFileRepair.rejected, (state, action) => {
+  state.loading = false;
+  state.success = false;
+  state.error = action.payload ?? 'Erreur inconnue';
+});
+``
 
   },
 });

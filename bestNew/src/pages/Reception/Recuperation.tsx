@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { getByBranchStep } from '../../Redux/Actions/Reception/repairAction';
 import { useAppDispatch } from '../../Redux/hooks';
 import { useNotification } from '../../Componants/NotificationContext';
@@ -6,7 +6,7 @@ import type { RootState } from '../../Redux/store';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import type { Customer, OutputListForm, RepairForm, TableAction } from '../../Redux/Types/repairTypes';
-import { Box, Button, FormControl, FormLabel, Input, Typography } from '@mui/material';
+import { Box, Button, Checkbox, FormControl, FormLabel, Grid, Input, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, Typography } from '@mui/material';
 import theme from '../../Theme/theme';
 import DynamicTable from '../../Componants/Global/TableComponat';
 import { addHistoryRepair } from '../../Redux/Actions/Reception/History';
@@ -22,7 +22,7 @@ export default function Recuperation() {
     const { notify } = useNotification();
     const userr = useSelector((state: RootState) => state.auth.user);
     const repairs = useSelector((state: RootState) => state.repair.repairs)
-    const navigate = useNavigate();
+    
     const [results, setResults] = useState<RepairForm[]>([]);
 
     const getLastStep = (history: any[] = []) => {
@@ -96,108 +96,169 @@ export default function Recuperation() {
         customer: 0,
         repairIds: [],
     })
-const Returned = async () => {
-    const resCustomer = await dispatch(AddCustomer(formCustomer));
-
-    if (AddCustomer.fulfilled.match(resCustomer)) {
-        const payloadCustomerId = resCustomer.payload.id || 0;
-
-        // On crée un objet final à envoyer au backend
-        const outputData: OutputListForm = {
-            ...returned,
-            customer: payloadCustomerId,
-            repairIds:selected
-        };
- 
-        const resAddOutPut = await dispatch(addOutPut(outputData));
-
-        if (addOutPut.fulfilled.match(resAddOutPut)) {
-            outputData.repairIds?.forEach((item) => {
-                dispatch(addHistoryRepair({
-                    date: new Date(),
-                    step: 'Récupérer',
-                    user: { id: userr.id || 0 },
-                    repair: item || 0
-                }));
-            });
-
-            notify('Récupération terminée', 'success');
-
-            dispatch(getByBranchStep({
-                branch: branchId,
-                step: 'Prêt à récupérer'
-            }))
-            .then((resultAction) => {
-                if (getByBranchStep.fulfilled.match(resultAction)) {
-                    setResults(resultAction.payload);
-                } else {
-                    notify(`Erreur lors du chargement : ${resultAction.payload}`, 'error');
-                }
-            });
-        }
-    }
-};
-
-
-   /*  const Returned = async () => {
-
+    const Returned = async () => {
         const resCustomer = await dispatch(AddCustomer(formCustomer));
+
         if (AddCustomer.fulfilled.match(resCustomer)) {
-            setReturned({ ...returned, customer: resCustomer.payload.id || 0 });
- 
-            const resAddOutPut = await dispatch( addOutPut(returned) );
+            const payloadCustomerId = resCustomer.payload.id || 0;
+
+            // On crée un objet final à envoyer au backend
+            const outputData: OutputListForm = {
+                ...returned,
+                customer: payloadCustomerId,
+                repairIds: selected
+            };
+
+            const resAddOutPut = await dispatch(addOutPut(outputData));
+
             if (addOutPut.fulfilled.match(resAddOutPut)) {
-console.log('resAddOutPut', resAddOutPut)
-                returned.repairIds?.map((item) => {
-                      dispatch(addHistoryRepair({
+                outputData.repairIds?.forEach((item) => {
+                    dispatch(addHistoryRepair({
                         date: new Date(),
                         step: 'Récupérer',
                         user: { id: userr.id || 0 },
                         repair: item || 0
                     }));
-                })
-                notify('Récupération terminer','success')
-            }
-            dispatch(getByBranchStep({
-            branch: branchId,
-            step: 'Prêt à récupérer'
-        }))
-            .then((resultAction) => {
-                if (getByBranchStep.fulfilled.match(resultAction)) {
-                    setResults(resultAction.payload);
-                } else {
-                    notify(
-                        `Erreur lors du chargement : ${resultAction.payload}`,
-                        'error'
-                    );
-                }
-            });
-        }
-    } */
-    //-----------------------------------------
-    /*     const handelAccepte = async (row: any) => {
-            if (!userr?.id) return;
-            const resultAction = await dispatch(addHistoryRepair({
-                date: new Date(),
-                step: 'Récupérer',
-                user: { id: userr.id || 0 },
-                repair: row?.id || 0
-            }));
-            if (addHistoryRepair.fulfilled.match(resultAction)) {
+                });
+
+                notify('Récupération terminée', 'success');
+
                 dispatch(getByBranchStep({
                     branch: branchId,
                     step: 'Prêt à récupérer'
                 }))
-                notify('Retourner', 'success')
+                    .then((resultAction) => {
+                        if (getByBranchStep.fulfilled.match(resultAction)) {
+                            setResults(resultAction.payload);
+                        } else {
+                            notify(`Erreur lors du chargement : ${resultAction.payload}`, 'error');
+                        }
+                    });
             }
         }
-        const actions: TableAction[] = [{
-            icon: <Button style={{ color: 'green' }} >Accepter </Button>,
-            onClick: (row: any) => handelAccepte(row)
-        },
-    
-        ] */
+    };
 
+
+        const [filters, setFilters] = useState({
+
+        id: [] as string[],
+        customername: [] as string[],
+        customerphone: [] as number[],
+        deviceid: [] as number[],
+        deviceserialenumber: [] as string[],
+        devicemodelname: [] as string[],
+        devicemodelbrandname: [] as string[],
+        distributername: [] as string[],
+    });
+ const filteredRows = useMemo(() => {
+  return results.filter((row: any) => {
+    return (
+      (filters.id.length === 0 || filters.id.includes(String(row.id))) &&
+
+      (filters.customername.length === 0 || filters.customername.includes(row.customer?.name)) &&
+
+      (filters.customerphone.length === 0 || filters.customerphone.includes(Number(row.customer?.phone))) &&
+
+      (filters.deviceid.length === 0 || filters.deviceid.includes(Number(row.device?.id))) &&
+
+      (filters.deviceserialenumber.length === 0 || filters.deviceserialenumber.includes(row.device?.serialenumber)) &&
+
+      (filters.devicemodelname.length === 0 || filters.devicemodelname.includes(row.device?.model?.name)) &&
+
+      (filters.devicemodelbrandname.length === 0 || filters.devicemodelbrandname.includes(row.device?.model?.brand?.name)) &&
+
+      (filters.distributername.length === 0 || filters.distributername.includes(row.customer?.distributer?.name))
+    );
+  });
+}, [results, filters]);
+
+const getUniqueOptions = (key: keyof FiltersType): string[] => {
+  const values = results.flatMap((row: any) => {
+    switch (key) {
+      case 'customername':
+        return row.customer?.name ? [row.customer.name] : [];
+      case 'customerphone':
+        return row.customer?.phone ? [String(row.customer.phone)] : [];
+        
+      case 'deviceid':
+        return row.device?.id ? [String(row.device.id)] : [];
+      case 'deviceserialenumber':
+        // ⚠️ ton DynamicTable montre "device.serialenumber" (avec un "e" minuscule)
+        return row.device?.serialenumber ? [row.device.serialenumber] : [];
+      case 'devicemodelname':
+        return row.device?.model?.name ? [row.device.model.name] : [];
+      case 'devicemodelbrandname':
+        return row.device?.model?.brand?.name ? [row.device.model.brand.name] : [];
+      case 'id':
+        return row.id ? [String(row.id)] : [];
+        case 'distributername':
+  return row.customer?.distributer?.name ? [row.customer.distributer.name] : [];
+
+      default:
+        return [];
+    }
+  });
+
+  return Array.from(new Set(values)).sort();
+};
+
+
+
+    const handleFilterChange = <K extends keyof FiltersType>(
+        field: K,
+        value: string[]
+    ) => {
+        // Si le filtre est censé contenir des nombres, on convertit les strings en number
+        const parsedValue =
+            field === 'customerphone' || field === 'deviceid'
+                ? (value.map(Number) as FiltersType[K])
+                : (value as FiltersType[K]);
+
+        setFilters({ ...filters, [field]: parsedValue });
+    };
+
+
+
+   
+    type FiltersType = {
+        id: string[];
+        customername: string[];
+        customerphone: number[];
+        deviceid: number[];
+        deviceserialenumber: string[];
+        devicemodelname: string[];
+        devicemodelbrandname: string[];
+          distributername: string[];
+    };
+
+    const renderMultiSelect = <K extends keyof FiltersType>(label: string, field: K) => (
+        <Grid sx={{ width: '200px' }}>
+            <FormControl fullWidth>
+                <InputLabel>{label}</InputLabel>
+                <Select
+                    multiple
+                    value={filters[field] as any}
+                    onChange={(e) => handleFilterChange(field, e.target.value as string[])}
+
+                    input={<OutlinedInput label={label} />}
+                    renderValue={(selected) => (selected as any[]).join(', ')}
+                    MenuProps={{
+                        PaperProps: {
+                            style: { maxHeight: 300, width: '200px' },
+                        },
+                    }}
+                >
+                    {getUniqueOptions(field).map((option) => (
+                        <MenuItem key={option} value={option}>
+                            <Checkbox checked={(filters[field] as any).includes(option)} />
+                            <ListItemText primary={option} />
+                        </MenuItem>
+                    ))}
+
+                </Select>
+            </FormControl>
+        </Grid>
+    );
 
     return (
         <Box>
@@ -268,10 +329,23 @@ console.log('resAddOutPut', resAddOutPut)
                     width: '100%',
                     ":hover": { backgroundColor: theme.palette.secondary.main }
                 }}
-            >Rècuperer</Button>
+            >Rècuperer</Button> <br /> <br />
+
+            <Grid container spacing={2} sx={{ mb: 2 }}>
+                {renderMultiSelect('Reparation', 'id')}
+                {renderMultiSelect('Nom client', 'customername')}
+                {renderMultiSelect('Téléphone', 'customerphone')}
+                {renderMultiSelect('Distributeur', 'distributername')} 
+                {renderMultiSelect('Appareille n°', 'deviceid')}
+                {renderMultiSelect('Imei', 'deviceserialenumber')}
+                {renderMultiSelect('Modéle', 'devicemodelname')}
+                {renderMultiSelect('Marque', 'devicemodelbrandname')}
+            </Grid>
+
+
 
             <DynamicTable
-                rows={results.map((r) => ({
+                rows={filteredRows.map((r:any) => ({
                     ...r,
                     lastStep: getLastStep(r.historyRepair)
                 }))}
@@ -300,7 +374,7 @@ console.log('resAddOutPut', resAddOutPut)
                 ]}
 
                 enableChecked={true}
-onChecked={setSelected}
+                onChecked={setSelected}
 
             />
         </Box>

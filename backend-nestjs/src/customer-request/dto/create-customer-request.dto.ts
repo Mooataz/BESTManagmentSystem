@@ -8,5 +8,5 @@ export class CreateCustomerRequestDto {
     })
     @IsString()
     @IsNotEmpty()
-    name: string;
+    name!: string;
 }

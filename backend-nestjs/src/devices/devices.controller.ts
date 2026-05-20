@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, Res, UploadedFile, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, Res, UploadedFile, HttpStatus, HttpException } from '@nestjs/common';
 import { DevicesService } from './devices.service';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
@@ -15,7 +15,7 @@ export class DevicesController {
  
   @Post()
   async create( @Body() createDeviceDto: CreateDeviceDto, 
-                @Res() res   
+                @Res() res: any   
                  ) {
     try {
            
@@ -27,16 +27,20 @@ export class DevicesController {
           })
     
         } catch (error) {
-          return res.status(HttpStatus.BAD_REQUEST).json({
-            message:error.message,
-            status:HttpStatus.BAD_REQUEST,
-            data:null
-          })
+          if (error instanceof HttpException) {
+            return res.status(error.getStatus()).json({
+              message: error.message,
+              status: error.getStatus(),
+              data: null,
+            })
+          }
+        
+          throw error
         }
   }
 
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     try {
       const findAll= await this.devicesService.findAll()
       return res.status(HttpStatus.OK).json({
@@ -45,17 +49,21 @@ export class DevicesController {
         data:findAll
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get(':id')
   async findOne( @Param('id') id: number, 
-                 @Res() res) {
+                 @Res() res: any) {
     try {
       const findOne = await this.devicesService.findOne(+id)
        return res.status(HttpStatus.OK).json({
@@ -64,19 +72,23 @@ export class DevicesController {
         data:findOne
       })
      } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-     }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   
   @Patch(':id')
   async update( @Param('id') id: number, 
                 @Body() updateDeviceDto: UpdateDeviceDto, 
-                @Res() res  
+                @Res() res : any 
                 ) {
 
     try {
@@ -87,19 +99,22 @@ export class DevicesController {
       status:HttpStatus.OK,
       data:updatedata
     })
-  } catch (error) {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-    message:error.message,
-    status:HttpStatus.BAD_REQUEST,
-    data:null
-  })
-    
+  }catch (error) {
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
   }
+
+  throw error
+}
   }
 
   @Delete(':id')
   async remove( @Param('id') id: number, 
-                @Res() res , ) {
+                @Res() res : any , ) {
     try {
       const deletedata = await this.devicesService.remove(+id);
       return res.status(HttpStatus.OK).json({
@@ -108,12 +123,16 @@ export class DevicesController {
         data:deletedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      }) 
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
 @ApiBody({
@@ -134,7 +153,7 @@ export class DevicesController {
     purchaseDate?:string,
      
     model?:number
-   }, @Res() res   ){
+   }, @Res() res: any   ){
 
      
     try {
@@ -149,17 +168,22 @@ export class DevicesController {
         status:HttpStatus.OK,
         data:device })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
 
    }
 
     @Get('deviceHasOpenRepair/:id')
   async deviceHasOpenRepair( @Param('id') id: string, 
-                 @Res() res) {
+                 @Res() res: any) {
     try {
       const findOne = await this.devicesService.deviceHasOpenRepair(id)
        return res.status(HttpStatus.OK).json({
@@ -168,12 +192,16 @@ export class DevicesController {
         data:findOne
       })
      } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-     }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   

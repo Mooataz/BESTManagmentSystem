@@ -38,7 +38,7 @@ export default function Checkout(props: { disableCustomTheme?: boolean }) {
   const { notify } = useNotification();
   const customerInfo = useSelector((state: RootState) => state.repair.tempCustomer);
   const deviceInfo = useSelector((state: RootState) => state.repair.temDevice);
-  const user = useSelector((state: RootState) => state.user)
+  const user = useSelector((state: RootState) => state.auth.user);
   const oneDistributeur = useSelector((state: RootState) => state.distributer.oneDistributer);
   const oneModel = useSelector((state: RootState) => state.models.Onemodel);
   const repairs = useSelector((state: RootState) => state.repair.repairs)
@@ -54,7 +54,14 @@ export default function Checkout(props: { disableCustomTheme?: boolean }) {
         throw new Error('Unknown step');
     }
   }
+if (!user?.id || !user.branch) return;
+  const branchId = typeof user.branch === 'object' ? user.branch.id : user.branch;
+  if (!branchId || isNaN(user.id)) return;
 
+  
+       
+
+ 
   const [dataCustomer, setDataCustomer] = React.useState<Customer>({
     name: '',
     phone: 0,
@@ -71,7 +78,7 @@ export default function Checkout(props: { disableCustomTheme?: boolean }) {
     listFaultIds: [],
     customerRequestIds: [],
     userId: user?.id ?? 0,
-    actuellybranch: user?.branch?.id ?? 1,
+    actuellybranch: branchId ?? 1,
     historyRepair: [],
   });
   const repair = useSelector((state: RootState) => state.repair)
@@ -145,7 +152,7 @@ export default function Checkout(props: { disableCustomTheme?: boolean }) {
           customerRequestIds: dataRepair.customerRequestIds,
           deviceStateReceive: dataRepair.deviceStateReceive,
           remark: dataRepair.remark || '',
-          actuellybranch: user.branch?.id ?? 0,
+          actuellybranch: branchId ?? 0,
           device: repair.temDevice?.id,
           customer: repair.tempCustomer?.id,
           userId: user.id || 0,
@@ -391,7 +398,7 @@ export default function Checkout(props: { disableCustomTheme?: boolean }) {
                     variant="text"
                     sx={{ display: { xs: 'none', sm: 'flex' } }}
                   >
-                    Previous
+                    Ancien
                   </Button>
                 )}
                 {activeStep !== 0 && (
@@ -411,7 +418,7 @@ export default function Checkout(props: { disableCustomTheme?: boolean }) {
                   onClick={handleNext}
                   sx={{ width: { xs: '100%', sm: 'fit-content' } }}
                 >
-                  {activeStep === steps.length - 1 ? 'Place order' : 'Suivant'}
+                  {activeStep === steps.length - 1 ? 'Terminer' : 'Suivant'}
                 </Button>
               </Box>
             </React.Fragment>

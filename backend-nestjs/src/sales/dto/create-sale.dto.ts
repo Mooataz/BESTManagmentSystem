@@ -5,18 +5,18 @@ export class CreateSaleDto {
         type: String,
         description: "Required"
     })
-    state: string;
+    state?: string;
 
     @ApiProperty({
         type: Number,
         format:('Float'),
         description: "Required"
     })
-    totalPrice: number;
+    totalPrice?: number;
 
     @ApiProperty({
         type: Date,
         description: "Required"
     })
-    date: Date;
+    date?: Date;
 }

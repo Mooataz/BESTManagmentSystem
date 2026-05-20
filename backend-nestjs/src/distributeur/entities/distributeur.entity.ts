@@ -5,23 +5,23 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 export class Distributeur {
     
     @PrimaryGeneratedColumn()
-    id : number;
+    id! : number;
 
     @Column()
-    name: string;
+    name!: string;
    
     @Column()
-    phone : number;
+    phone! : number;
     
     @Column()
-    email: string;
+    email!: string;
     
     @Column()
-    location: string;
+    location?: string;
     
     @Column()
-    taxRegisterNumber: string;
+    taxRegisterNumber!: string;
 
     @OneToMany( () => Customer,customer =>customer.distributer)
-    customer : Customer[]
+    customer? : Customer[]
 }

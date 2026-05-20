@@ -6,26 +6,26 @@ import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "ty
 @Entity()
 export class Branch {
     @PrimaryGeneratedColumn()
-    id : number;
+    id! : number;
 
     @Column()
-    name : string;
+    name? : string;
 
     @Column()
-    location : string;
+    location? : string;
 
     @Column()
-    phone : number;
+    phone? : number;
 
     @Column()
-    email  : string;
+    email?  : string;
 
     @ManyToOne(() => Company,Company =>Company.branches)
-    company:Company;
+    company?:Company;
     
     @OneToMany(() =>User,user => user.branch)
-    user: User[];
+    user?: User[];
 
     @OneToMany( () => Bin, bin => bin.branch)
-    bin : Bin[];
+    bin? : Bin[];
 }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, HttpException } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -9,7 +9,7 @@ export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
  
   @Post()
-  async create(@Body() createCustomerDto: CreateCustomerDto, @Res() res) {
+  async create(@Body() createCustomerDto: CreateCustomerDto, @Res() res:any) {
     try {
       
       const newCustomer= await this.customersService.create(createCustomerDto)
@@ -19,18 +19,22 @@ export class CustomersController {
         data:newCustomer
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+    
+      throw error
     }
   }
 
   
   @Get('/findByDistributer/:distributerId')
   async getByDistributerId(@Param('distributerId') distributerId: number,
-                      @Res() res) {
+                      @Res() res: any) {
     try {
       const allfind = await this.customersService.findByDistributer(distributerId)
       return res.status(HttpStatus.OK).json({
@@ -38,17 +42,23 @@ export class CustomersController {
         status:HttpStatus.OK,
         data:allfind })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
   
  
  
   @Post('/findByName')
-  async getByName(@Body() body:{name:string , phone:number, distributer} ,
-                      @Res() res) {
+  async getByName(@Body() body:{name:string , phone:number, distributer:number} ,
+                      @Res() res: any) {
     try {
       const {name, phone, distributer} = body;
       const allfind = await this.customersService.findByName(name, phone, distributer)
@@ -57,13 +67,19 @@ export class CustomersController {
         status:HttpStatus.OK,
         data:allfind })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     try {
       const allCustomer= await this.customersService.findAll()
       return res.status(HttpStatus.OK).json({
@@ -72,16 +88,20 @@ export class CustomersController {
         data:allCustomer
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number, @Res() res) {
+  async findOne(@Param('id') id: number, @Res() res: any) {
   
     try {
       const OneCustomer = await this.customersService.findOne(+id)
@@ -91,16 +111,20 @@ export class CustomersController {
         data:OneCustomer
       })
      } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-     }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
   
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() updateCustomerDto: UpdateCustomerDto, @Res() res) {
+  async update(@Param('id') id: number, @Body() updateCustomerDto: UpdateCustomerDto, @Res() res: any) {
    
 
     try {
@@ -111,18 +135,21 @@ export class CustomersController {
         data:updatedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-      message:error.message,
-      status:HttpStatus.BAD_REQUEST,
-      data:null
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
     })
-      
-    }
+  }
+
+  throw error
+}
     
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: number, @Res() res) {
+  async remove(@Param('id') id: number, @Res() res: any) {
     
     try {
       const deletedata = await this.customersService.remove(+id);
@@ -132,12 +159,15 @@ export class CustomersController {
         data:deletedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-      
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 }

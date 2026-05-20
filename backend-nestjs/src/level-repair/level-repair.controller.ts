@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, HttpException } from '@nestjs/common';
 import { LevelRepairService } from './level-repair.service';
 import { CreateLevelRepairDto } from './dto/create-level-repair.dto';
 import { UpdateLevelRepairDto } from './dto/update-level-repair.dto';
@@ -9,7 +9,7 @@ export class LevelRepairController {
 
   @Post()
   async create(@Body() createLevelRepairDto: CreateLevelRepairDto,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const newcreate = await this.levelRepairService.create(createLevelRepairDto)
       return res.status(HttpStatus.CREATED).json({
@@ -18,16 +18,20 @@ export class LevelRepairController {
         data:newcreate
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+    
+      throw error
     }
   }
 
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     try {
       const allfind = await this.levelRepairService.findAll()
       return res.status(HttpStatus.OK).json({
@@ -36,17 +40,21 @@ export class LevelRepairController {
         data:allfind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const Onefind = await this.levelRepairService.findOne(+id)
       return res.status(HttpStatus.OK).json({
@@ -55,18 +63,22 @@ export class LevelRepairController {
         data:Onefind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Patch(':id')
   async update(@Param('id') id: number,
     @Body() updateLevelRepairDto: UpdateLevelRepairDto,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const updatedata = await this.levelRepairService.update(+id, updateLevelRepairDto)
       return res.status(HttpStatus.OK).json({
@@ -75,17 +87,21 @@ export class LevelRepairController {
         data:updatedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Delete(':id')
   async remove(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const deletedata = await this.levelRepairService.remove(+id)
       return res.status(HttpStatus.OK).json({
@@ -94,11 +110,15 @@ export class LevelRepairController {
         data:deletedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 }

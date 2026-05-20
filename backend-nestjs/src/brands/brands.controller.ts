@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseInterceptors, UploadedFile, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseInterceptors, UploadedFile, Req, HttpException } from '@nestjs/common';
 import { BrandsService } from './brands.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
@@ -33,7 +33,7 @@ export class BrandsController {
   )
   @Post()
   async create( @Body() createBrandDto: CreateBrandDto, 
-                @Res() res , 
+                @Res() res: any, 
                 @UploadedFile() logo:Express.Multer.File) {
      
     try {
@@ -46,17 +46,21 @@ export class BrandsController {
       })
 
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get('/findAutoriser')
-  async getBySaleId(/* @Param('status') status: string, */
-                      @Res() res) {
+  async getAutoriser(/* @Param('status') status: string, */
+                      @Res() res: any) {
     try {
       const status ='Autoriser'
       const allfind = await this.brandsService.findByStatus(status)
@@ -65,14 +69,20 @@ export class BrandsController {
         status:HttpStatus.OK,
         data:allfind })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     
     try {
       const allBrands= await this.brandsService.findAll()
@@ -82,16 +92,20 @@ export class BrandsController {
         data:allBrands
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number, @Res() res) {
+  async findOne(@Param('id') id: number, @Res() res: any) {
     
     try {
       const findOne = await this.brandsService.findOne(+id)
@@ -101,12 +115,16 @@ export class BrandsController {
         data:findOne
       })
      } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-     }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
     @ApiBody({
@@ -131,7 +149,7 @@ export class BrandsController {
   )
  
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() updateBrandDto: UpdateBrandDto, @Res() res, @UploadedFile() logo:Express.Multer.File) {
+  async update(@Param('id') id: number, @Body() updateBrandDto: UpdateBrandDto, @Res() res: any, @UploadedFile() logo:Express.Multer.File) {
     
     try {
         updateBrandDto.logo=logo?.filename
@@ -142,17 +160,20 @@ export class BrandsController {
         data:updatedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-      message:error.message,
-      status:HttpStatus.BAD_REQUEST,
-      data:null
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
     })
-      
-    }
+  }
+
+  throw error
+}
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: number, @Res() res) {
+  async remove(@Param('id') id: number, @Res() res: any) {
     
     try {
       const deletedata = await this.brandsService.remove(+id);
@@ -162,12 +183,15 @@ export class BrandsController {
         data:deletedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-      
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+    
+      throw error
     }
   }
 

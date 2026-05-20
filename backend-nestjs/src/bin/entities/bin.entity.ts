@@ -5,17 +5,17 @@ import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "ty
 @Entity()
 export class Bin {
     @PrimaryGeneratedColumn()
-    id : number;
+    id! : number;
 
     @Column({ unique: true })
-    name: string;
+    name?: string;
 
     @Column()
-    type: string;
+    type?: string;
 
     @ManyToOne( () => Branch, branch => branch.bin)
-    branch : Branch;
+    branch? : Branch;
 
     @OneToMany( () => StockPart, stockPart => stockPart.bin)
-    stockPart : StockPart[];
+    stockPart? : StockPart[];
 }

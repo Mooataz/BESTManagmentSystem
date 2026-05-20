@@ -7,19 +7,19 @@ import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "t
 @Entity()
 export class AllPart {
     @PrimaryGeneratedColumn()
-        id : number;
+        id! : number;
     @Column()
-        description : string;
+        description? : string;
 
     @ManyToMany( () => Model, (model) => model.allpart)
-    model : Model[]
+    model? : Model[]
 
     @OneToMany( () => Reference, (reference) => reference.allpart)
-    reference : Reference[];
+    reference? : Reference[];
 
     @OneToMany( () => PartsPrice, (partsPrice) => partsPrice.allPart)
-    partsPrice : PartsPrice[];
+    partsPrice? : PartsPrice[];
     
     @ManyToMany( () => Sale, (sale) => sale.allPart)
-    sale: Sale[];
+    sale? : Sale[];
 }

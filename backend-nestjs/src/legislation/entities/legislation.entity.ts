@@ -5,9 +5,9 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 export class Legislation {
 
     @PrimaryGeneratedColumn()
-    id : number;
+    id! : number;
 
     @Column()
-    name: string;
+    name!: string;
 
 }

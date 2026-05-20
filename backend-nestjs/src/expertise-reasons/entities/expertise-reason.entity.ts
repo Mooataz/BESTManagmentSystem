@@ -4,11 +4,11 @@ import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export class ExpertiseReason {
     @PrimaryGeneratedColumn()
-    id : number;
+    id! : number;
 
     @Column()
-    name: string;
+    name!: string;
 
     @ManyToMany(() => Repair, (repair) => repair.expertiseReason)
-    repair: Repair[];
+    repair?: Repair[];
 }

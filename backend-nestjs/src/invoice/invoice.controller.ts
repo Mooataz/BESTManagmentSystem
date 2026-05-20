@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, HttpException } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { UpdateInvoiceDto } from './dto/update-invoice.dto';
@@ -9,7 +9,7 @@ export class InvoiceController {
 
   @Post()
   async create(@Body() createInvoiceDto: CreateInvoiceDto,
-    @Res() res) {
+    @Res() res:any) {
     try {
       const newcreate = await this.invoiceService.create(createInvoiceDto)
       return res.status(HttpStatus.CREATED).json({
@@ -18,17 +18,21 @@ export class InvoiceController {
         data:newcreate
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+    
+      throw error
     }
   }
   
   @Get('/findByBranchId/:branchId')
-  async getBySaleId(@Param('branchId') branchId: number,
-                      @Res() res) {
+  async getByranchId(@Param('branchId') branchId: number,
+                      @Res() res: any) {
     try {
       const allfind = await this.invoiceService.findByBranchId(branchId)
       return res.status(HttpStatus.OK).json({
@@ -36,15 +40,21 @@ export class InvoiceController {
         status:HttpStatus.OK,
         data:allfind })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get('/findByUserId/:userId')
   async getByUserId(@Param('userId') userId: number,
-                      @Res() res) {
+                      @Res() res: any) {
     try {
       const allfind = await this.invoiceService.findByUserId(userId)
       return res.status(HttpStatus.OK).json({
@@ -52,15 +62,21 @@ export class InvoiceController {
         status:HttpStatus.OK,
         data:allfind })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get('/findByRepairId/:repairId')
   async getByRepairId(@Param('repairId') repairId: number,
-                      @Res() res) {
+                      @Res() res: any) {
     try {
       const allfind = await this.invoiceService.findByRepairId(repairId)
       return res.status(HttpStatus.OK).json({
@@ -68,15 +84,21 @@ export class InvoiceController {
         status:HttpStatus.OK,
         data:allfind })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get('/findByState/:state')
   async getByState(@Param('state') state: string,
-                      @Res() res) {
+                      @Res() res: any) {
     try {
       const allfind = await this.invoiceService.findByState(state)
       return res.status(HttpStatus.OK).json({
@@ -84,13 +106,19 @@ export class InvoiceController {
         status:HttpStatus.OK,
         data:allfind })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     try {
       const allfind = await this.invoiceService.findAll()
       return res.status(HttpStatus.OK).json({
@@ -99,17 +127,21 @@ export class InvoiceController {
         data:allfind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const Onefind = await this.invoiceService.findOne(+id)
       return res.status(HttpStatus.OK).json({
@@ -118,18 +150,22 @@ export class InvoiceController {
         data:Onefind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Patch(':id')
   async update(@Param('id') id: number,
     @Body() updateInvoiceDto: UpdateInvoiceDto,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const updatedata = await this.invoiceService.update(+id, updateInvoiceDto)
       return res.status(HttpStatus.OK).json({
@@ -138,17 +174,21 @@ export class InvoiceController {
         data:updatedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Delete(':id')
   async remove(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const deletedata = await this.invoiceService.remove(id)
       return res.status(HttpStatus.OK).json({
@@ -157,11 +197,15 @@ export class InvoiceController {
         data:deletedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 }

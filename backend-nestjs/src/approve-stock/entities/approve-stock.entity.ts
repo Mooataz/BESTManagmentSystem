@@ -6,27 +6,27 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn
 @Entity()
 export class ApproveStock {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column()
-    type: string;
+    type?: string;
 
     @Column({ type: 'timestamptz' })
-    date: Date;
+    date?: Date;
 
     @Column()
-    state: string;
+    state?: string;
 
     @Column()
-    idPartRepair: number;
+    idPartRepair?: number;
 
     @ManyToOne( () => Repair, repair => repair.approveStock)
-    repair : Repair; 
+    repair? : Repair; 
 
     @OneToOne( () => StockPart, (stockPart) => stockPart.approveStock)
     @JoinColumn()
-    stockPart : StockPart;
+    stockPart? : StockPart;
 
     @ManyToOne( () => Sale, (sale) => sale.approveStock)
-    sale: Sale;
+    sale?: Sale;
 }

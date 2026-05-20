@@ -5,14 +5,14 @@ export class CreateHistoryRepairDto {
         type: Date,
         description: "Required"
     })
-    date: Date;
+    date!: Date;
 
     @ApiProperty({
         type: String,
         description: "Required"
     })
-    step: string;
+    step!: string;
 
     @ApiProperty({ type: Number})
-    repair: number;
+    repair?: number;
 }

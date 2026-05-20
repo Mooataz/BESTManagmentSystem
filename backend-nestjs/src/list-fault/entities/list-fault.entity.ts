@@ -6,12 +6,12 @@ import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 export class ListFault {
 
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
     
     @Column()
-    name: string;
+    name?: string;
     
     @ManyToMany(() => Repair, (repair) => repair.listFault)
-    repair: Repair[];
+    repair?: Repair[];
 
 }

@@ -8,5 +8,5 @@ export class CreateListFaultDto {
     })
     @IsString()
     @IsNotEmpty()
-    name: string;
+    name!: string;
 }

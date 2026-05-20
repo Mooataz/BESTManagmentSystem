@@ -5,21 +5,21 @@ import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGen
 @Entity()
 export class Brand {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column({unique:true})
-    name: string;
+    name?: string;
 
     @Column({ nullable: true })
-    logo: string;
+    logo?: string;
 
     @Column()
-    status : string;
+    status? : string;
 
     @OneToMany ( () => Model, Model => Model.brand)
-    model : Model[]
+    model? : Model[]
 
     @ManyToMany( () => LevelRepair, (levelRepair) => levelRepair.brand)
     @JoinTable()
-    levelRepair: LevelRepair;
+    levelRepair?: LevelRepair;
 }

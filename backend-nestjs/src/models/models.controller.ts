@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, Res, HttpStatus, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, Res, HttpStatus, UploadedFile, HttpException } from '@nestjs/common';
 import { ModelsService } from './models.service';
 import { CreateModelDto } from './dto/create-model.dto';
 import { UpdateModelDto } from './dto/update-model.dto';
@@ -38,7 +38,7 @@ export class ModelsController {
   ) 
   @Post()
   async create(@Body() createModelDto: CreateModelDto,
-    @Res() res ,
+    @Res() res: any ,
      @UploadedFile() picture: Express.Multer.File  ) {
     try {
      
@@ -54,17 +54,21 @@ export class ModelsController {
       })
 
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get('/findByBrand/:brandId')
-  async getBySaleId(@Param('brandId') brandId: number,
-                      @Res() res) {
+  async getByBrand(@Param('brandId') brandId: number,
+                      @Res() res: any) {
     try {
       const allfind = await this.modelsService.findByBrandId(brandId)
       return res.status(HttpStatus.OK).json({
@@ -72,15 +76,21 @@ export class ModelsController {
         status:HttpStatus.OK,
         data:allfind })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get('/findByBrand/:typeModelId')
   async getByTypeModelId(@Param('typeModelId') typeModelId: number,
-                      @Res() res) {
+                      @Res() res: any) {
     try {
       const allfind = await this.modelsService.findByTypeModelId(typeModelId)
       return res.status(HttpStatus.OK).json({
@@ -88,14 +98,20 @@ export class ModelsController {
         status:HttpStatus.OK,
         data:allfind })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
     @Get('findByBrandAuthorised')
-  async findByBrandAuthorised (@Res() res) {
+  async findByBrandAuthorised (@Res() res: any) {
     
     try {
        
@@ -106,16 +122,19 @@ export class ModelsController {
         data: data
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
-      })
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
 
-    }
+  throw error
+}
   }
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
 
     try {
       const comp = await this.modelsService.findAll()
@@ -125,18 +144,21 @@ export class ModelsController {
         data: comp
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
-      })
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
 
-    }
+  throw error
+}
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
 
     try {
       const oneCompany = await this.modelsService.findOne(+id)
@@ -146,12 +168,16 @@ export class ModelsController {
         data: oneCompany
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @ApiBody({
@@ -181,7 +207,7 @@ export class ModelsController {
   @Patch(':id')
   async update(@Param('id') id: number,
     @Body() body:any,
-    @Res() res,
+    @Res() res: any,
     @UploadedFile() picture: Express.Multer.File) {
 
     try {
@@ -210,17 +236,21 @@ export class ModelsController {
         data: updatedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Delete(':id')
   async remove(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
 
     try {
       const deletedata = await this.modelsService.remove(+id);
@@ -230,12 +260,15 @@ export class ModelsController {
         data: deletedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message: error.message,
-        status: HttpStatus.BAD_REQUEST,
-        data: null
-      })
-
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+    
+      throw error
     }
   }
 

@@ -6,22 +6,22 @@ import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGen
 @Entity()
 export class Reference {
     @PrimaryGeneratedColumn()
-    id : number;
+    id? : number;
     
     @Column({ unique: true })
-    materialCode: string;
+    materialCode?: string;
 
     @Column()
-    description: string;
+    description?: string;
 
     @OneToMany( () => StockPart, stockPart => stockPart.reference)
-    stockPart : StockPart[];
+    stockPart? : StockPart[];
 
     @ManyToMany( () => Model, (model) => model.reference, { cascade : true})
     @JoinTable()
-    model : Model[];
+    model? : Model[];
 
     @ManyToOne( () => AllPart, (allpart) => allpart.reference)
-    allpart : AllPart
+    allpart? : AllPart
         
 }

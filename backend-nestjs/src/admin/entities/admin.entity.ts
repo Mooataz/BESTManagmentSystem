@@ -4,5 +4,5 @@ import { ChildEntity, Column } from "typeorm";
 //@ChildEntity()
 export class Admin extends User {
     @Column()
-    adminCode: string;
+    adminCode!: string;
 }

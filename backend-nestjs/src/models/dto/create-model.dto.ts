@@ -10,14 +10,14 @@ export class CreateModelDto {
         })
         @IsString()
         @IsNotEmpty()
-        name: string;
+        name!: string;
 
         @ApiProperty({
                 type: String,
                 description: "Required"
         })
         @IsNotEmpty()
-        picture: string;
+        picture!: string;
 
         @ApiProperty({
         type: [Number], // Note the brackets for array of numbers
@@ -25,7 +25,7 @@ export class CreateModelDto {
         })
         @IsArray()
         @IsNumber({}, { each: true })
-        allpartIds: number[];
+        allpartIds?: number[];
 
             @ApiProperty({
         type:Number,
@@ -41,5 +41,5 @@ export class CreateModelDto {
     })
     @IsNumber()
     @IsNotEmpty()
-        typeModel:number; 
+        typeModel!:number; 
 }

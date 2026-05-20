@@ -17,20 +17,44 @@ export class ModelsService {
                   @InjectRepository(TypeModel) private readonly  typeModelRepositry:Repository<TypeModel>,
                                   private appService: AppService ){}
   
-    async create(createModelDto: CreateModelDto):Promise<Model> {
-      createModelDto.name =this.appService.cleanSpaces(createModelDto.name)
-    
-      const brand = createModelDto.brand ? await this.brandRepositry.findOne({ where: { id: createModelDto.brand } }):undefined;
-      if (!brand) { throw new NotFoundException("No valid brand found.");}
-     
-      const typeModel = createModelDto.brand ? await this.typeModelRepositry.findOne({ where: { id: createModelDto.typeModel } }):undefined;
-      if (!typeModel) { throw new NotFoundException("No Type model found.");}
+async create(createModelDto: CreateModelDto): Promise<Model> {
+  createModelDto.name = this.appService.cleanSpaces(createModelDto.name);
 
-    const allpart = await this.allPartRepositry.find( { where : { id : In(createModelDto.allpartIds)}})
-      const createNew = this.modelRepositry.create( { ...createModelDto, brand, allpart, typeModel})
-      
-      return await this.modelRepositry.save(createNew);
+  const brand = createModelDto.brand
+    ? await this.brandRepositry.findOne({ where: { id: createModelDto.brand } })
+    : undefined;
+
+  if (!brand) {
+    throw new NotFoundException('No valid brand found.');
   }
+
+  const typeModel = createModelDto.typeModel
+    ? await this.typeModelRepositry.findOne({
+        where: { id: createModelDto.typeModel },
+      })
+    : undefined;
+
+  if (!typeModel) {
+    throw new NotFoundException('No Type model found.');
+  }
+
+  const allpart =
+    createModelDto.allpartIds && createModelDto.allpartIds.length
+      ? await this.allPartRepositry.find({
+          where: { id: In(createModelDto.allpartIds) },
+        })
+      : [];
+
+  const createNew = this.modelRepositry.create({
+    ...createModelDto,
+    brand,
+    typeModel,
+    allpart,
+  });
+
+  return await this.modelRepositry.save(createNew);
+}
+
 
   async findAll():Promise<Model[]>  {
     const findAll = await this.modelRepositry.find({

@@ -6,18 +6,18 @@ import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGen
 
 export class LevelRepair {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column()
-    name: string;
+    name!: string;
 
     @Column('float')
-    price: number;
+    price!: number;
 
     @ManyToMany( () => Brand, (brand) => brand.levelRepair)
     
-    brand: Brand[];
+    brand!: Brand[];
 
     @OneToMany( () => PartsPrice, (partsPrice) => partsPrice.levelRepair)
-    partsPrice: PartsPrice;
+    partsPrice!: PartsPrice;
 }

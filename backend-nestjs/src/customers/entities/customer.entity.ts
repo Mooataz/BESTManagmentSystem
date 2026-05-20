@@ -7,20 +7,20 @@ import { Column, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColum
 @Entity()
 export class Customer {
         @PrimaryGeneratedColumn()
-        id: number;
+        id!: number;
 
         @Column()
-        name: string;
+        name?: string;
  
         @Column()
-        phone: number;
+        phone?: number;
     
        @ManyToOne( () => Distributeur, distributer => distributer.customer)
-       distributer : Distributeur;
+       distributer? : Distributeur;
         
        @OneToMany( () => Repair, repair => repair.customer)
-       repair : Repair;
+       repair? : Repair;
 
        @OneToMany( () => OutputList, (outputList) => outputList.customer)
-       outputList : OutputList[];
+       outputList? : OutputList[];
 }

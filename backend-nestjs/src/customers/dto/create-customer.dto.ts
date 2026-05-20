@@ -8,7 +8,7 @@ export class CreateCustomerDto {
     })
     @IsString()
     @IsEmpty()
-    name: string;
+    name!: string;
 
     /* @ApiProperty({
         type:String,
@@ -24,7 +24,7 @@ export class CreateCustomerDto {
     })
     @IsNumber()
     @IsEmpty()
-    phone: number;
+    phone!: number;
 
     
     

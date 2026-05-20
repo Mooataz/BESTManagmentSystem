@@ -4,10 +4,10 @@ import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "t
 @Entity()
 export class TypeModel {
     @PrimaryGeneratedColumn()
-            id : number;
+    id!: number;
     @Column()
-        description : string;
+    description?: string;
 
-    @OneToMany( () => Model, Model => Model.typeModel)
-     model : Model[]
+    @OneToMany(() => Model, Model => Model.typeModel)
+    model?: Model[]
 }

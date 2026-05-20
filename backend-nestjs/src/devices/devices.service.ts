@@ -150,15 +150,16 @@ async deviceHasOpenRepair(serialNumber: string): Promise<boolean> {
 
   for (const rep of device.repair) {
     if (rep.historyRepair && rep.historyRepair.length > 0) {
-      // Trier par date desc pour obtenir la dernière étape
-      const sortedHistory = rep.historyRepair.sort((a, b) => {
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
-      });
+      const sortedHistory = rep.historyRepair.sort(
+        (a, b) =>
+          (b.date?.getTime() ?? 0) -
+          (a.date?.getTime() ?? 0),
+      );
 
       const lastStep = sortedHistory[0].step;
 
       if (lastStep !== 'Récupérer') {
-        return true; // Il y a une réparation en cours
+        return true; // réparation en cours
       }
     }
   }

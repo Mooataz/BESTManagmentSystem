@@ -47,24 +47,24 @@ const TransfertSlice = createSlice({
                 state.error =
                     typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
             })
-            
+
             .addCase(UpdateOneTransfert.pending, (state) => {
                 state.loading = true;
                 state.error = null;
                 state.success = false;
             })
             .addCase(UpdateOneTransfert.fulfilled, (state, action: PayloadAction<TransfertPR>) => {
-    state.loading = false;
-    state.success = true;
+                state.loading = false;
+                state.success = true;
 
-    // Remplacer ou insérer le transfert dans le tableau existant
-    const index = state.Transfert.findIndex(t => t.id === action.payload.id);
-    if (index !== -1) {
-        state.Transfert[index] = action.payload;
-    } else {
-        state.Transfert.push(action.payload);
-    }
-})
+                // Remplacer ou insérer le transfert dans le tableau existant
+                const index = state.Transfert.findIndex(t => t.id === action.payload.id);
+                if (index !== -1) {
+                    state.Transfert[index] = action.payload;
+                } else {
+                    state.Transfert.push(action.payload);
+                }
+            })
             .addCase(UpdateOneTransfert.rejected, (state, action) => {
                 state.loading = false;
                 state.success = false;

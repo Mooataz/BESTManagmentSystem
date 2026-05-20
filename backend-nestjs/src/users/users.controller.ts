@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, ConflictException, Query, ParseIntPipe, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, ConflictException, Query, ParseIntPipe, BadRequestException, HttpException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -10,7 +10,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
  
   @Post()
-  async create(@Body() createUserDto: CreateUserDto , @Res() res) {
+  async create(@Body() createUserDto: CreateUserDto , @Res() res: any) {
     //return this.usersService.create(createUserDto);
 
     try {
@@ -24,16 +24,16 @@ export class UsersController {
         data : newUser
       })
     } catch (error) {
-      if (error.code === '23505') {
-        throw new ConflictException('Login already exists');
-      }
-      
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 /* @Get('/findUser/:branchId')
   async findUser(@Param('branchId') branchId: number,
@@ -53,7 +53,7 @@ export class UsersController {
  */
   @Get('/findByBranch/:branchId')
   async getByBranchId(@Param('branchId') branchId: number,
-                      @Res() res) {
+                      @Res() res: any) {
     try {
       const allfind = await this.usersService.findByBranchId(branchId)
       return res.status(HttpStatus.OK).json({
@@ -61,15 +61,21 @@ export class UsersController {
         status:HttpStatus.OK,
         data:allfind })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get('/findByStatus/:status')
   async getByStatus(@Param('status') status: string,
-                      @Res() res) {
+                      @Res() res: any) {
     try {
       const allfind = await this.usersService.findByStatus(status)
       return res.status(HttpStatus.OK).json({
@@ -77,14 +83,20 @@ export class UsersController {
         status:HttpStatus.OK,
         data:allfind })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
   @Get('/userByLogin/:login')
   async getUserByLogin(@Param('login') login: string,
-                      @Res() res) {
+                      @Res() res: any) {
     try {
       const allfind = await this.usersService.findUserByLogin(login)
       return res.status(HttpStatus.OK).json({
@@ -92,13 +104,19 @@ export class UsersController {
         status:HttpStatus.OK,
         data:allfind })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     //return this.usersService.findAll();
     try {
       const allUsers= await this.usersService.findAll()
@@ -108,16 +126,20 @@ export class UsersController {
         data:allUsers
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number ,@Res() res) {
+  async findOne(@Param('id') id: number ,@Res() res: any) {
    try {
     const OneUser = await this.usersService.findOne(+id)
      return res.status(HttpStatus.OK).json({
@@ -126,18 +148,22 @@ export class UsersController {
       data:OneUser
     })
    } catch (error) {
-    return res.status(HttpStatus.BAD_REQUEST).json({
-      message:error.message,
-      status:HttpStatus.BAD_REQUEST,
-      data:null
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
     })
-   }
+  }
+
+  throw error
+}
   }
 
 
 
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto, @Res() res) {
+  async update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto, @Res() res: any) {
     //return this.usersService.update(+id, updateUserDto);
     try {
       if (updateUserDto.password){
@@ -151,17 +177,20 @@ export class UsersController {
         data:updatedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-      message:error.message,
-      status:HttpStatus.BAD_REQUEST,
-      data:null
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
     })
-      
-    }
+  }
+
+  throw error
+}
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: number, @Res() res) {
+  async remove(@Param('id') id: number, @Res() res: any) {
     //return this.usersService.remove(+id);
     try {
       const deletedata = await this.usersService.remove(+id);
@@ -171,18 +200,21 @@ export class UsersController {
         data:deletedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-      
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 @Post('userAssign')
 async getUsersAssign(
   @Body() body: {   branchId: number, admin: boolean }, 
-  @Res() res
+  @Res() res: any
 ) {
    const {  branchId,  admin } = body; 
 

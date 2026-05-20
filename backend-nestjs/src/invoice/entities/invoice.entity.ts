@@ -6,28 +6,28 @@ import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne,
 @Entity()
 export class Invoice {
     @PrimaryGeneratedColumn()
-    id : number;
+    id! : number;
 
     @Column()
-    paymentMethod: string;
+    paymentMethod?: string;
 
     @Column()
-    date: Date;
+    date!: Date;
 
     @Column()
-    state: string;
+    state!: string;
 
     @Column()
-    totalPrice: number;
+    totalPrice?: number;
 
     @ManyToMany( () => OtherCost, (otherCost) => otherCost.invoice)
     @JoinTable()
-    otherCost : OtherCost[]; 
+    otherCost? : OtherCost[]; 
 
     @OneToOne( () => Repair, (repair) => repair.invoice, {nullable: true} )
     @JoinColumn()
-    repair: Repair;
+    repair!: Repair;
 
     @ManyToOne( () => User, (user) => user.invoice)
-    user: User;
+    user!: User;
 }

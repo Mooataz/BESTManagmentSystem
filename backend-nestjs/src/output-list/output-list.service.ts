@@ -17,41 +17,47 @@ export class OutputListService {
 ){}
 
 async create(createOutputListDto: CreateOutputListDto): Promise<OutputList> {
+  if (
+    !createOutputListDto.repairIds ||
+    createOutputListDto.repairIds.length === 0
+  ) {
+    throw new NotFoundException('No repair ids provided');
+  }
+
   const repair = await this.repairRepository.find({
-      where: { id: In(createOutputListDto.repairIds) }
+    where: { id: In(createOutputListDto.repairIds) },
   });
 
   if (!repair.length) {
-      throw new NotFoundException('No repair data found');
+    throw new NotFoundException('No repair data found');
   }
 
-  // Récupérer `customer` et `user` à partir de la base de données
   const customer = await this.customerRepository.findOne({
-      where: { id: createOutputListDto.customer }
+    where: { id: createOutputListDto.customer },
   });
 
   if (!customer) {
-      throw new NotFoundException('Customer not found');
+    throw new NotFoundException('Customer not found');
   }
 
   const user = await this.userRepository.findOne({
-      where: { id: createOutputListDto.user }
+    where: { id: createOutputListDto.user },
   });
 
   if (!user) {
-      throw new NotFoundException('User not found');
+    throw new NotFoundException('User not found');
   }
 
-  // Création d'un nouvel objet avec des entités complètes
   const newCreate = this.outputListRepositry.create({
-      ...createOutputListDto,
-      repair,  // Tableau d'objets Repair[]
-      customer, // Objet Customer
-      user      // Objet User
+    ...createOutputListDto,
+    repair,
+    customer,
+    user,
   });
 
   return await this.outputListRepositry.save(newCreate);
 }
+
 
   async findAll(): Promise<OutputList[]> {
     const allfind= await this.outputListRepositry.find()

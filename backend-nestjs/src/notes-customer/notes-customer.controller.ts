@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, HttpException } from '@nestjs/common';
 import { NotesCustomerService } from './notes-customer.service';
 import { CreateNotesCustomerDto } from './dto/create-notes-customer.dto';
 import { UpdateNotesCustomerDto } from './dto/update-notes-customer.dto';
@@ -9,7 +9,7 @@ export class NotesCustomerController {
 
   @Post()
   async create(@Body() createNotesCustomerDto: CreateNotesCustomerDto, 
-  @Res() res) {
+  @Res() res: any) {
     try {
       const newcreate = await this.notesCustomerService.create(createNotesCustomerDto)
       return res.status(HttpStatus.CREATED).json({
@@ -18,16 +18,20 @@ export class NotesCustomerController {
         data:newcreate
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     try {
       const allfind = await this.notesCustomerService.findAll()
       return res.status(HttpStatus.OK).json({
@@ -36,17 +40,21 @@ export class NotesCustomerController {
         data:allfind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number, 
-  @Res() res) {
+  @Res() res: any) {
     try {
       const Onefind = await this.notesCustomerService.findOne(+id)
       return res.status(HttpStatus.OK).json({
@@ -55,18 +63,22 @@ export class NotesCustomerController {
         data:Onefind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Patch(':id')
   async update(@Param('id') id: number, 
   @Body() updateNotesCustomerDto: UpdateNotesCustomerDto, 
-  @Res() res) {
+  @Res() res: any) {
     try {
       const updatedata = await this.notesCustomerService.update(+id, updateNotesCustomerDto)
       return res.status(HttpStatus.OK).json({
@@ -75,17 +87,21 @@ export class NotesCustomerController {
         data:updatedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Delete(':id')
   async remove(@Param('id') id: number, 
-  @Res() res) {
+  @Res() res: any) {
     try {
       const deletedata = await this.notesCustomerService.remove(+id)
       return res.status(HttpStatus.OK).json({
@@ -94,11 +110,15 @@ export class NotesCustomerController {
         data:deletedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+    
+      throw error
     }
   }
 }

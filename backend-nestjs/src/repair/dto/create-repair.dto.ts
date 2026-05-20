@@ -7,54 +7,54 @@ export class CreateRepairDto {
     
     @ApiProperty({ type: String  })
    
-    actuellybranch: number;
+    actuellybranch!: number;
 
     @ApiProperty({type: Number,})
     @IsNumber()
     @IsOptional()
-    customer: number;
+    customer!: number;
     
     @ApiProperty({ type: Number,})
     @IsNumber()
     @IsOptional()   
-    device: number;
+    device!: number;
 
     @ApiProperty({ type: String   })
     @IsOptional()
-    remark: string;
+    remark!: string;
 
     @ApiProperty({ type: String  })
-    deviceStateReceive: string;
+    deviceStateReceive!: string;
 
     @ApiProperty({ type: Array   })
     @IsOptional()
-    accessoryIds: number[];
+    accessoryIds!: number[];
 
     @ApiProperty({ type: [Number], required: true })
     @IsArray()
     @IsNumber({}, { each: true })
-    listFaultIds: number[];
+    listFaultIds!: number[];
 
     @ApiProperty({ type: Array  })
     @IsOptional()
-    customerRequestIds: number[];
+    customerRequestIds!: number[];
 
       
     @ApiProperty({ type: [String] })
     @IsArray()
     @IsOptional()
-    files: string[];
+    files!: string[];
    @ApiProperty({ type: Array  })
     @IsOptional()
-    notesCustomerIds: number[];
+    notesCustomerIds!: number[];
 
     @ApiProperty({ type: Array })
     @IsOptional()
-    expertiseReasonsIds: number[];
+    expertiseReasonsIds!: number[];
 
     @ApiProperty({ type: Array  })
     @IsOptional()
-    repairActionIds: number[];  
+    repairActionIds!: number[];  
 
          @ApiProperty({ type: Boolean   })
     @IsBoolean()
@@ -64,28 +64,28 @@ export class CreateRepairDto {
     @ApiProperty({type: Boolean })
     @IsBoolean()
     @IsOptional()
-    approveRepair: boolean;
+    approveRepair!: boolean;
 
      
 
       @ApiProperty({type: Number,})
     @IsNumber()
     @IsOptional()
-    newSerialNumber: string;
+    newSerialNumber!: string;
 
     @ApiProperty({type: Number })
     @IsOptional()
-    advancePayment: number;  
+    advancePayment!: number;  
 
      @ApiProperty({type: Number,})
     @IsOptional()
-    user: number;  
+    user!: number;  
 
         @ApiProperty({ type: [Number]  })
     @IsArray()
     @IsNumber({}, { each: true})
     @IsOptional()
-    partsNeed: number[];   
+    partsNeed!: number[];   
 
     
 }

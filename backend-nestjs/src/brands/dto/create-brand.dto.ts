@@ -8,19 +8,19 @@ export class CreateBrandDto {
         })
     
     @IsEmpty()
-    name: string;
+    name?: string;
     
     @ApiProperty({
         type:String,
         description: "Required"
     })
     @IsEmpty()
-    logo: string;
+    logo!: string;
 
     @ApiProperty({
         type:String,
         description: "Required"
     })
     @IsEmpty()
-    status : string
+    status? : string
 }

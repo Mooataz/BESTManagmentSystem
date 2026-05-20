@@ -7,6 +7,6 @@ export class CreateAccessoryDto {
         description: "Required"
     })
     @IsString()
-    name: string;
+    name?: string;
     
 }

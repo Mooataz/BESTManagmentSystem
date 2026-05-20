@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, HttpException } from '@nestjs/common';
 import { PermissionService } from './permission.service';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
@@ -8,7 +8,7 @@ export class PermissionController {
   constructor(private readonly permissionService: PermissionService) {}
 
   @Post()
-  async create(@Body() createPermissionDto: CreatePermissionDto, @Res() res) {
+  async create(@Body() createPermissionDto: CreatePermissionDto, @Res() res: any) {
     
     try {
           const newPermission = await this.permissionService.create(createPermissionDto)
@@ -18,17 +18,21 @@ export class PermissionController {
             data:newPermission
           })
         } catch (error) {
-          return res.status(HttpStatus.BAD_REQUEST).json({
-            message:error.message,
-            status:HttpStatus.BAD_REQUEST,
-            data:null
-          })
+          if (error instanceof HttpException) {
+            return res.status(error.getStatus()).json({
+              message: error.message,
+              status: error.getStatus(),
+              data: null,
+            })
+          }
+
+          throw error
         }
 
   }
 
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     
     try {
       const allPermissions = await this.permissionService.findAll()
@@ -38,16 +42,20 @@ export class PermissionController {
         data:allPermissions
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+
+      throw error
     }
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number, @Res() res) {
+  async findOne(@Param('id') id: number, @Res() res: any) {
     
     try {
       const onePermissions = await this.permissionService.findOne(+id)
@@ -57,16 +65,20 @@ export class PermissionController {
         data:onePermissions
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+
+      throw error
     }
   }
 
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() updatePermissionDto: UpdatePermissionDto, @Res() res) {
+  async update(@Param('id') id: number, @Body() updatePermissionDto: UpdatePermissionDto,   @Res() res: any) {
     try {
       const updatePermission = await this.permissionService.update(+id, updatePermissionDto)
       return res.status(HttpStatus.OK).json({
@@ -75,16 +87,20 @@ export class PermissionController {
         data:updatePermission
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+    
+      throw error
     }
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: number, @Res() res) {
+  async remove(@Param('id') id: number, @Res() res: any) {
     try {
       const deletePermission = await this.permissionService.remove(+id)
       return res.status(HttpStatus.OK).json({
@@ -93,11 +109,15 @@ export class PermissionController {
         data:deletePermission
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 }

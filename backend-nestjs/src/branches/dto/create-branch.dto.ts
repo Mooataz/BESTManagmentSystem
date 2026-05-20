@@ -7,34 +7,34 @@ export class CreateBranchDto {
         description: "Required"
     })
     @IsString()
-    name: string;
+    name!: string;
 
     @ApiProperty({
         type: String,
         description: "Required"
     })
     @IsString()
-    location: string;
+    location?: string;
 
     @ApiProperty({
         type: Number,
         description: "Required"
     })
     @IsNumber()
-    phone: number;
+    phone?: number;
 
     @ApiProperty({
         type: String,
         description: "Required"
     })
     @IsEmail()
-    email: string;
+    email?: string;
     
     @ApiProperty({
         type: String,
         description: "Required"
     })
     @IsEmail()
-    company: number;
+    company?: number;
 
 }

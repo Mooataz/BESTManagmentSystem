@@ -9,7 +9,7 @@ import { Server, Socket } from 'socket.io';
 @WebSocketGateway({ cors: true })
 export class StockGateway implements OnGatewayInit, OnGatewayConnection {
   @WebSocketServer()
-  server: Server;
+  server!: Server;
   afterInit() {
     console.log(':coche_blanche: WebSocket prêt');
   }

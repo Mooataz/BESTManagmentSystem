@@ -9,15 +9,15 @@ export class CreatePartsPriceDto {
     @IsPositive()
     @IsNotEmpty()
     @IsNumber()
-    price: number;
+    price!: number;
 
     @ApiProperty({ type: Number, description: 'ID of the associated model' })
     @IsNumber()
-    modelId: number;
+    modelId?: number;
 
     @ApiProperty({ type: Number, description: 'ID of the associated allPart' })
     @IsNumber()
-    allPartId: number;
+    allPartId?: number;
 
     @ApiProperty({
         type: Number,
@@ -26,5 +26,5 @@ export class CreatePartsPriceDto {
     @IsPositive()
     @IsNotEmpty()
     @IsNumber()
-    laborCharge: number;
+    laborCharge?: number;
 }

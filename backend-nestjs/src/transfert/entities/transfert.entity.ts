@@ -5,39 +5,39 @@ import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGen
 
 @Entity()
 export class Transfert {
-    @PrimaryGeneratedColumn() id: number;
+    @PrimaryGeneratedColumn() id!: number;
 
-    @Column({ nullable: true }) delivredBy: string;
-
-    
-    @Column() sendingDate: Date;
-    
-    @Column() frombranch: number;
-
-    @Column() sendUser: number;
+    @Column({ nullable: true }) delivredBy?: string;
 
     
-    @Column({ nullable: true }) receivedDate: Date;
+    @Column() sendingDate?: Date;
+    
+    @Column() frombranch?: number;
 
-    @Column() tobranch: number;
-
-    @Column({ nullable: true }) receiveUser: number;
+    @Column() sendUser?: number;
 
     
-    @Column() type: string;
+    @Column({ nullable: true }) receivedDate?: Date;
 
-    @Column({ nullable: true }) state: string;
+    @Column() tobranch?: number;
 
-    @Column({ nullable: true }) remark: string;
+    @Column({ nullable: true }) receiveUser?: number;
+
     
-    @Column({ nullable: true }) typePart:string;
+    @Column() type?: string;
+
+    @Column({ nullable: true }) state?: string;
+
+    @Column({ nullable: true }) remark?: string;
+    
+    @Column({ nullable: true }) typePart?:string;
 
     @ManyToMany(() => Repair, (repair) => repair.transfert, { cascade: true })
     @JoinTable()
-    repair: Repair[];
+    repair?: Repair[];
 
     @ManyToMany(() => StockPart, (stockPart) => stockPart.transfert, { cascade: true })
     @JoinTable()
-    stockPart: StockPart[];
+    stockPart?: StockPart[];
 
 }

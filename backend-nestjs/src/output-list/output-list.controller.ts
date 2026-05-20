@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, HttpException } from '@nestjs/common';
 import { OutputListService } from './output-list.service';
 import { CreateOutputListDto } from './dto/create-output-list.dto';
 import { UpdateOutputListDto } from './dto/update-output-list.dto';
@@ -9,7 +9,7 @@ export class OutputListController {
 
   @Post()
   async create(@Body() createOutputListDto: CreateOutputListDto,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const newcreate = await this.outputListService.create(createOutputListDto)
       return res.status(HttpStatus.CREATED).json({
@@ -18,16 +18,20 @@ export class OutputListController {
         data : newcreate
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+    
+      throw error
     }
   }
 
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     try {
       const allfind= await this.outputListService.findAll()
       return res.status(HttpStatus.OK).json({
@@ -36,17 +40,21 @@ export class OutputListController {
         data:allfind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const Onefind = await this.outputListService.findOne(+id)
        return res.status(HttpStatus.OK).json({
@@ -55,16 +63,20 @@ export class OutputListController {
         data:Onefind
       })
      } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-     }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
   @Get('/findByBranch/:branchId')
   async getByBranchId(@Param('branchId') branchId: number,
-                      @Res() res) {
+                      @Res() res: any) {
     try {
       const allfind = await this.outputListService.findByBranchId(branchId)
       return res.status(HttpStatus.OK).json({
@@ -72,15 +84,21 @@ export class OutputListController {
         status:HttpStatus.OK,
         data:allfind })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get('/findByCustomer/:customerId')
   async getByCustomerId(@Param('customerId') customerId: number,
-                      @Res() res) {
+                      @Res() res: any) {
     try {
       const allfind = await this.outputListService.findByCustomerId(customerId)
       return res.status(HttpStatus.OK).json({
@@ -88,34 +106,21 @@ export class OutputListController {
         status:HttpStatus.OK,
         data:allfind })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null }) }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
   }
- /*  @Patch(':id')
-  async update(@Param('id') id: number,
-    @Body() updateOutputListDto: UpdateOutputListDto,
-    @Res() res) {
-    try {
-      const updatedata = await this.outputListService.update(+id, updateOutputListDto)
-      return res.status(HttpStatus.OK).json({
-        message:" updated successfuly !",
-        status:HttpStatus.OK,
-        data:updatedata
-      })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-      message:error.message,
-      status:HttpStatus.BAD_REQUEST,
-      data:null
-    })    
-    }
+
+  throw error
+}
   }
- */
+
   @Delete(':id')
   async remove(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const deletedata = await this.outputListService.remove(+id);
       return res.status(HttpStatus.OK).json({
@@ -124,12 +129,15 @@ export class OutputListController {
         data:deletedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-      
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 }

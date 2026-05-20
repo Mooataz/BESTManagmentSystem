@@ -17,19 +17,40 @@ export class InvoiceService {
                 @InjectRepository(OtherCost) private readonly  otherCostRepositry:Repository<OtherCost>
               ){}
 
-  async create(createInvoiceDto: CreateInvoiceDto):Promise<Invoice> {
-    const otherCost = await this.otherCostRepositry.find({ where: { id: In(createInvoiceDto.otherCost) }, });
-    
-    
-    const repair = await this.repairRepositry.findOne({ where: { id: createInvoiceDto.repair }, });
-    if (!repair) { throw new NotFoundException(`repair with ID ${createInvoiceDto.repair} not found`);}
+  async create(createInvoiceDto: CreateInvoiceDto): Promise<Invoice> {
+  const otherCost = createInvoiceDto.otherCost?.length
+    ? await this.otherCostRepositry.find({
+        where: { id: In(createInvoiceDto.otherCost) },
+      })
+    : [];
 
-    const user = await this.userRepositry.findOne({ where: { id: createInvoiceDto.user }, });
-    if (!user) { throw new NotFoundException(`user with ID ${createInvoiceDto.user} not found`);}
-
-    const newCreate = await this.invoiceRepositry.create( { ...createInvoiceDto, otherCost:otherCost || undefined, repair, user})
-    return await this.invoiceRepositry.save(newCreate);
+  const repair = await this.repairRepositry.findOne({
+    where: { id: createInvoiceDto.repair },
+  });
+  if (!repair) {
+    throw new NotFoundException(
+      `repair with ID ${createInvoiceDto.repair} not found`,
+    );
   }
+
+  const user = await this.userRepositry.findOne({
+    where: { id: createInvoiceDto.user },
+  });
+  if (!user) {
+    throw new NotFoundException(
+      `user with ID ${createInvoiceDto.user} not found`,
+    );
+  }
+
+  const newCreate = this.invoiceRepositry.create({
+    ...createInvoiceDto,
+    otherCost: otherCost.length ? otherCost : undefined,
+    repair,
+    user,
+  });
+
+  return await this.invoiceRepositry.save(newCreate);
+}
 
   async findAll():Promise<Invoice[]> {
     const allfind = await this.invoiceRepositry.find()

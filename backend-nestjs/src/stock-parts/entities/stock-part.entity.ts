@@ -10,27 +10,27 @@ import { Column, Entity, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGene
 
 export class StockPart {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column()
-    remark: string;
+    remark?: string;
 
     @Column()
-    serialnumber: string;
+    serialnumber?: string;
 
     @ManyToOne( () => Bin, bin => bin.stockPart, { nullable: true })
-    bin: Bin;
+    bin?: Bin;
 
     @ManyToOne( () =>Reference, reference => reference.stockPart)
-    reference : Reference;
+    reference ?: Reference;
 
     @OneToMany( () => HistoryStockPart, historyStockPart => historyStockPart.stockPart)
-    historyStockPart : HistoryStockPart[];
+    historyStockPart? : HistoryStockPart[];
 
     @OneToOne( () => ApproveStock, (approveStock) => approveStock.stockPart)
-    approveStock : ApproveStock;
+    approveStock? : ApproveStock;
 
     @ManyToMany(() => Transfert, (transfert) => transfert.stockPart)
-    transfert: Transfert;
+    transfert?: Transfert;
 
 }

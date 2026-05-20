@@ -8,5 +8,5 @@ export class CreateRepairActionDto {
     })
     @IsString()
     @IsNotEmpty()
-    name: string;
+    name?: string;
 }

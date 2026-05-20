@@ -5,18 +5,18 @@ export class CreateOtherCostDto {
         type: String,
         description: "Required"
     })
-    name :string;
+    name! :string;
 
     @ApiProperty({
         type: Number,
         format: 'float',
         description: "Required"
     })
-    price : number;
+    price! : number;
 
     @ApiProperty({
         type: String,
         description: "Required"
     })
-    status: string;
+    status!: string;
 }

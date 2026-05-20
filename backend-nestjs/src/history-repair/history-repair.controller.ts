@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseGuards, Req, HttpException } from '@nestjs/common';
 import { HistoryRepairService } from './history-repair.service';
 import { CreateHistoryRepairDto } from './dto/create-history-repair.dto';
 import { UpdateHistoryRepairDto } from './dto/update-history-repair.dto';
@@ -9,8 +9,8 @@ export class HistoryRepairController {
   constructor(private readonly historyRepairService: HistoryRepairService) { }
 @UseGuards(AccessTokenGuard)
   @Post()
-  async create(/*@Body()  createHistoryRepairDto: CreateHistoryRepairDto date:Date,step: string,repair: number,*/@Body() data:any , @Req() req,
-    @Res() res) {
+  async create(/*@Body()  createHistoryRepairDto: CreateHistoryRepairDto date:Date,step: string,repair: number,*/@Body() data:any , @Req() req : any,
+    @Res() res: any) {
     try {
       
       const newcreate = await this.historyRepairService.create(data  )
@@ -19,15 +19,20 @@ export class HistoryRepairController {
         status:HttpStatus.CREATED,
         data:newcreate})
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null})
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+    
+      throw error
     }
   }
   @Get('/find/:repairId')
   async getByRepairId(@Param('repairId') repairId: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const allfind = await this.historyRepairService.findByRepairId(repairId)
       return res.status(HttpStatus.OK).json({
@@ -36,15 +41,19 @@ export class HistoryRepairController {
         data:allfind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     try {
       const allfind = await this.historyRepairService.findAll()
       return res.status(HttpStatus.OK).json({
@@ -53,17 +62,21 @@ export class HistoryRepairController {
         data:allfind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const Onefind = await this.historyRepairService.findOne(+id)
       return res.status(HttpStatus.OK).json({
@@ -72,18 +85,22 @@ export class HistoryRepairController {
         data:Onefind
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Patch(':id')
   async update(@Param('id') id: number,
     @Body() updateHistoryRepairDto: UpdateHistoryRepairDto,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const updatedata = await this.historyRepairService.update(+id, updateHistoryRepairDto)
       return res.status(HttpStatus.OK).json({
@@ -92,17 +109,21 @@ export class HistoryRepairController {
         data:updatedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
   @Delete(':id')
   async remove(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const deletedata = await this.historyRepairService.remove(+id)
       return res.status(HttpStatus.OK).json({
@@ -110,13 +131,17 @@ export class HistoryRepairController {
         status:HttpStatus.OK,
         data:deletedata
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+    }catch (error) {
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
 
 

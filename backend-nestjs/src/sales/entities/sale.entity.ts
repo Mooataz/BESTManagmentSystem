@@ -7,23 +7,23 @@ import { Column, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColum
 
 export class Sale {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column()
-    state: string;
+    state?: string;
 
     @Column('float')
-    totalPrice: number;
+    totalPrice?: number;
 
     @Column()
-    date: Date;
+    date?: Date;
 
     @ManyToOne( () => User, (user) => user.sale)
-    user: User;
+    user?: User;
 
     @ManyToMany( () => AllPart, (allPart) => allPart.sale)
-    allPart: AllPart[];
+    allPart?: AllPart[];
 
     @OneToMany( () => ApproveStock, (approveStock) => approveStock.sale)
-    approveStock: ApproveStock;
+    approveStock?: ApproveStock;
 }

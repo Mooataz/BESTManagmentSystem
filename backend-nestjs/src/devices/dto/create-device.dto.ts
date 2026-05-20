@@ -6,12 +6,12 @@ export class CreateDeviceDto {
     type: String,
     description: "Required"
   })
-  serialenumber: string; // ✅ Match the entity name
+  serialenumber!: string; // ✅ Match the entity name
 
   @ApiProperty({
     type: Date,
     description: "Required"
   })
-  purchaseDate: Date;
+  purchaseDate!: Date;
 
 }

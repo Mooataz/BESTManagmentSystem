@@ -7,5 +7,5 @@ export class CreatePermissionDto {
                 description: "Required"
             })
         @IsString()
-        description : string;
+        description? : string;
 }

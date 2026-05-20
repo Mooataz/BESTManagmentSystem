@@ -31,6 +31,7 @@ export default function ListRepair() {
       dispatch(getRepairsByBranch(branchId))
 
     }
+  
   }, [dispatch, branchId])
 
 
@@ -74,6 +75,7 @@ const getLastStep = (history: any[] = []) => {
   const sorted = [...history].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   return sorted[0]?.step ?? '-';
 };
+
   return (
     <div style={{ padding: '20px' }}>
       <Typography sx={{ textAlign: 'left', fontWeight: 'bold', marginBottom: '3%' , color:theme.palette.secondary.main  }} >List des réparations</Typography   >

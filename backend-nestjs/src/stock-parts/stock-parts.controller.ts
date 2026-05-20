@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, Query, ParseArrayPipe, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, Query, ParseArrayPipe, ParseIntPipe, HttpException } from '@nestjs/common';
 import { StockPartsService } from './stock-parts.service';
 import { CreateStockPartDto } from './dto/create-stock-part.dto';
 import { UpdateStockPartDto } from './dto/update-stock-part.dto';
@@ -9,7 +9,7 @@ export class StockPartsController {
 
   @Post()
   async create(@Body() /* createStockPartDto: CreateStockPartDto */ data:any,
-    @Res() res) {
+    @Res() res: any) {
     try {
        const {userId, ...createStockPartDto} = data; 
       const newCreate = await this.stockPartsService.create(createStockPartDto, userId)
@@ -18,17 +18,21 @@ export class StockPartsController {
         status:HttpStatus.CREATED,
         data:newCreate
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     try {
       const allfind = await this.stockPartsService.findAll()
       return res.status(HttpStatus.OK).json({
@@ -36,18 +40,22 @@ export class StockPartsController {
         status:HttpStatus.OK,
         data:allfind
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 
   @Get(':id')
   async findOne(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const onefind = await this.stockPartsService.findOne(+id)
       return res.status(HttpStatus.OK).json({
@@ -55,19 +63,23 @@ export class StockPartsController {
         status:HttpStatus.OK,
         data:onefind
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 
   @Patch(':id')
   async update(@Param('id') id: number,
     @Body() updateStockPartDto: UpdateStockPartDto,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const updateType = await this.stockPartsService.update(+id, updateStockPartDto)
       return res.status(HttpStatus.OK).json({
@@ -75,18 +87,22 @@ export class StockPartsController {
         status:HttpStatus.OK,
         data:updateType
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 
   @Delete(':id')
   async remove(@Param('id') id: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const deleteType = await this.stockPartsService.remove(+id)
       return res.status(HttpStatus.OK).json({
@@ -94,17 +110,21 @@ export class StockPartsController {
         status:HttpStatus.OK,
         data:deleteType
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
   @Get('/findBranch/:branchId')
   async getByBinId(@Param('branchId') branchId: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const allfind = await this.stockPartsService.findByBranchId(branchId)
       return res.status(HttpStatus.OK).json({
@@ -112,20 +132,24 @@ export class StockPartsController {
         status:HttpStatus.OK,
         data:allfind
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
     
   @Get('filter/:references/:bin')
   async filterStockParts(
     @Param('references', new ParseArrayPipe({ items: Number, separator: ',' })) references: number[],
     @Param('bin') binType: number,
-    @Res() res
+    @Res() res: any
   ) {
     try {
       const result = await this.stockPartsService.filterByReferenceAndBin(
@@ -136,18 +160,22 @@ export class StockPartsController {
         status: HttpStatus.OK,
         data: result,
       });
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
+    }  catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
         message: error.message,
-        status: HttpStatus.BAD_REQUEST,
+        status: error.getStatus(),
         data: null,
-      });
+      })
     }
+  
+    throw error
+  }
   }
 
   @Get('/find/:type/:branchId')
   async getByBinType(@Param('type') type: string,@Param('branchId') branchId: number,
-    @Res() res) {
+    @Res() res: any) {
     try {
       const allfind = await this.stockPartsService.findByBinType(type, branchId)
       return res.status(HttpStatus.OK).json({
@@ -155,29 +183,41 @@ export class StockPartsController {
         status:HttpStatus.OK,
         data:allfind
       })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   } 
   
-  @Get('stateStock')
-  async getStateStock (  @Res() res){
+ 
+
+
+    @Get('AddHistorytockPart/:id/:userId/:step')
+  async AddHistorytockPart (@Param('id') id: number, @Param('userId') userId: number, @Param('step') step: string, @Res() res: any) {
     try {
-      const allfind = await this.stockPartsService.stateStock()
+      const allfind = await this.stockPartsService.AddHistorytockPart(id, userId, step)
+
       return res.status(HttpStatus.OK).json({
-        message:"Founded Successfuly !",
+        message:"Updated Successfuly !",
         status:HttpStatus.OK,
         data:allfind })
-    } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
+    }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
       })
     }
+  
+    throw error
+  }
   }
 }

@@ -6,17 +6,17 @@ import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn 
 
 export class HistoryRepair {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column()
-    date: Date;
+    date?: Date;
 
     @Column()
-    step: string;
+    step?: string;
 
     @ManyToOne( () => Repair, (repair) => repair.historyRepair)
-    repair : Repair;
+    repair? : Repair;
 
     @OneToMany( () => Tracability, (tracability) => tracability.historyRepair)
-    tracability : Tracability[];
+    tracability? : Tracability[];
 }

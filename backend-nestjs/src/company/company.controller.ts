@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, UseInterceptors, UploadedFile, HttpException } from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
@@ -36,7 +36,7 @@ export class CompanyController {
     })
   )
   @Post()
-  async create(@Body() createCompanyDto: CreateCompanyDto, @Res() res, @UploadedFile() logo:Express.Multer.File) {
+  async create(@Body() createCompanyDto: CreateCompanyDto, @Res() res: any, @UploadedFile() logo:Express.Multer.File) {
     try {
       createCompanyDto.logo=logo.filename
       const newUser= await this.companyService.create(createCompanyDto)
@@ -47,16 +47,20 @@ export class CompanyController {
       })
 
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+    
+      throw error
     }
   }
 
   @Get()
-  async findAll(@Res() res) {
+  async findAll(@Res() res: any) {
     //return this.companyService.findAll();
     try {
       const comp = await this.companyService.findAll()
@@ -66,16 +70,19 @@ export class CompanyController {
         data:comp
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-      
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
   @Get(':id')
-  async findOne(@Param('id') id: number, @Res() res) {
+  async findOne(@Param('id') id: number, @Res() res: any) {
     
     try {
       const oneCompany = await this.companyService.findOne(+id)
@@ -85,12 +92,16 @@ export class CompanyController {
         data:oneCompany
       })
      } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-     }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
   @ApiBody({
     schema:{
@@ -117,7 +128,7 @@ export class CompanyController {
     })
   )
   @Patch(':id')
-  async update(@Param('id') id: number, @Body() updateCompanyDto: UpdateCompanyDto, @Res() res, @UploadedFile() logo:Express.Multer.File) {
+  async update(@Param('id') id: number, @Body() updateCompanyDto: UpdateCompanyDto, @Res() res: any, @UploadedFile() logo:Express.Multer.File) {
     try {
        if (logo) {
       updateCompanyDto.logo = logo.filename;
@@ -129,15 +140,19 @@ export class CompanyController {
         data:updatedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
   @Delete(':id')
-  async remove(@Param('id') id: number, @Res() res) {
+  async remove(@Param('id') id: number, @Res() res: any) {
     
     try {
       const deletedata = await this.companyService.remove(+id);
@@ -147,13 +162,16 @@ export class CompanyController {
         data:deletedata
       })
     } catch (error) {
-      return res.status(HttpStatus.BAD_REQUEST).json({
-        message:error.message,
-        status:HttpStatus.BAD_REQUEST,
-        data:null
-      })
-      
-    }
+  if (error instanceof HttpException) {
+    return res.status(error.getStatus()).json({
+      message: error.message,
+      status: error.getStatus(),
+      data: null,
+    })
+  }
+
+  throw error
+}
   }
   
 }

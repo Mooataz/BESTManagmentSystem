@@ -3,9 +3,9 @@ import { IsString } from "class-validator";
 
 export class CreateAllPartDto {
     @ApiProperty({
-                    type:String,
-                    description: "Required"
-                })
+        type: String,
+        description: "Required"
+    })
     @IsString()
-            description : string;
+    description?: string;
 }

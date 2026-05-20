@@ -5,16 +5,16 @@ import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGen
 @Entity()
 export class Device {
     @PrimaryGeneratedColumn()
-        id: number;
+        id!: number;
     @Column()
-        serialenumber : string;
+        serialenumber! : string;
     
     @Column({ type: 'timestamptz' })
-        purchaseDate : Date ;
+        purchaseDate! : Date ;
     
     @OneToMany( () => Repair, repair => repair.device)
-    repair: Repair[];
+    repair!: Repair[];
 
     @ManyToOne( () => Model, model => model.device)
-    model : Model;
+    model! : Model;
 }

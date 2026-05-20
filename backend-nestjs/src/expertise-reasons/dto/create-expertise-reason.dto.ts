@@ -8,5 +8,5 @@ export class CreateExpertiseReasonDto {
     })
     @IsString()
     @IsNotEmpty()
-    name: string;
+    name!: string;
 }

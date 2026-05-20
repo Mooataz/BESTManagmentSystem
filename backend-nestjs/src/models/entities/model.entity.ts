@@ -10,32 +10,32 @@ import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGen
 
 @Entity()
 export class Model {
-    @PrimaryGeneratedColumn()
-            id: number;
+        @PrimaryGeneratedColumn()
+        id!: number;
 
-    @Column()
-            name: string;
-            
-    @Column({ nullable: true })
-            picture: string;
+        @Column()
+        name!: string;
 
-    @ManyToOne( () => Brand, Brand => Brand.model,  { cascade: true })
-    brand : Brand 
+        @Column({ nullable: true })
+        picture!: string;
 
-    @ManyToOne( () => TypeModel, typeModel => typeModel.model,  { cascade: true })
-    typeModel : TypeModel ;
+        @ManyToOne(() => Brand, Brand => Brand.model, { cascade: true })
+        brand!: Brand
 
-    @OneToMany( () => Device, device => device.model)
-    device :Device[];
+        @ManyToOne(() => TypeModel, typeModel => typeModel.model, { cascade: true })
+        typeModel!: TypeModel;
 
-    @ManyToMany( () => Reference, reference => reference.model)
-    reference : Reference;
+        @OneToMany(() => Device, device => device.model)
+        device!: Device[];
 
-    @ManyToMany( () => AllPart, (allpart) => allpart.model, { cascade: true })
-    @JoinTable()
-    allpart : AllPart[];
+        @ManyToMany(() => Reference, reference => reference.model)
+        reference!: Reference;
 
-    @OneToMany( () => PartsPrice, (partPrice) => partPrice.model )
-    partsPrice : PartsPrice[];
+        @ManyToMany(() => AllPart, (allpart) => allpart.model, { cascade: true })
+        @JoinTable()
+        allpart!: AllPart[];
+
+        @OneToMany(() => PartsPrice, (partPrice) => partPrice.model)
+        partsPrice!: PartsPrice[];
 
 }

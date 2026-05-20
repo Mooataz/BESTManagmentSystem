@@ -166,9 +166,13 @@ const dispatch = useAppDispatch();
           <Avatar /> {user?.name}
         </MenuItem>
         <MenuItem onClick={handleClose}>
-          {user?.role.map((role: string) => (
-                      <div className='flex flex-item'><VscStarEmpty color={roleColors[role]} /> {role}</div>
-                    ))}
+          <ul style={{ listStyle: 'none', margin: 0, paddingLeft: '1rem' }}>
+            {user?.role.map((role: string, index: number) => (
+              <li key={index}>
+                <VscStarEmpty color={roleColors[role]} /> {role}
+              </li>
+            ))}
+          </ul>
         </MenuItem>
         <Divider />
         <MenuItem onClick={handleNavigation}>

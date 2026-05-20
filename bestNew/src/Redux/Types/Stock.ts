@@ -1,6 +1,6 @@
 import type { FormAllParts, LevelRepairForm } from "./administrationTypes";
 import type { User } from "./authenTypes";
-import type { Model } from "./repairTypes";
+import type { Model, StateHistoryRepair } from "./repairTypes";
 
 
 export interface Agency {
@@ -51,7 +51,8 @@ export interface getFormStock {
     serialnumber: string;
     reference: GetReferences;
     userId?: User;
-     
+    historyStockPart?: StateHistoryRepair[];
+    approveStock?: ApproveStockForm
 }
 export interface StockPartItem{
 

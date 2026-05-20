@@ -8,5 +8,5 @@ export class CreateNotesCustomerDto {
     })
     @IsString()
     @IsNotEmpty()
-    name: string;
+    name?: string;
 }

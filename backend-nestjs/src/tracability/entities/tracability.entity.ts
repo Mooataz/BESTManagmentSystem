@@ -6,16 +6,16 @@ import {  Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from
 @Entity()
 export class Tracability {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @ManyToOne( () => HistoryRepair, (historyRepair) => historyRepair.repair, {cascade: true, eager: true, nullable: true }  )
-    historyRepair : HistoryRepair;
+    historyRepair? : HistoryRepair;
 
     @ManyToOne( () => HistoryStockPart, (historyStockPart) => historyStockPart.tracability, {nullable: true}  )
-    historyStockPart : HistoryStockPart;
+    historyStockPart? : HistoryStockPart;
 
     @ManyToOne( () => User, user => user.tracability)
-    user : User;
+    user! : User;
 
     
 }

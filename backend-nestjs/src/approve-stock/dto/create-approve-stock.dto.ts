@@ -8,7 +8,7 @@ export class CreateApproveStockDto {
     })
     @IsString()
     @IsNotEmpty()
-    type : string;
+    type! : string;
 
     @ApiProperty({
         type:Date,
@@ -16,7 +16,7 @@ export class CreateApproveStockDto {
     })
     @IsDate()
     @IsNotEmpty()
-    date : Date;
+    date? : Date;
 
     @ApiProperty({
         type:String,
@@ -24,12 +24,12 @@ export class CreateApproveStockDto {
     })
     @IsString()
     @IsNotEmpty()
-    state : string;
+    state? : string;
 
     @ApiProperty({
         type:Number,
         description: "Required"
     })
-    idPartRepair: number;
+    idPartRepair?: number;
     
 }

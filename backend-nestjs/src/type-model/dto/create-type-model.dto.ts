@@ -8,7 +8,7 @@ export class CreateTypeModelDto {
                 })
     @IsString()
     @IsNotEmpty()
-            description : string;
+            description !: string;
 }
 
 

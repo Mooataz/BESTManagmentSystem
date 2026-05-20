@@ -17,19 +17,42 @@ export class ReferencesService {
 
 ) { }
 
-  async create(createReferenceDto: CreateReferenceDto): Promise<Reference> {
-    createReferenceDto.materialCode =this.appService.cleanSpaces(createReferenceDto.materialCode)
-    createReferenceDto.description =this.appService.cleanSpaces(createReferenceDto.description)
+async create(createReferenceDto: CreateReferenceDto): Promise<Reference> {
+  createReferenceDto.materialCode =
+    this.appService.cleanSpaces(createReferenceDto.materialCode);
+  createReferenceDto.description =
+    this.appService.cleanSpaces(createReferenceDto.description);
 
-    const model = await this.modelRepositry.find( { where : { id : In(createReferenceDto.modelIds)},})
-    if (!model.length) {throw new NotFoundException('No model')};
-
-    const allpart = await this.allPartRepositry.findOne( { where : { id : createReferenceDto.allpart},})
-    if (!allpart) {throw new NotFoundException('No part')};
-
-    const createNew = this.referenceRepositry.create( { ...createReferenceDto , model, allpart})
-    return await this.referenceRepositry.save(createNew);
+  if (!createReferenceDto.modelIds || createReferenceDto.modelIds.length === 0) {
+    throw new NotFoundException('No model ids provided');
   }
+
+  const model = await this.modelRepositry.find({
+    where: {
+      id: In(createReferenceDto.modelIds),
+    },
+  });
+
+  if (!model.length) {
+    throw new NotFoundException('No model');
+  }
+
+  const allpart = await this.allPartRepositry.findOne({
+    where: { id: createReferenceDto.allpart },
+  });
+
+  if (!allpart) {
+    throw new NotFoundException('No part');
+  }
+
+  const createNew = this.referenceRepositry.create({
+    ...createReferenceDto,
+    model,
+    allpart,
+  });
+
+  return await this.referenceRepositry.save(createNew);
+}
 
   async findAll(): Promise<Reference[]> {
     const findAll = await this.referenceRepositry.find({  relations: ['allpart','model']})

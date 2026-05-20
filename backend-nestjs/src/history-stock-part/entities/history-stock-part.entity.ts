@@ -5,17 +5,17 @@ import { Column, Entity, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn 
 @Entity()
 export class HistoryStockPart {
     @PrimaryGeneratedColumn()
-        id: number;
+        id!: number;
     
         @Column()
-        date: Date;
+        date?: Date;
     
         @Column()
-        step: string;
+        step?: string;
     
         @ManyToOne( () => StockPart, (stockPart) => stockPart.historyStockPart)
-        stockPart : StockPart;
+        stockPart? : StockPart;
     
         @OneToMany( () => Tracability, (tracability) => tracability.historyStockPart)
-        tracability : Tracability[];
+        tracability? : Tracability[];
 }

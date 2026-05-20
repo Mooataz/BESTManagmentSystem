@@ -18,8 +18,12 @@ export class AppController {
   }
 
   @Get('/file/:folder/:img')
-  readFile(@Param('folder') folder, @Param('img') img):StreamableFile{
-    const file=createReadStream(join(process.cwd(), '/upload/'+ folder + '/'+img))
+  readFile(@Param('folder') folder: string, @Param('img') img: string): StreamableFile {
+    
+const file = createReadStream(
+      join(process.cwd(), 'upload', folder, img),
+    );
+
     return new StreamableFile(file)
   }
 }

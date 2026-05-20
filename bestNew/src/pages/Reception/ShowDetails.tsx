@@ -6,7 +6,6 @@ import { getOneRepair } from '../../Redux/Actions/Reception/repairAction';
 import { Backdrop, Box, Button, DialogActions, Fade, Modal, Step, StepLabel, Stepper, Typography } from '@mui/material';
 import ShowStepper from '../../Componants/Global/ShowStepper';
 import theme from '../../Theme/theme';
-import { BiFullscreen } from 'react-icons/bi';
 type EditRepairModelProps = {
     open: boolean;              // ✅ type primitif
     onClose: () => void;        // ✅ c'est une fonction
@@ -64,6 +63,7 @@ export default function ShowDetails({
             >
                 <Fade in={open} >
                     <Box sx={style }>
+                        
                         {isLoading ? (
                             <Typography>Chargement...</Typography>
                         ) : oneRepair?.historyRepair ? (

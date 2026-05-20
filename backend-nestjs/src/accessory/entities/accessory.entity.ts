@@ -4,12 +4,12 @@ import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export class Accessory {
     @PrimaryGeneratedColumn()
-        id : number;
+        id! : number;
     @Column()
-        name : string;
+        name? : string;
 
         
     @ManyToMany ( () => Repair, (repair) => repair.accessory)
-    repair : Repair[];
+    repair? : Repair[];
 }
 

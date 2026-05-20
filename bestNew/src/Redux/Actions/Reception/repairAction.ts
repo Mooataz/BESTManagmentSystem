@@ -1,7 +1,7 @@
 //repairAction.ts
 import axios from 'axios';
 import { store } from '../../store';
-import type { FormHistoryRepair, RepairForm, RepairFormInput, TypeForm } from '../../Types/repairTypes'
+import type { FormHistoryRepair, RepairForm, RepairFormInput, TypeForm, UploadRepairFilesPayload } from '../../Types/repairTypes'
 import type { AsyncThunkConfig, LoginCredentials } from '../../Types/authenTypes';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 const API = axios.create({
@@ -174,7 +174,8 @@ export const getOneRepair = createAsyncThunk<
   }
 
 
-);  
+);
+
 type RepairFormUpdate = Partial<Omit<RepairForm, 'id'>> & { id: number };
 export const UpdateOneRepair = createAsyncThunk<
   RepairForm,
@@ -198,30 +199,28 @@ export const UpdateOneRepair = createAsyncThunk<
 );
 
 export const UpdatePartFileRepair = createAsyncThunk<
-  RepairForm,
-  FormData, // <-- FormData ici
+  any,
+  UploadRepairFilesPayload,
   { rejectValue: string }
 >(
-  `repair/UpdatePartFileRepair`,
-  async (formData, { rejectWithValue }) => {
+  'repair/updateWithPartsFiles',
+  async ({ id, data }, { rejectWithValue }) => {
     try {
-        const response = await API.patch(`repair/${formData.get('id')}`, formData  /* , {
-        headers: {
-          'Content-Type': 'multipart/form-data', 
-        },
-      }  */ );  
-
-      /* const response = await  API.patch(`repair/${formData.get('id')}`, formData,{
-        headers:{
-          'Content-Type': 'multipart/form-data', updateWithPartsFiles/
+      const response = await API.patch(
+        `/repair/updateWithPartsFiles/${id}`,
+        data,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
         }
-      }) */
-      return response.data.data;
+      );
+      return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Échec de récupération');
+      return rejectWithValue(
+        error.response?.data?.message ||
+        'Erreur lors de la mise à jour (fichiers)'
+      );
     }
   }
 );
-
-
+``
  
