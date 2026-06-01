@@ -26,31 +26,38 @@ import { Legislation } from 'src/legislation/entities/legislation.entity';
 import { StockGateway } from './Stock.Gateway';
 import { User } from 'src/users/entities/user.entity';
 
- 
+
 
 @Injectable({ scope: Scope.DEFAULT })
 export class StockPartsService {
   private readonly LOCK_FILE = path.join(os.tmpdir(), 'stock-calculation.lock');
   private isRunning = false; // Verrou en mémoire pour single-instance
-  constructor ( @InjectRepository(StockPart) private readonly  stockPartRepositry:Repository<StockPart>,
-                @InjectRepository(Branch) private readonly  branchRepositry:Repository<Branch>,
-                @InjectRepository(Bin) private readonly  binRepositry:Repository<Bin>,
-                @InjectRepository(Company) private readonly  companyRepositry:Repository<Company>,
-                @InjectRepository(HistoryStockPart) private readonly historyStockPartRepositry:Repository<HistoryStockPart>,
-                @InjectRepository(Tracability) private readonly tracabilityRepositry:Repository<Tracability>,
-                   @InjectRepository(User) private readonly UserRepositry:Repository<User>,
-                   private appService: AppService,
-                  private modelService:ModelsService,
-                  private referenceService: ReferencesService,
-                private PDFService: PdfService,
-               private StockGateway: StockGateway, ){}
+  constructor(@InjectRepository(StockPart) private readonly stockPartRepositry: Repository<StockPart>,
+    @InjectRepository(Branch) private readonly branchRepositry: Repository<Branch>,
+    @InjectRepository(Bin) private readonly binRepositry: Repository<Bin>,
+    @InjectRepository(Company) private readonly companyRepositry: Repository<Company>,
+    @InjectRepository(HistoryStockPart) private readonly historyStockPartRepositry: Repository<HistoryStockPart>,
+    @InjectRepository(Tracability) private readonly tracabilityRepositry: Repository<Tracability>,
+    @InjectRepository(User) private readonly UserRepositry: Repository<User>,
+    private appService: AppService,
+    private modelService: ModelsService,
+    private referenceService: ReferencesService,
+    private PDFService: PdfService,
+    private StockGateway: StockGateway,) { }
 
-  async create(createStockPartDto: CreateStockPartDto, userId: number):Promise<StockPart> {
-    createStockPartDto.serialNumber =this.appService.cleanSpaces(createStockPartDto.serialNumber)
-const newCreate =  this.stockPartRepositry.create(createStockPartDto);
- const saveStockPart =   await this.stockPartRepositry.save(newCreate);
+  async create(createStockPartDto: CreateStockPartDto, userId: number): Promise<StockPart> {
+    if (createStockPartDto.serialNumber) {
+      createStockPartDto.serialNumber = this.appService.cleanSpaces(createStockPartDto.serialNumber);
+    }
+    const { userId: _uid, bin: binId, reference: refId, ...rest } = createStockPartDto;
+    const newCreate = this.stockPartRepositry.create({
+      ...rest,
+      bin: binId ? { id: binId } : undefined,
+      reference: refId ? { id: refId } : undefined,
+    });
+    const saveStockPart = await this.stockPartRepositry.save(newCreate);
 
- const history = this.historyStockPartRepositry.create({
+    const history = this.historyStockPartRepositry.create({
       date: new Date(),
       step: 'Création',
       stockPart: { id: saveStockPart.id },
@@ -59,7 +66,7 @@ const newCreate =  this.stockPartRepositry.create(createStockPartDto);
     const savedHistory = await this.historyStockPartRepositry.save(history);
 
 
-     const tracability = this.tracabilityRepositry.create({
+    const tracability = this.tracabilityRepositry.create({
       historyStockPart: { id: savedHistory.id },
       user: { id: userId },
     });
@@ -67,127 +74,167 @@ const newCreate =  this.stockPartRepositry.create(createStockPartDto);
     return saveStockPart
   }
 
-  async findAll():Promise<StockPart[]> {
-    const findAll = await this.stockPartRepositry.find({relations:[
-      'bin',
-      'reference','reference.model','reference.model.brand','reference.allpart',
-      'historyStockPart','historyStockPart.tracability','historyStockPart.tracability.user'
-    ]})
-    if (!findAll || findAll.length === 0){
-      throw new NotFoundException('No data found')
-    }
-    return findAll;  }
+  async findAll(): Promise<StockPart[]> {
+    return this.stockPartRepositry.find({
+      relations: [
+        'bin',
+        'reference', 'reference.model', 'reference.model.brand', 'reference.allpart',
+        'historyStockPart', 'historyStockPart.tracability', 'historyStockPart.tracability.user'
+      ]
+    });
+  }
 
-  async findOne(id: number):Promise<StockPart> {
-    const findOne = await this.stockPartRepositry.findOne({ where : { id },
-    relations:[
-      'bin',
-      'reference','reference.model','reference.model.brand','reference.allpart',
-      'historyStockPart','historyStockPart.tracability','historyStockPart.tracability.user'
-    ]
+  async findOne(id: number): Promise<StockPart> {
+    const findOne = await this.stockPartRepositry.findOne({
+      where: { id },
+      relations: [
+        'bin',
+        'reference', 'reference.model', 'reference.model.brand', 'reference.allpart',
+        'historyStockPart', 'historyStockPart.tracability', 'historyStockPart.tracability.user'
+      ]
     })
-    if (!findOne){
+    if (!findOne) {
       throw new NotFoundException('No data available')
     }
-    return findOne;  }
+    return findOne;
+  }
 
-  async update(id: number, updateStockPartDto: UpdateStockPartDto):Promise<StockPart> {
-    await this.stockPartRepositry.update(id,updateStockPartDto);
-    const updateData = await this.stockPartRepositry.findOne({ where : { id } })
-
-    if (!updateData){
+  async update(id: number, updateStockPartDto: UpdateStockPartDto): Promise<StockPart> {
+    const { bin: binId, reference: refId, ...rest } = updateStockPartDto as any;
+    const updateData: any = { ...rest };
+    if (binId) updateData.bin = { id: Number(binId) };
+    if (refId) updateData.reference = { id: Number(refId) };
+    await this.stockPartRepositry.update(id, updateData);
+    const updated = await this.stockPartRepositry.findOne({ where: { id } })
+    if (!updated) {
       throw new NotFoundException('data not found to update')
-    }    
-    return updateData;  }
+    }
+    return updated;
+  }
 
-  async remove(id: number):Promise<StockPart> {
-    const deletedata = await this.stockPartRepositry.findOne ({where: {id}});
+  async remove(id: number): Promise<StockPart> {
+    const deletedata = await this.stockPartRepositry.findOne({ where: { id } });
     if (!deletedata) {
       throw new NotFoundException('data not found for delete')
     }
     await this.stockPartRepositry.delete({ id: deletedata.id })
-    return deletedata;   }
-
-    
-    async filterByReferenceAndBin( referencesIds: number[], binId: number): Promise<StockPart[]>{
-      const findAll = await this.stockPartRepositry
-        .createQueryBuilder('stockPart')
-        .leftJoinAndSelect('stockPart.reference', 'reference')
-        .leftJoinAndSelect('stockPart.bin', 'bin')
-        .where('bin.id = :binId', {binId})
-        .andWhere('reference.id IN (:...referencesIds)', {referencesIds})
-        .getMany();
-      if (!findAll || findAll.length === 0) {
-          throw new NotFoundException("There is no data Available") }
-      return findAll
-    }
-
-async findByBranchId(branchId: number): Promise<StockPart[]> {
-  return this.stockPartRepositry
-    .createQueryBuilder('stockPart')
-    .leftJoinAndSelect('stockPart.bin', 'bin')
-    .leftJoinAndSelect('bin.branch', 'branch')
-    .leftJoinAndSelect('stockPart.reference', 'reference')
-    .leftJoinAndSelect('reference.model', 'model')
-    .leftJoinAndSelect('model.brand', 'brand')
-    .leftJoinAndSelect('reference.allpart', 'allpart')
-    .leftJoinAndSelect('stockPart.historyStockPart', 'historyStockPart')
-    .leftJoinAndSelect('historyStockPart.tracability', 'tracability')
-    .leftJoinAndSelect('tracability.user', 'user')
-    .where('branch.id = :branchId', { branchId })
-    .orderBy('stockPart.id', 'DESC')  // ← Ajout du tri ici
-    .getMany();
-}
+    return deletedata;
+  }
 
 
- 
+  async filterByReferenceAndBin(referencesIds: number[], binId: number): Promise<StockPart[]> {
+    return this.stockPartRepositry
+      .createQueryBuilder('stockPart')
+      .leftJoinAndSelect('stockPart.reference', 'reference')
+      .leftJoinAndSelect('stockPart.bin', 'bin')
+      .where('bin.id = :binId', { binId })
+      .andWhere('reference.id IN (:...referencesIds)', { referencesIds })
+      .getMany();
+  }
+
+  async findByBranchId(branchId: number): Promise<StockPart[]> {
+    return this.stockPartRepositry
+      .createQueryBuilder('stockPart')
+      .leftJoinAndSelect('stockPart.bin', 'bin')
+      .leftJoinAndSelect('bin.branch', 'branch')
+      .leftJoinAndSelect('stockPart.reference', 'reference')
+      .leftJoinAndSelect('reference.model', 'model')
+      .leftJoinAndSelect('model.brand', 'brand')
+      .leftJoinAndSelect('reference.allpart', 'allpart')
+      .leftJoinAndSelect('stockPart.historyStockPart', 'historyStockPart')
+      .leftJoinAndSelect('historyStockPart.tracability', 'tracability')
+      .leftJoinAndSelect('tracability.user', 'user')
+      .where('branch.id = :branchId', { branchId })
+      .orderBy('stockPart.id', 'DESC')  // ← Ajout du tri ici
+      .getMany();
+  }
 
   async findByBinType(type: string, branchId: number): Promise<StockPart[]> {
     return this.stockPartRepositry
-        .createQueryBuilder('StockPart')
-        .leftJoinAndSelect('StockPart.bin', 'bin')
-        .leftJoinAndSelect('bin.branch', 'branch')
-        .leftJoinAndSelect('StockPart.reference', 'reference')
-        .leftJoinAndSelect('reference.allpart', 'allpart')
-        .leftJoinAndSelect('reference.model', 'model')
-        .where('bin.type = :type', { type }) 
-        .andWhere('branch.id = :branchId', { branchId })
-        .getMany();
-}
-async findGoodReference(references:Reference[], branchId: number): Promise<StockPart[]> {
-  const refIds = references.map(ref => ref.id); // EXTRACTION des ids
-  const goodPart = await this.stockPartRepositry
-    .createQueryBuilder('stockPart')
-    .leftJoinAndSelect('stockPart.reference', 'ref')
-    .leftJoinAndSelect('stockPart.bin', 'bin')
-    .leftJoinAndSelect('bin.branch', 'branch')
-    .where('bin.type = :type', { type: 'Good' })
-    .andWhere('branch.id = :branchId', { branchId })
-    .andWhere('ref.id IN (:...refIds)', {refIds})
-    .getMany();
-  return goodPart ;
-}
+      .createQueryBuilder('StockPart')
+      .leftJoinAndSelect('StockPart.bin', 'bin')
+      .leftJoinAndSelect('bin.branch', 'branch')
+      .leftJoinAndSelect('StockPart.reference', 'reference')
+      .leftJoinAndSelect('reference.allpart', 'allpart')
+      .leftJoinAndSelect('reference.model', 'model')
+      .where('bin.type = :type', { type })
+      .andWhere('branch.id = :branchId', { branchId })
+      .getMany();
+  }
+  async findGoodReference(references: Reference[], branchId: number): Promise<StockPart[]> {
+    const refIds = references.map(ref => ref.id); // EXTRACTION des ids
+    const goodPart = await this.stockPartRepositry
+      .createQueryBuilder('stockPart')
+      .leftJoinAndSelect('stockPart.reference', 'ref')
+      .leftJoinAndSelect('stockPart.bin', 'bin')
+      .leftJoinAndSelect('bin.branch', 'branch')
+      .where('bin.type = :type', { type: 'Good' })
+      .andWhere('branch.id = :branchId', { branchId })
+      .andWhere('ref.id IN (:...refIds)', { refIds })
+      .getMany();
+    return goodPart;
+  }
 
-async AddHistorytockPart(id: number, userId: number, step: string):Promise<number>{
-  const history = this.historyStockPartRepositry.create({
+  async AddHistoryStockPart(id: number, userId: number, step: string): Promise<number> {
+    const history = this.historyStockPartRepositry.create({
       date: new Date(),
       step: step,
-      stockPart: { id:id },
+      stockPart: { id: id },
     });
 
     const savedHistory = await this.historyStockPartRepositry.save(history);
 
 
-     const tracability = this.tracabilityRepositry.create({
+    const tracability = this.tracabilityRepositry.create({
       historyStockPart: { id: savedHistory.id },
       user: { id: userId },
     });
     await this.tracabilityRepositry.save(tracability);
     return id
-}
+  }
+
+  async findAppareilComplet(modelId: number, branchId: number): Promise<StockPart[]> {
+    return this.stockPartRepositry
+      .createQueryBuilder('stockPart')
+      .leftJoinAndSelect('stockPart.bin', 'bin')
+      .leftJoinAndSelect('bin.branch', 'branch')
+      .leftJoinAndSelect('stockPart.reference', 'reference')
+      .leftJoinAndSelect('reference.allpart', 'allpart')
+      .leftJoinAndSelect('reference.model', 'model')
+      .leftJoinAndSelect('stockPart.historyStockPart', 'historyStockPart')
+      .leftJoinAndSelect('historyStockPart.tracability', 'tracability')
+      .leftJoinAndSelect('tracability.user', 'user')
+      .where('model.id = :modelId', { modelId })
+      .andWhere('branch.id = :branchId', { branchId })
+      .andWhere('LOWER(allpart.description) LIKE :desc', { desc: '%complet%' })
+      .getMany();
+  }
+
+  async dismantle(id: number, binId: number, userId: number): Promise<StockPart> {
+    await this.stockPartRepositry.update(id, { bin: { id: binId } });
+    await this.AddHistoryStockPart(id, userId, 'Démantèlement');
+    return this.findOne(id);
+  }
+
+  async createDismantledPart(dto: CreateStockPartDto, userId: number, originalStockPartId: number): Promise<StockPart> {
+    const { userId: _uid, bin: binId, reference: refId, serialNumber, ...rest } = dto;
+    if (!serialNumber) {
+      throw new NotFoundException('Numéro de série obligatoire');
+    }
+    const finalSerial = this.appService.cleanSpaces(serialNumber);
+    const newCreate = this.stockPartRepositry.create({
+      ...rest,
+      serialNumber: finalSerial,
+      bin: binId ? { id: binId } : undefined,
+      reference: refId ? { id: refId } : undefined,
+    });
+    const saved = await this.stockPartRepositry.save(newCreate);
+    await this.AddHistoryStockPart(saved.id, userId, `Démantèlement(${originalStockPartId})`);
+    return this.findOne(saved.id);
+  }
 
 
-  
+
 }
 
 

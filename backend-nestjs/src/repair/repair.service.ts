@@ -360,6 +360,19 @@ if (!updateRepairDto || typeof updateRepairDto !== 'object') {
       'notesCustomer', 'expertiseReason', 'repairAction'
     ]
   });
+
+  if (!existingRepair) {
+    throw new NotFoundException('Repair not found');
+  }
+if (updateRepairDto.expertiseReason) {
+  existingRepair!.expertiseReason =
+    await this.expertiseReasonRepositry.findBy({
+      id: In(updateRepairDto.expertiseReason),
+    });
+}
+  // Parse helper
+  const parseIfString = <T>(value: any): T =>
+    typeof value === 'string' ? JSON.parse(value) : value;
 if (updateRepairDto.repairAction) {
   existingRepair!.repairAction =
     await this.repairActionRepositry.findBy({
@@ -377,21 +390,13 @@ if (updateRepairDto.notesCustomer) {
 if (updateRepairDto.partsNeed) {
   existingRepair!.partsNeed = updateRepairDto.partsNeed;
 }
-  if (!existingRepair) {
-    throw new NotFoundException('Repair not found');
-  }
-
-  // Parse helper
-  const parseIfString = <T>(value: any): T =>
-    typeof value === 'string' ? JSON.parse(value) : value;
-
   // Parse tous les champs ID-array s'ils arrivent en string
   updateRepairDto.accessoryIds = parseIfString(updateRepairDto?.accessoryIds);
   updateRepairDto.listFaultIds = parseIfString(updateRepairDto?.listFaultIds);
   updateRepairDto.customerRequestIds = parseIfString(updateRepairDto?.customerRequestIds);
-  updateRepairDto.notesCustomerIds = parseIfString(updateRepairDto?.notesCustomerIds);
-  updateRepairDto.expertiseReasonsIds = parseIfString(updateRepairDto?.expertiseReasonsIds);
-  updateRepairDto.repairActionIds = parseIfString(updateRepairDto?.repairActionIds);
+  updateRepairDto.notesCustomer = parseIfString(updateRepairDto?.notesCustomer);
+  updateRepairDto.expertiseReason = parseIfString(updateRepairDto?.expertiseReason);
+  updateRepairDto.repairAction = parseIfString(updateRepairDto?.repairAction);
   updateRepairDto.partsNeed = parseIfString(updateRepairDto?.partsNeed);
   updateRepairDto.device = parseIfString(updateRepairDto?.device);
   updateRepairDto.user = parseIfString(updateRepairDto?.user);
@@ -418,14 +423,14 @@ if (updateRepairDto.partsNeed) {
   if (updateRepairDto.customerRequestIds) {
     existingRepair.customerRequest = await this.customerRequestRepositry.findBy({ id: In(updateRepairDto.customerRequestIds) });
   }
-  if (updateRepairDto.notesCustomerIds) {
-    existingRepair.notesCustomer = await this.notesCustomerRepositry.findBy({ id: In(updateRepairDto.notesCustomerIds) });
+  if (updateRepairDto.notesCustomer) {
+    existingRepair.notesCustomer = await this.notesCustomerRepositry.findBy({ id: In(updateRepairDto.notesCustomer) });
   }
-  if (updateRepairDto.expertiseReasonsIds) {
-    existingRepair.expertiseReason = await this.expertiseReasonRepositry.findBy({ id: In(updateRepairDto.expertiseReasonsIds) });
+  if (updateRepairDto.expertiseReason) {
+    existingRepair.expertiseReason = await this.expertiseReasonRepositry.findBy({ id: In(updateRepairDto.expertiseReason) });
   }
-  if (updateRepairDto.repairActionIds) {
-    existingRepair.repairAction = await this.repairActionRepositry.findBy({ id: In(updateRepairDto.repairActionIds) });
+  if (updateRepairDto.repairAction) {
+    existingRepair.repairAction = await this.repairActionRepositry.findBy({ id: In(updateRepairDto.repairAction) });
   }
 
   // Champs simples
@@ -442,18 +447,71 @@ if (updateRepairDto.partsNeed) {
 
   await this.repairRepositry.save(existingRepair);
 
+  // ✅ Sync ApproveStock — create entries for any selected parts
+  const finalPartIds = (Array.isArray(existingRepair.partsNeed) ? existingRepair.partsNeed : []).map(Number);
+
+  const existingEntries = await this.approveStockRepositry.find({
+    where: { repair: { id } },
+  });
+
+  const existingPartIds = existingEntries.map(e => Number(e.idPartRepair));
+
+  // Delete entries for parts no longer in partsNeed
+  const toDelete = existingEntries.filter(e => !finalPartIds.includes(Number(e.idPartRepair)));
+  if (toDelete.length > 0) {
+    await this.approveStockRepositry.remove(toDelete);
+  }
+
+  // Create entries for new parts
+  const toCreate = finalPartIds.filter(id => !existingPartIds.includes(id));
+  if (toCreate.length > 0) {
+    const entries = toCreate.map(partId => ({
+      type: existingRepair.repairAction?.some(a => a.name === 'Nouvelle appareille') ? 'Nouvelle appareille' : 'Réparation',
+      date: new Date(),
+      state: 'En cours',
+      idPartRepair: partId,
+      repair: { id },
+    }));
+    await this.approveStockRepositry.save(entries);
+  }
+
   return this.repairRepositry.findOneOrFail({
     where: { id },
     relations: [
-      'device', 'user', 'customer',
-      'accessory', 'listFault', 'customerRequest',
-      'notesCustomer', 'expertiseReason', 'repairAction'
-    ]
+      'customer', 'customer.distributer',
+      'device', 'device.model', 'device.model.brand', 'device.model.allpart', 'device.model.typeModel',
+      'accessory',
+      'listFault',
+      'customerRequest',
+      'notesCustomer',
+      'expertiseReason',
+      'repairAction',
+      'approveStock',
+      'user',
+    ],
   });
 }
 
 
 
+
+  async removeFile(id: number, fileName: string): Promise<Repair> {
+    const repair = await this.repairRepositry.findOne({ where: { id } });
+    if (!repair) throw new NotFoundException('Repair not found');
+
+    const files = (repair.files ?? []) as string[];
+    if (!files.includes(fileName)) {
+      throw new NotFoundException(`File ${fileName} not found in repair ${id}`);
+    }
+
+    const filePath = path.join(process.cwd(), 'upload/repairs', fileName);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    repair.files = files.filter(f => f !== fileName);
+    return await this.repairRepositry.save(repair);
+  }
 
   async updateRepairWithParts(
   id: number,
@@ -491,7 +549,22 @@ if (updateRepairDto.partsNeed) {
     }
   });
 
-  return await this.repairRepositry.save(repair);
+  await this.repairRepositry.save(repair);
+
+  return this.repairRepositry.findOneOrFail({
+    where: { id },
+    relations: [
+      'customer', 'customer.distributer',
+      'device', 'device.model', 'device.model.brand', 'device.model.allpart', 'device.model.typeModel',
+      'accessory',
+      'listFault',
+      'customerRequest',
+      'notesCustomer',
+      'expertiseReason',
+      'repairAction',
+      'user',
+    ],
+  });
 }
 
 

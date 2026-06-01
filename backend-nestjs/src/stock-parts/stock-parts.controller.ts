@@ -8,11 +8,10 @@ export class StockPartsController {
   constructor(private readonly stockPartsService: StockPartsService) { }
 
   @Post()
-  async create(@Body() /* createStockPartDto: CreateStockPartDto */ data:any,
+  async create(@Body() createStockPartDto: CreateStockPartDto,
     @Res() res: any) {
     try {
-       const {userId, ...createStockPartDto} = data; 
-      const newCreate = await this.stockPartsService.create(createStockPartDto, userId)
+      const newCreate = await this.stockPartsService.create(createStockPartDto, createStockPartDto.userId)
       return res.status(HttpStatus.CREATED).json({
         message:"Created Successfuly !",
         status:HttpStatus.CREATED,
@@ -148,7 +147,7 @@ export class StockPartsController {
   @Get('filter/:references/:bin')
   async filterStockParts(
     @Param('references', new ParseArrayPipe({ items: Number, separator: ',' })) references: number[],
-    @Param('bin') binType: number,
+    @Param('bin', ParseIntPipe) binType: number,
     @Res() res: any
   ) {
     try {
@@ -199,10 +198,10 @@ export class StockPartsController {
  
 
 
-    @Get('AddHistorytockPart/:id/:userId/:step')
-  async AddHistorytockPart (@Param('id') id: number, @Param('userId') userId: number, @Param('step') step: string, @Res() res: any) {
+    @Post('AddHistorytockPart/:id/:userId/:step')
+  async AddHistoryStockPart (@Param('id') id: number, @Param('userId') userId: number, @Param('step') step: string, @Res() res: any) {
     try {
-      const allfind = await this.stockPartsService.AddHistorytockPart(id, userId, step)
+      const allfind = await this.stockPartsService.AddHistoryStockPart(id, userId, step)
 
       return res.status(HttpStatus.OK).json({
         message:"Updated Successfuly !",
@@ -217,6 +216,69 @@ export class StockPartsController {
       })
     }
   
+    throw error
+  }
+  }
+
+  @Get('demantelement/:modelId/:branchId')
+  async findAppareilComplet(@Param('modelId') modelId: number, @Param('branchId') branchId: number, @Res() res: any) {
+    try {
+      const result = await this.stockPartsService.findAppareilComplet(modelId, branchId)
+      return res.status(HttpStatus.OK).json({
+        message:"Founded Successfuly !",
+        status:HttpStatus.OK,
+        data:result
+      })
+    } catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
+      })
+    }
+    throw error
+  }
+  }
+
+  @Post('dismantle/:id')
+  async dismantle(@Param('id') id: number, @Body() body: { binId: number, userId: number }, @Res() res: any) {
+    try {
+      const result = await this.stockPartsService.dismantle(id, body.binId, body.userId)
+      return res.status(HttpStatus.OK).json({
+        message:"Dismantled Successfuly !",
+        status:HttpStatus.OK,
+        data:result
+      })
+    } catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
+      })
+    }
+    throw error
+  }
+  }
+
+  @Post('create-dismantled')
+  async createDismantled(@Body() body: { dto: CreateStockPartDto, originalStockPartId: number }, @Res() res: any) {
+    try {
+      const result = await this.stockPartsService.createDismantledPart(body.dto, body.dto.userId, body.originalStockPartId)
+      return res.status(HttpStatus.CREATED).json({
+        message:"Created Successfuly !",
+        status:HttpStatus.CREATED,
+        data:result
+      })
+    } catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
+      })
+    }
     throw error
   }
   }

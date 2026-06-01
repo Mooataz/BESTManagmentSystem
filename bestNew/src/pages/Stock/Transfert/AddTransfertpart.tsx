@@ -15,7 +15,7 @@ export default function AddTransfertpart() {
   const dispatch = useAppDispatch();
   const { notify } = useNotification();
   const user = useSelector((state: RootState) => state.auth.user);
-  const allStockPart = useSelector((state: RootState) => state.stockParts.stockParts)
+  const allStockPart = useSelector((state: RootState) => state.stockParts.stockPartsTransfert)
   const getBranchId = (branch: number | { id: number } | undefined): number | undefined =>
     typeof branch === 'number' ? branch : branch?.id;
 

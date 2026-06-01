@@ -2,7 +2,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { Customer, Device, RepairForm } from '../Types/repairTypes'
-import { addRepair, AssignRepair, getByBranchStep, getByUserStep, getOneRepair, getRepairIncomplet, getRepairs, getRepairsByBranch, UpdateOneRepair, UpdatePartFileRepair } from '../Actions/Reception/repairAction';
+import { addRepair, AssignRepair, DeleteRepairFile, getByBranchStep, getByUserStep, getOneRepair, getRepairIncomplet, getRepairs, getRepairsByBranch, UpdateOneRepair, UpdatePartFileRepair } from '../Actions/Reception/repairAction';
 import { AddDevice } from '../Actions/Reception/DeviceActions';
 import { AddCustomer } from '../Actions/Reception/customerActions';
 
@@ -246,11 +246,31 @@ const repairSlice = createSlice({
   state.loading = true;
   state.error = null;
 })
-.addCase(UpdatePartFileRepair.fulfilled, (state) => {
+.addCase(UpdatePartFileRepair.fulfilled, (state, action) => {
   state.loading = false;
   state.success = true;
+  if (action.payload?.data) {
+    state.oneRepair = action.payload.data;
+  }
 })
 .addCase(UpdatePartFileRepair.rejected, (state, action) => {
+  state.loading = false;
+  state.success = false;
+  state.error = action.payload ?? 'Erreur inconnue';
+})
+
+.addCase(DeleteRepairFile.pending, (state) => {
+  state.loading = true;
+  state.error = null;
+})
+.addCase(DeleteRepairFile.fulfilled, (state, action) => {
+  state.loading = false;
+  state.success = true;
+  if (state.oneRepair && state.oneRepair.id === action.payload.id) {
+    state.oneRepair.files = action.payload.files;
+  }
+})
+.addCase(DeleteRepairFile.rejected, (state, action) => {
   state.loading = false;
   state.success = false;
   state.error = action.payload ?? 'Erreur inconnue';

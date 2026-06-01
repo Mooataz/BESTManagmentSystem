@@ -211,6 +211,31 @@ async updateWithPartsFiles(
   };
 }
 
+ @Delete(':id/files/:fileId')
+  async removeFile(
+    @Param('id') id: number,
+    @Param('fileId') fileId: string,
+    @Res() res: any,
+  ) {
+    try {
+      const updatedRepair = await this.repairService.removeFile(+id, fileId);
+      return res.status(HttpStatus.OK).json({
+        message: 'File deleted successfully',
+        status: HttpStatus.OK,
+        data: updatedRepair,
+      });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        });
+      }
+      throw error;
+    }
+  }
+
  @Patch(':id')
   async update(@Param('id') id: number,
     @Body() body: any,

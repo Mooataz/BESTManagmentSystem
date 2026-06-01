@@ -71,7 +71,7 @@ export default function EnAttente() {
     // :grand_cercle_vert: Acceptation du transfert
     const handleAccepte = async (row: any) => {
         const valueupdate = {
-            id: row.transfertId,
+            id: row.id ?? row.transfertId,
             state: 'Accepter',
             receivedDate: new Date(),
             receiveUser: user?.id || 0
@@ -81,18 +81,21 @@ export default function EnAttente() {
             notify('Transfert accepté', 'success');
 
             loadTransferts()
-                     await Promise.all(
-                       (formtransfert.stockPartIds ?? []).map((idPart: number) =>
-                         dispatch(
-                           AddhistoryOnePart({
-                             id: idPart,
-                             userId: user?.id || 0,
-                             step: `Transfert accepter agence ${formtransfert.tobranch}`,
-                           })
-                         )
-                       )
-                     );
-             
+            const partIds = row.stockPartIds ?? [];
+            const toBranch = row.tobranch ?? row.toBranchName ?? '';
+            if (partIds.length > 0) {
+                await Promise.all(
+                    partIds.map((idPart: number) =>
+                        dispatch(
+                            AddhistoryOnePart({
+                                id: idPart,
+                                userId: user?.id || 0,
+                                step: `Transfert accepter agence ${toBranch}`,
+                            })
+                        )
+                    )
+                );
+            }
         } catch (error) {
             notify('Erreur lors de l’acceptation', 'error');
         }
@@ -111,11 +114,7 @@ export default function EnAttente() {
         },
         {
             icon: <Button>Accepter</Button>,
-            onClick: (row: Record<string, any>) => {/* handleAccepte(row) */
-                 setFormtransfert(row)
-                setOpen(true);
-               
-            },
+            onClick: (row: Record<string, any>) => handleAccepte(row),
         },
     ];
     return (

@@ -32,7 +32,7 @@ export interface FormStock {
     id?: number;
     bin: number;
     remark: string;
-    serialnumber: string;
+    serialNumber: string;
     reference: number;
     userId?: number;
 }

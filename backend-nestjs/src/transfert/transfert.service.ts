@@ -202,7 +202,7 @@ async update(id: number, data: any): Promise<Transfert> {
       ]);
       const stockPartsDetail = t.stockPart?.map(sp => ({
         id: sp.id,
-        serialnumber: sp.serialnumber,
+        serialnumber: sp.serialNumber,
         remark: sp.remark,
         binName: sp.bin?.name ?? null,
         materialCode: sp.reference?.materialCode ?? null,
@@ -256,7 +256,7 @@ async update(id: number, data: any): Promise<Transfert> {
       ]);
       const stockPartsDetail = t.stockPart?.map(sp => ({
         id: sp.id,
-        serialnumber: sp.serialnumber,
+        serialnumber: sp.serialNumber,
         remark: sp.remark,
         binName: sp.bin?.name ?? null,
         materialCode: sp.reference?.materialCode ?? null,

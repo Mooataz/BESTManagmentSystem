@@ -2,6 +2,7 @@ import { createSlice,   } from '@reduxjs/toolkit';
 import { handleAuthen, handleLogout, loginUser  } from '../Actions/authAction';
 import type { PayloadAction, AsyncThunk } from '@reduxjs/toolkit';
 import type { User } from '../Types/authenTypes';
+import type { Agency } from '../Types/Stock';
 //import type { AuthState, AsyncThunkConfig,User  } from './Types/authenTypes';
 
 
@@ -29,7 +30,13 @@ const authSlice = createSlice({
     
 clearError: (state: AuthState) => {
   state.error = null;
-}
+},
+
+setBranch: (state, action: PayloadAction<Agency>) => {
+  if (state.user) {
+    state.user.branch = action.payload;
+  }
+},
 
 
   },
@@ -86,5 +93,5 @@ clearError: (state: AuthState) => {
   },
 });
 
-export const { clearError } = authSlice.actions;
+export const { clearError, setBranch } = authSlice.actions;
 export default authSlice.reducer;

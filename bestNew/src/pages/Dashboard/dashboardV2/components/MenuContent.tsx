@@ -105,7 +105,7 @@ export default function MenuContent() {
         { label: 'Transfertpiéces', page: 'TransfertPiéces', icon: <TbTransitionRight /> },
         { label: 'Reçoipiéces', page: 'ReçoiPiéces', icon: <TbTransitionLeft /> },
         { label: 'AjusterPrix', page: 'AjusterPrixPiéces', icon: <FcCurrencyExchange /> },
-        { label: 'Défalcation', page: 'Défalcation', icon: <RiPageSeparator /> },
+        { label: 'Démantèlement', page: 'Démantèlement', icon: <RiPageSeparator /> },
       ]
     },
 

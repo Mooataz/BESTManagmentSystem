@@ -198,6 +198,24 @@ export const UpdateOneRepair = createAsyncThunk<
 
 );
 
+export const DeleteRepairFile = createAsyncThunk<
+  { id: number; files: string[] },
+  { id: number; fileName: string },
+  { rejectValue: string }
+>(
+  'repair/deleteFile',
+  async ({ id, fileName }, { rejectWithValue }) => {
+    try {
+      const response = await API.delete(`repair/${id}/files/${fileName}`);
+      return { id, files: response.data.data.files };
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Erreur suppression fichier'
+      );
+    }
+  }
+);
+
 export const UpdatePartFileRepair = createAsyncThunk<
   any,
   UploadRepairFilesPayload,
@@ -222,5 +240,104 @@ export const UpdatePartFileRepair = createAsyncThunk<
     }
   }
 );
-``
- 
+
+export interface ApproveStockItem {
+  id: number;
+  type?: string;
+  date?: string;
+  state?: string;
+  idPartRepair?: number;
+  repair?: {
+    id: number;
+    actuellybranch?: number;
+    device?: any;
+    user?: { id: number; name: string };
+    warrenty?: boolean;
+    historyRepair?: any[];
+  };
+}
+
+export const getApproveStockByBranch = createAsyncThunk<
+  ApproveStockItem[],
+  number,
+  { rejectValue: string }
+>(
+  'approveStock/getByBranch',
+  async (branchId, { rejectWithValue }) => {
+    try {
+      const response = await API.get(`approve-stock/findByBranch/${branchId}`);
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Erreur de récupération'
+      );
+    }
+  }
+);
+
+export const updateApproveStockState = createAsyncThunk<
+  ApproveStockItem,
+  { id: number; state: string },
+  { rejectValue: string }
+>(
+  'approveStock/updateState',
+  async ({ id, state }, { rejectWithValue }) => {
+    try {
+      const response = await API.patch(`approve-stock/${id}`, { state });
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Erreur de mise à jour'
+      );
+    }
+  }
+);
+
+export interface AvailableStockPart {
+  id: number;
+  serialnumber?: string;
+  remark?: string;
+  bin?: { id: number; name: string; type: string };
+  reference?: {
+    id: number;
+    materialCode: string;
+    description?: string;
+    allpart?: { id: number; description: string };
+  };
+}
+
+export const getAvailableParts = createAsyncThunk<
+  AvailableStockPart[],
+  { approveStockId: number; branchId: number },
+  { rejectValue: string }
+>(
+  'approveStock/getAvailableParts',
+  async ({ approveStockId, branchId }, { rejectWithValue }) => {
+    try {
+      const response = await API.get(`approve-stock/${approveStockId}/available-parts`, { params: { branchId } });
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Erreur de récupération des pièces disponibles'
+      );
+    }
+  }
+);
+
+export const confirmApprovePart = createAsyncThunk<
+  ApproveStockItem,
+  { approveStockId: number; stockPartId: number; binDefectId: number; userId: number },
+  { rejectValue: string }
+>(
+  'approveStock/confirmPart',
+  async ({ approveStockId, stockPartId, binDefectId, userId }, { rejectWithValue }) => {
+    try {
+      const response = await API.post(`approve-stock/${approveStockId}/confirm-part`, { stockPartId, binDefectId, userId });
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || 'Erreur de confirmation de pièce'
+      );
+    }
+  }
+);

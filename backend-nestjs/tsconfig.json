@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2023",
     "module": "CommonJS",
-    "moduleResolution": "node",
+    "moduleResolution": "node10",
 
     "baseUrl": ".",
     "paths": {
@@ -31,7 +31,7 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
 
-   //"ignoreDeprecations": "5.0"
+
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

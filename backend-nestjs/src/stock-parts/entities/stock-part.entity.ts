@@ -15,8 +15,8 @@ export class StockPart {
     @Column()
     remark?: string;
 
-    @Column()
-    serialnumber?: string;
+    @Column({ name: 'serialnumber' })
+    serialNumber?: string;
 
     @ManyToOne( () => Bin, bin => bin.stockPart, { nullable: true })
     bin?: Bin;

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, HttpException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Query, HttpStatus, HttpException, ParseIntPipe } from '@nestjs/common';
 import { ApproveStockService } from './approve-stock.service';
 import { CreateApproveStockDto } from './dto/create-approve-stock.dto';
 import { UpdateApproveStockDto } from './dto/update-approve-stock.dto';
@@ -94,6 +94,54 @@ export class ApproveStockController {
   
     throw error
   }
+  }
+
+  @Get(':id/available-parts')
+  async getAvailableParts(@Param('id', ParseIntPipe) id: number,
+    @Query('branchId', ParseIntPipe) branchId: number,
+    @Res() res: any) {
+    try {
+      const parts = await this.approveStockService.findAvailableParts(id, branchId);
+      return res.status(HttpStatus.OK).json({
+        message: "Available parts found",
+        status: HttpStatus.OK,
+        data: parts
+      });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        });
+      }
+      throw error;
+    }
+  }
+
+  @Post(':id/confirm-part')
+  async confirmPart(@Param('id', ParseIntPipe) id: number,
+    @Body('stockPartId', ParseIntPipe) stockPartId: number,
+    @Body('binDefectId', ParseIntPipe) binDefectId: number,
+    @Body('userId', ParseIntPipe) userId: number,
+    @Res() res: any) {
+    try {
+      const result = await this.approveStockService.confirmPart(id, stockPartId, binDefectId, userId);
+      return res.status(HttpStatus.OK).json({
+        message: "Part confirmed successfully",
+        status: HttpStatus.OK,
+        data: result
+      });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        });
+      }
+      throw error;
+    }
   }
 
   @Get('/findByType/:type')

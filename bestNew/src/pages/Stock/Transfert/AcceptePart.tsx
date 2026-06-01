@@ -54,9 +54,7 @@ export default function AcceptePart() {
     const transfertAccept = useSelector((state: RootState) => state.Transfert.Transfert)
     const bins = useSelector((state: RootState) => state.bin.bin);
 
-    if (!userr?.id || !userr.branch) return;
-    const branchId = typeof userr.branch === 'object' ? userr.branch.id : userr.branch;
-    if (!branchId || isNaN(userr.id)) return;
+    const branchId = typeof userr?.branch === 'object' ? userr?.branch?.id : userr?.branch;
     React.useEffect(() => {
         if (branchId) {
             dispatch(GetReceiveTransfert({ branchId, type, state }))
@@ -92,6 +90,7 @@ const [formData, setFormData] = useState<TransfertPR>();
     ];
 
 
+    if (!userr?.id || !branchId) return null;
     return (
         <Box>
 

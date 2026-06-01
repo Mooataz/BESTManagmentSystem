@@ -11,7 +11,7 @@ import { IconButton } from '@mui/material';
 import { getAgencies } from '../../api/administration/Agencies';
 import { getCompany } from '../../api/administration/Company';
 import theme from '../../Theme/theme';
-import { setBranch } from '../../Redux/auth/userSlice';
+import { setBranch } from '../../Redux/auth/authSlice';
 import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';

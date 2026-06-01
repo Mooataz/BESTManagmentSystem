@@ -11,6 +11,9 @@ interface CustomCheckboxSelectorProps {
   returnField: string;
   maxSelection?: number;
   title?:string;
+  disabledIds?: number[];
+  exclusiveIds?: number[];
+  value?: any[];
   onChange: (selectedValues: any[]) => void;
 }
 
@@ -20,19 +23,66 @@ export const CustomCheckboxSelector: React.FC<CustomCheckboxSelectorProps> = ({
   displayFields,
   returnField,
   maxSelection = Infinity,
+  disabledIds,
+  exclusiveIds,
+  value,
   onChange,
 }) => {
-  const [selectedIds, setSelectedIds] = React.useState<Set<number>>(new Set());
+  const [internalIds, setInternalIds] = React.useState<Set<number>>(new Set());
+
+  const selectedIds = value !== undefined
+    ? new Set(value.map(v => {
+        const found = data.find(d => String(d[returnField]) === String(v));
+        return found ? found.id : v;
+      }).filter((id): id is number => typeof id === 'number'))
+    : internalIds;
+
+  const anyExclusiveSelected = [...selectedIds].some(id => exclusiveIds?.includes(id));
 
   const toggleSelection = (id: number) => {
-    const newSet = new Set(selectedIds);
-    if (newSet.has(id)) {
-      newSet.delete(id);
-    } else if (newSet.size < maxSelection) {
-      newSet.add(id);
+    if (exclusiveIds?.includes(id)) {
+      const newSet = new Set(selectedIds);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.clear();
+        newSet.add(id);
+      }
+      const result = Array.from(newSet).map(i => data.find(d => d.id === i)?.[returnField]);
+      if (value !== undefined) {
+        onChange(result);
+      } else {
+        setInternalIds(newSet);
+        onChange(result);
+      }
+      return;
     }
-    setSelectedIds(newSet);
-    onChange(Array.from(newSet).map(i => data.find(d => d.id === i)?.[returnField]));
+    if (value !== undefined) {
+      const newSet = new Set(selectedIds);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else if (newSet.size < maxSelection) {
+        if (anyExclusiveSelected) {
+          const exclusiveItem = [...selectedIds].find(i => exclusiveIds?.includes(i));
+          if (exclusiveItem !== undefined) newSet.delete(exclusiveItem);
+        }
+        newSet.add(id);
+      }
+      onChange(Array.from(newSet).map(i => data.find(d => d.id === i)?.[returnField]));
+    } else {
+      const newSet = new Set(internalIds);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else if (newSet.size < maxSelection) {
+        if (anyExclusiveSelected) {
+          const exclusiveItem = [...selectedIds].find(i => exclusiveIds?.includes(i));
+          if (exclusiveItem !== undefined) newSet.delete(exclusiveItem);
+        }
+        newSet.add(id);
+      }
+      setInternalIds(newSet);
+      onChange(Array.from(newSet).map(i => data.find(d => d.id === i)?.[returnField]));
+    }
   };
 
 
@@ -46,6 +96,8 @@ export const CustomCheckboxSelector: React.FC<CustomCheckboxSelectorProps> = ({
         {data.map((item) => {
           const isSelected = selectedIds.has(item.id);
           const label = displayFields.map(field => item[field]).join(" - ");
+          const isExclusive = exclusiveIds?.includes(item.id);
+          const disabledDueToExclusive = anyExclusiveSelected && !isExclusive && !isSelected;
 
           return (
             <Chip
@@ -58,12 +110,13 @@ export const CustomCheckboxSelector: React.FC<CustomCheckboxSelectorProps> = ({
               onClick={() => toggleSelection(item.id)}
               sx={{
                 backgroundColor: isSelected ? theme.palette.secondary.main: "default" ,
-                cursor: "pointer",
+                cursor: disabledDueToExclusive ? "not-allowed" : "pointer",
                 borderRadius: "16px",
                 px: 1.5,
                 py: 0.5,
+                opacity: disabledDueToExclusive ? 0.5 : 1,
               }}
-              disabled={!isSelected && selectedIds.size >= maxSelection}
+              disabled={(!isSelected && (selectedIds.size >= maxSelection || disabledDueToExclusive)) || (isSelected && (disabledIds ?? []).includes(item.id))}
             />
           );
         })}

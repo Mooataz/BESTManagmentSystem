@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../../../Redux/hooks';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../../../Redux/store';
-import { setBranch } from '../../../../Redux/auth/userSlice';
+import { setBranch } from '../../../../Redux/auth/authSlice';
 import type { Agency } from '../../../../Redux/Types/Stock';
 import { handleLogout } from '../../../../Redux/Actions/authAction';
 import SelectAgencie from '../../../../Componants/getAgence';

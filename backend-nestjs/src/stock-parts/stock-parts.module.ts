@@ -12,7 +12,6 @@ import { Reference } from 'src/references/entities/reference.entity';
 import { AllPart } from 'src/all-parts/entities/all-part.entity';
 import { ModelsModule } from 'src/models/models.module';
 import { ReferencesModule } from 'src/references/references.module';
-import { AppModule } from 'src/app.module';
 import { Branch } from 'src/branches/entities/branch.entity';
 import { Company } from 'src/company/entities/company.entity';
 import { Tracability } from 'src/tracability/entities/tracability.entity';
@@ -22,11 +21,12 @@ import { Pdf } from 'src/pdf/entities/pdf.entity';
 import { Legislation } from 'src/legislation/entities/legislation.entity';
 import { StockGateway } from './Stock.Gateway';
 import { User } from 'src/users/entities/user.entity';
+import { RepairModule } from 'src/repair/repair.module';
 
 @Module({
-  imports: [ModelsModule,ReferencesModule,/* AppModule, */ TypeOrmModule.forFeature([StockPart, StockGateway, Model,User, Reference, AllPart, Branch, Bin, Company, Tracability, HistoryStockPart,Pdf, Legislation])],
+  imports: [ModelsModule, ReferencesModule, RepairModule, TypeOrmModule.forFeature([StockPart, StockGateway, Model,User, Reference, AllPart, Branch, Bin, Company, Tracability, HistoryStockPart, Pdf, Legislation])],
   controllers: [StockPartsController],
   providers: [StockPartsService, AppService, PdfService, StockGateway],
-  exports:[TypeOrmModule,StockPartsService, PdfService, StockGateway]
+  exports:[TypeOrmModule, StockPartsService, PdfService, StockGateway]
 })
 export class StockPartsModule {}

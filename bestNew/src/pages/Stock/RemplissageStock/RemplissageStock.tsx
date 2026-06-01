@@ -117,7 +117,7 @@ export default function RemplissageStock() {
                     bin: formRempStock.bin,
                     reference: formRempStock.reference,
                     remark: field.remark,
-                    serialnumber: field.serialNumber,
+                    serialNumber: field.serialNumber,
                     userId: UserID || 0,
                 })).unwrap();
                 if (result.id !== undefined) {
@@ -156,7 +156,7 @@ export default function RemplissageStock() {
                         bin: item.binId,
                         reference: item.referenceId,
                         remark: item.remark,
-                        serialnumber: item.serialNumber,
+                        serialNumber: item.serialNumber,
                         userId: UserID || 0,
                     })).unwrap();
                     successCount++;

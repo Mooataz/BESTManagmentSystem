@@ -7,6 +7,7 @@ import { AddhistoryOnePart, getAllStockPartBranch, getOnePart, getTotransfert } 
 interface ReferencesState {
     stockParts: FormStock[];
     stockPartsBranch: getFormStock[]
+    stockPartsTransfert: FormStock[];
     getOnePart: getFormStock | null;
     loading: boolean;
     success: boolean;
@@ -16,6 +17,7 @@ interface ReferencesState {
 const initialState: ReferencesState = {
     stockParts: [],
     stockPartsBranch: [],
+    stockPartsTransfert: [],
     loading: false,
     success: false,
     error: null,
@@ -93,7 +95,7 @@ const RemplissageStockSlice = createSlice({
             .addCase(getTotransfert.fulfilled, (state, action: PayloadAction<FormStock[]>) => {
                 state.loading = false;
                 state.success = true;
-                state.stockParts = action.payload;
+                state.stockPartsTransfert = action.payload;
             })
             .addCase(getTotransfert.rejected, (state, action) => {
                 state.loading = false;
@@ -139,4 +141,3 @@ const RemplissageStockSlice = createSlice({
 
 export const { clearError } = RemplissageStockSlice.actions;
 export default RemplissageStockSlice.reducer;
-AddhistoryOnePart 

@@ -59,6 +59,8 @@ import ReceiveCQ from '../../Reception/ReceiveCQ';
 import Recuperation from '../../Reception/Recuperation';
 import ListOutPut from '../../Reception/ListOutPut';
 import Reaffectation from '../../Coordinate/Reaffectation';
+import ApproveParts from '../../Stock/ApproveParts';
+import Demantelement from '../../Stock/Demantelement';
 
 const xThemeComponents = {
   ...chartsCustomizations,
@@ -139,7 +141,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
               <Route path='TransfertPiéces' element={<TransfertPart />} />
               <Route path='ReçoiPiéces' element={<ReceiveState />} />
               <Route path="AjusterPrixPiéces" element={<ListPartPrice />} />
-
+              <Route path="AccordPiéces" element={<ApproveParts />} />
               <Route path='Affectation' element={<Assign />} />
               <Route path='ReçoiAffectation' element={<AcceptAssign />} />
               <Route path="Reçoiproduit" element={<Checkout />} />
@@ -151,6 +153,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
               <Route path='TypeModéle' element={<TypeModel />} />
               <Route path="accessoires" element={<Accessoires />} />
               <Route path='Modéles' element={<ListModel />} />
+              <Route path="Démantèlement" element={<Demantelement />} />
 
             </Routes>
           </Stack>
