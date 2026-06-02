@@ -30,3 +30,4 @@ export class Company {
         @OneToMany(() => Branch,Branch => Branch.company)
         branches?:Branch[]
 }
+ 

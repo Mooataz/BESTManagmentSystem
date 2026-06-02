@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { Repair } from '../repair/entities/repair.entity';
 import { Company } from 'src/company/entities/company.entity';
 import { Legislation } from 'src/legislation/entities/legislation.entity';
+import { Branch } from 'src/branches/entities/branch.entity';
 
 @Injectable()
 export class PdfService {
@@ -18,6 +19,8 @@ export class PdfService {
     private readonly legislationRepository: Repository<Legislation>,
     @InjectRepository(Repair)
     private readonly repairRepository: Repository<Repair>,
+    @InjectRepository(Branch)
+    private readonly branchRepository: Repository<Branch>,
   ) {}
 
   async generatRepairPdf(repair: Repair): Promise<Buffer> {
@@ -280,5 +283,566 @@ export class PdfService {
     });
     doc.end();
     return filePath;
+  }
+
+  async generateStockAlertPdf(
+    alertId: number,
+    branchId: number,
+    report: { brand: string; model: string; part: string; quantity: number }[],
+  ): Promise<Buffer> {
+    const branch = await this.branchRepository.findOne({
+      where: { id: branchId },
+      relations: ['company'],
+    });
+    const company = branch?.company?.id
+      ? await this.companyRepository.findOne({ where: { id: branch.company.id } })
+      : null;
+
+    const doc = new PDFDocument({ margin: 30, size: 'A4' });
+    const buffers: Buffer[] = [];
+    doc.on('data', (b) => buffers.push(b));
+
+    const pageWidth = doc.page.width - 60;
+    let y = 30;
+
+    // Company logo
+    if (company?.logo) {
+      const logoPath = path.join(__dirname, '..', '..', 'upload', 'company', company.logo);
+      try {
+        if (fs.existsSync(logoPath)) {
+          doc.image(logoPath, 30, y, { width: 60 });
+        }
+      } catch {}
+    }
+
+    // Title
+    doc.font('Helvetica-Bold').fontSize(16).fillColor('#135188')
+      .text('Rapport d\'Alerte Stock', 30, y + 10, { align: 'center', width: pageWidth });
+    y += 30;
+
+    // Info line
+    doc.font('Helvetica').fontSize(9).fillColor('black');
+    doc.text(`Agence: ${branch?.name ?? '-'}`, 30, y);
+    y += 12;
+    doc.text(`Date: ${new Date().toLocaleString('fr-FR')}`, 30, y);
+    y += 20;
+
+    // Table header
+    const colX = [30, 150, 300, 450];
+    const colW = [110, 140, 140, 80];
+    const headers = ['Marque', 'Modèle', 'Pièce', 'Quantité'];
+    const rowH = 16;
+
+    doc.rect(30, y, pageWidth, rowH).fill('#135188');
+    doc.font('Helvetica-Bold').fontSize(8).fillColor('white');
+    headers.forEach((h, i) => {
+      doc.text(h, colX[i] + 4, y + 4, { width: colW[i] - 8 });
+    });
+    y += rowH;
+
+    // Table rows
+    doc.font('Helvetica').fontSize(8).fillColor('black');
+    report.forEach((item, i) => {
+      if (y + rowH > doc.page.height - 40) {
+        doc.addPage();
+        y = 30;
+        doc.rect(30, y, pageWidth, rowH).fill('#135188');
+        doc.font('Helvetica-Bold').fontSize(8).fillColor('white');
+        headers.forEach((h, i) => {
+          doc.text(h, colX[i] + 4, y + 4, { width: colW[i] - 8 });
+        });
+        y += rowH;
+        doc.font('Helvetica').fontSize(8).fillColor('black');
+      }
+
+      const bgColor = i % 2 === 0 ? '#F5F5F5' : 'white';
+      doc.rect(30, y, pageWidth, rowH).fill(bgColor);
+      doc.fillColor('black');
+      doc.text(item.brand, colX[0] + 4, y + 4, { width: colW[0] - 8 });
+      doc.text(item.model, colX[1] + 4, y + 4, { width: colW[1] - 8 });
+      doc.text(item.part, colX[2] + 4, y + 4, { width: colW[2] - 8 });
+      doc.text(String(item.quantity), colX[3] + 4, y + 4, { width: colW[3] - 8 });
+      y += rowH;
+    });
+
+    // Summary
+    y += 10;
+    doc.font('Helvetica-Bold').fontSize(9).fillColor('#135188')
+      .text(`Total: ${report.length} pièce(s) sous le seuil d'alerte`, 30, y);
+
+    // Footer
+    doc.font('Helvetica').fontSize(7).fillColor('gray')
+      .text(
+        `Généré le ${new Date().toLocaleString('fr-FR')}`,
+        30, doc.page.height - 20,
+        { align: 'right' },
+      );
+
+    doc.end();
+    return new Promise((resolve) =>
+      doc.on('end', () => resolve(Buffer.concat(buffers))),
+    );
+  }
+
+  async generateReceptionAlertPdf(
+    alertId: number,
+    branchId: number,
+    report: { repairId: number; customerName: string; deviceModel: string; serialNumber: string; creationDate: Date }[],
+  ): Promise<Buffer> {
+    const branch = await this.branchRepository.findOne({
+      where: { id: branchId },
+      relations: ['company'],
+    });
+    const company = branch?.company?.id
+      ? await this.companyRepository.findOne({ where: { id: branch.company.id } })
+      : null;
+
+    const doc = new PDFDocument({ margin: 30, size: 'A4' });
+    const buffers: Buffer[] = [];
+    doc.on('data', (b) => buffers.push(b));
+
+    const pageWidth = doc.page.width - 60;
+    let y = 30;
+
+    if (company?.logo) {
+      const logoPath = path.join(__dirname, '..', '..', 'upload', 'company', company.logo);
+      try { if (fs.existsSync(logoPath)) doc.image(logoPath, 30, y, { width: 60 }); } catch {}
+    }
+
+    doc.font('Helvetica-Bold').fontSize(16).fillColor('#135188')
+      .text('Rapport d\'Alerte Réception', 30, y + 10, { align: 'center', width: pageWidth });
+    y += 30;
+
+    doc.font('Helvetica').fontSize(9).fillColor('black');
+    doc.text(`Agence: ${branch?.name ?? '-'}`, 30, y);
+    y += 12;
+    doc.text(`Date: ${new Date().toLocaleString('fr-FR')}`, 30, y);
+    y += 12;
+    doc.text(`Réparations en Création: ${report.length}`, 30, y);
+    y += 20;
+
+    const colX = [30, 130, 260, 380];
+    const colW = [90, 120, 120, 120];
+    const headers = ['N° Réparation', 'Client', 'Modèle', 'N° Série'];
+    const rowH = 16;
+
+    doc.rect(30, y, pageWidth, rowH).fill('#135188');
+    doc.font('Helvetica-Bold').fontSize(8).fillColor('white');
+    headers.forEach((h, i) => doc.text(h, colX[i] + 4, y + 4, { width: colW[i] - 8 }));
+    y += rowH;
+
+    doc.font('Helvetica').fontSize(8).fillColor('black');
+    report.forEach((item, i) => {
+      if (y + rowH > doc.page.height - 40) {
+        doc.addPage(); y = 30;
+        doc.rect(30, y, pageWidth, rowH).fill('#135188');
+        doc.font('Helvetica-Bold').fontSize(8).fillColor('white');
+        headers.forEach((h, i) => doc.text(h, colX[i] + 4, y + 4, { width: colW[i] - 8 }));
+        y += rowH;
+        doc.font('Helvetica').fontSize(8).fillColor('black');
+      }
+      const bgColor = i % 2 === 0 ? '#F5F5F5' : 'white';
+      doc.rect(30, y, pageWidth, rowH).fill(bgColor);
+      doc.fillColor('black');
+      doc.text(String(item.repairId), colX[0] + 4, y + 4, { width: colW[0] - 8 });
+      doc.text(item.customerName, colX[1] + 4, y + 4, { width: colW[1] - 8 });
+      doc.text(item.deviceModel, colX[2] + 4, y + 4, { width: colW[2] - 8 });
+      doc.text(item.serialNumber, colX[3] + 4, y + 4, { width: colW[3] - 8 });
+      y += rowH;
+    });
+
+    y += 10;
+    doc.font('Helvetica-Bold').fontSize(9).fillColor('#135188')
+      .text(`Total: ${report.length} réparation(s) bloquée(s) en Création`, 30, y);
+
+    doc.font('Helvetica').fontSize(7).fillColor('gray')
+      .text(`Généré le ${new Date().toLocaleString('fr-FR')}`, 30, doc.page.height - 20, { align: 'right' });
+
+    doc.end();
+    return new Promise((resolve) => doc.on('end', () => resolve(Buffer.concat(buffers))));
+  }
+
+  async generateAffectationAlertPdf(
+    alertId: number,
+    branchId: number,
+    report: { repairId: number; customerName: string; deviceModel: string; serialNumber: string; creationDate: Date }[],
+  ): Promise<Buffer> {
+    const branch = await this.branchRepository.findOne({
+      where: { id: branchId },
+      relations: ['company'],
+    });
+    const company = branch?.company?.id
+      ? await this.companyRepository.findOne({ where: { id: branch.company.id } })
+      : null;
+
+    const doc = new PDFDocument({ margin: 30, size: 'A4' });
+    const buffers: Buffer[] = [];
+    doc.on('data', (b) => buffers.push(b));
+
+    const pageWidth = doc.page.width - 60;
+    let y = 30;
+
+    if (company?.logo) {
+      const logoPath = path.join(__dirname, '..', '..', 'upload', 'company', company.logo);
+      try { if (fs.existsSync(logoPath)) doc.image(logoPath, 30, y, { width: 60 }); } catch {}
+    }
+
+    doc.font('Helvetica-Bold').fontSize(16).fillColor('#135188')
+      .text('Rapport d\'Alerte Affectation', 30, y + 10, { align: 'center', width: pageWidth });
+    y += 30;
+
+    doc.font('Helvetica').fontSize(9).fillColor('black');
+    doc.text(`Agence: ${branch?.name ?? '-'}`, 30, y);
+    y += 12;
+    doc.text(`Date: ${new Date().toLocaleString('fr-FR')}`, 30, y);
+    y += 12;
+    doc.text(`Réparations en Affectation: ${report.length}`, 30, y);
+    y += 20;
+
+    const colX = [30, 130, 260, 380];
+    const colW = [90, 120, 120, 120];
+    const headers = ['N° Réparation', 'Client', 'Modèle', 'N° Série'];
+    const rowH = 16;
+
+    doc.rect(30, y, pageWidth, rowH).fill('#135188');
+    doc.font('Helvetica-Bold').fontSize(8).fillColor('white');
+    headers.forEach((h, i) => doc.text(h, colX[i] + 4, y + 4, { width: colW[i] - 8 }));
+    y += rowH;
+
+    doc.font('Helvetica').fontSize(8).fillColor('black');
+    report.forEach((item, i) => {
+      if (y + rowH > doc.page.height - 40) {
+        doc.addPage(); y = 30;
+        doc.rect(30, y, pageWidth, rowH).fill('#135188');
+        doc.font('Helvetica-Bold').fontSize(8).fillColor('white');
+        headers.forEach((h, i) => doc.text(h, colX[i] + 4, y + 4, { width: colW[i] - 8 }));
+        y += rowH;
+        doc.font('Helvetica').fontSize(8).fillColor('black');
+      }
+      const bgColor = i % 2 === 0 ? '#F5F5F5' : 'white';
+      doc.rect(30, y, pageWidth, rowH).fill(bgColor);
+      doc.fillColor('black');
+      doc.text(String(item.repairId), colX[0] + 4, y + 4, { width: colW[0] - 8 });
+      doc.text(item.customerName, colX[1] + 4, y + 4, { width: colW[1] - 8 });
+      doc.text(item.deviceModel, colX[2] + 4, y + 4, { width: colW[2] - 8 });
+      doc.text(item.serialNumber, colX[3] + 4, y + 4, { width: colW[3] - 8 });
+      y += rowH;
+    });
+
+    y += 10;
+    doc.font('Helvetica-Bold').fontSize(9).fillColor('#135188')
+      .text(`Total: ${report.length} réparation(s) bloquée(s) en Affectation`, 30, y);
+
+    doc.font('Helvetica').fontSize(7).fillColor('gray')
+      .text(`Généré le ${new Date().toLocaleString('fr-FR')}`, 30, doc.page.height - 20, { align: 'right' });
+
+    doc.end();
+    return new Promise((resolve) => doc.on('end', () => resolve(Buffer.concat(buffers))));
+  }
+
+  async generateReparationAlertPdf(
+    alertId: number,
+    branchId: number,
+    report: { repairId: number; customerName: string; deviceModel: string; serialNumber: string; creationDate: Date }[],
+  ): Promise<Buffer> {
+    const branch = await this.branchRepository.findOne({
+      where: { id: branchId },
+      relations: ['company'],
+    });
+    const company = branch?.company?.id
+      ? await this.companyRepository.findOne({ where: { id: branch.company.id } })
+      : null;
+
+    const doc = new PDFDocument({ margin: 30, size: 'A4' });
+    const buffers: Buffer[] = [];
+    doc.on('data', (b) => buffers.push(b));
+
+    const pageWidth = doc.page.width - 60;
+    let y = 30;
+
+    if (company?.logo) {
+      const logoPath = path.join(__dirname, '..', '..', 'upload', 'company', company.logo);
+      try { if (fs.existsSync(logoPath)) doc.image(logoPath, 30, y, { width: 60 }); } catch {}
+    }
+
+    doc.font('Helvetica-Bold').fontSize(16).fillColor('#135188')
+      .text('Rapport d\'Alerte Réparation', 30, y + 10, { align: 'center', width: pageWidth });
+    y += 30;
+
+    doc.font('Helvetica').fontSize(9).fillColor('black');
+    doc.text(`Agence: ${branch?.name ?? '-'}`, 30, y);
+    y += 12;
+    doc.text(`Date: ${new Date().toLocaleString('fr-FR')}`, 30, y);
+    y += 12;
+    doc.text(`Réparations en cours: ${report.length}`, 30, y);
+    y += 20;
+
+    const colX = [30, 130, 260, 380];
+    const colW = [90, 120, 120, 120];
+    const headers = ['N° Réparation', 'Client', 'Modèle', 'N° Série'];
+    const rowH = 16;
+
+    doc.rect(30, y, pageWidth, rowH).fill('#135188');
+    doc.font('Helvetica-Bold').fontSize(8).fillColor('white');
+    headers.forEach((h, i) => doc.text(h, colX[i] + 4, y + 4, { width: colW[i] - 8 }));
+    y += rowH;
+
+    doc.font('Helvetica').fontSize(8).fillColor('black');
+    report.forEach((item, i) => {
+      if (y + rowH > doc.page.height - 40) {
+        doc.addPage(); y = 30;
+        doc.rect(30, y, pageWidth, rowH).fill('#135188');
+        doc.font('Helvetica-Bold').fontSize(8).fillColor('white');
+        headers.forEach((h, i) => doc.text(h, colX[i] + 4, y + 4, { width: colW[i] - 8 }));
+        y += rowH;
+        doc.font('Helvetica').fontSize(8).fillColor('black');
+      }
+      const bgColor = i % 2 === 0 ? '#F5F5F5' : 'white';
+      doc.rect(30, y, pageWidth, rowH).fill(bgColor);
+      doc.fillColor('black');
+      doc.text(String(item.repairId), colX[0] + 4, y + 4, { width: colW[0] - 8 });
+      doc.text(item.customerName, colX[1] + 4, y + 4, { width: colW[1] - 8 });
+      doc.text(item.deviceModel, colX[2] + 4, y + 4, { width: colW[2] - 8 });
+      doc.text(item.serialNumber, colX[3] + 4, y + 4, { width: colW[3] - 8 });
+      y += rowH;
+    });
+
+    y += 10;
+    doc.font('Helvetica-Bold').fontSize(9).fillColor('#135188')
+      .text(`Total: ${report.length} réparation(s) en attente`, 30, y);
+
+    doc.font('Helvetica').fontSize(7).fillColor('gray')
+      .text(`Généré le ${new Date().toLocaleString('fr-FR')}`, 30, doc.page.height - 20, { align: 'right' });
+
+    doc.end();
+    return new Promise((resolve) => doc.on('end', () => resolve(Buffer.concat(buffers))));
+  }
+
+  async generateCqAlertPdf(
+    alertId: number,
+    branchId: number,
+    report: { repairId: number; customerName: string; deviceModel: string; serialNumber: string; creationDate: Date }[],
+  ): Promise<Buffer> {
+    const branch = await this.branchRepository.findOne({
+      where: { id: branchId },
+      relations: ['company'],
+    });
+    const company = branch?.company?.id
+      ? await this.companyRepository.findOne({ where: { id: branch.company.id } })
+      : null;
+
+    const doc = new PDFDocument({ margin: 30, size: 'A4' });
+    const buffers: Buffer[] = [];
+    doc.on('data', (b) => buffers.push(b));
+
+    const pageWidth = doc.page.width - 60;
+    let y = 30;
+
+    if (company?.logo) {
+      const logoPath = path.join(__dirname, '..', '..', 'upload', 'company', company.logo);
+      try { if (fs.existsSync(logoPath)) doc.image(logoPath, 30, y, { width: 60 }); } catch {}
+    }
+
+    doc.font('Helvetica-Bold').fontSize(16).fillColor('#135188')
+      .text('Rapport d\'Alerte CQ', 30, y + 10, { align: 'center', width: pageWidth });
+    y += 30;
+
+    doc.font('Helvetica').fontSize(9).fillColor('black');
+    doc.text(`Agence: ${branch?.name ?? '-'}`, 30, y);
+    y += 12;
+    doc.text(`Date: ${new Date().toLocaleString('fr-FR')}`, 30, y);
+    y += 12;
+    doc.text(`Réparations en CQ: ${report.length}`, 30, y);
+    y += 20;
+
+    const colX = [30, 130, 260, 380];
+    const colW = [90, 120, 120, 120];
+    const headers = ['N° Réparation', 'Client', 'Modèle', 'N° Série'];
+    const rowH = 16;
+
+    doc.rect(30, y, pageWidth, rowH).fill('#135188');
+    doc.font('Helvetica-Bold').fontSize(8).fillColor('white');
+    headers.forEach((h, i) => doc.text(h, colX[i] + 4, y + 4, { width: colW[i] - 8 }));
+    y += rowH;
+
+    doc.font('Helvetica').fontSize(8).fillColor('black');
+    report.forEach((item, i) => {
+      if (y + rowH > doc.page.height - 40) {
+        doc.addPage(); y = 30;
+        doc.rect(30, y, pageWidth, rowH).fill('#135188');
+        doc.font('Helvetica-Bold').fontSize(8).fillColor('white');
+        headers.forEach((h, i) => doc.text(h, colX[i] + 4, y + 4, { width: colW[i] - 8 }));
+        y += rowH;
+        doc.font('Helvetica').fontSize(8).fillColor('black');
+      }
+      const bgColor = i % 2 === 0 ? '#F5F5F5' : 'white';
+      doc.rect(30, y, pageWidth, rowH).fill(bgColor);
+      doc.fillColor('black');
+      doc.text(String(item.repairId), colX[0] + 4, y + 4, { width: colW[0] - 8 });
+      doc.text(item.customerName, colX[1] + 4, y + 4, { width: colW[1] - 8 });
+      doc.text(item.deviceModel, colX[2] + 4, y + 4, { width: colW[2] - 8 });
+      doc.text(item.serialNumber, colX[3] + 4, y + 4, { width: colW[3] - 8 });
+      y += rowH;
+    });
+
+    y += 10;
+    doc.font('Helvetica-Bold').fontSize(9).fillColor('#135188')
+      .text(`Total: ${report.length} réparation(s) bloquée(s) en CQ`, 30, y);
+
+    doc.font('Helvetica').fontSize(7).fillColor('gray')
+      .text(`Généré le ${new Date().toLocaleString('fr-FR')}`, 30, doc.page.height - 20, { align: 'right' });
+
+    doc.end();
+    return new Promise((resolve) => doc.on('end', () => resolve(Buffer.concat(buffers))));
+  }
+
+  async generateStockPartTicketPdf(
+    stockParts: any[],
+  ): Promise<Buffer> {
+    const doc = new PDFDocument({ margin: 15, size: 'A4' });
+    const buffers: Buffer[] = [];
+    doc.on('data', (b) => buffers.push(b));
+
+    const pageWidth = doc.page.width - 30;
+    const cols = 3;
+    const gap = 6;
+    const colW = (pageWidth - gap * (cols - 1)) / cols;
+    const labelW = 58;
+    const valXOff = labelW + 2;
+    const lineH = 9;
+    const headerH = 14;
+    const padd = 4;
+    const ticketH = headerH + 11 * lineH + padd * 2;
+
+    const colX: number[] = [];
+    for (let i = 0; i < cols; i++) {
+      colX.push(15 + i * (colW + gap));
+    }
+
+    const ticketsPerPage = 12;
+    const rowsPerPage = Math.floor(ticketsPerPage / cols);
+
+    for (let idx = 0; idx < stockParts.length; idx++) {
+      const sp = stockParts[idx];
+      const pageIdx = Math.floor(idx / ticketsPerPage);
+      const posInPage = idx % ticketsPerPage;
+      const col = posInPage % cols;
+      const row = Math.floor(posInPage / cols);
+
+      if (posInPage === 0 && pageIdx > 0) {
+        doc.addPage();
+      }
+
+      const x = colX[col];
+      const y = 15 + row * (ticketH + gap);
+
+      const branch = sp.bin?.branch;
+
+      const fieldRows: [string, string][] = [
+        ['ID:', String(sp.id)],
+        ['N° Série:', sp.serialNumber ?? '-'],
+        ['Casier:', sp.bin?.name ?? '-'],
+        ['Type Casier:', sp.bin?.type ?? '-'],
+        ['Agence:', branch?.name ?? '-'],
+        ['Code Matière:', sp.reference?.materialCode ?? '-'],
+        ['Description:', sp.reference?.description ?? '-'],
+        ['Marque:', sp.reference?.model?.[0]?.brand?.name ?? '-'],
+        ['Type Modèle:', sp.reference?.model?.[0]?.typeModel?.description ?? '-'],
+        ['Modèle:', sp.reference?.model?.[0]?.name ?? '-'],
+        ['Pièce:', sp.reference?.allpart?.description ?? '-'],
+      ];
+
+      doc.rect(x, y, colW, ticketH).stroke('#333');
+
+      doc.font('Helvetica-Bold').fontSize(6).fillColor('#135188');
+      fieldRows.forEach(([label], i) => {
+        doc.text(label, x + padd, y + headerH + i * lineH, { width: labelW });
+      });
+
+      doc.font('Helvetica').fontSize(6).fillColor('black');
+      fieldRows.forEach(([, value], i) => {
+        doc.text(value, x + padd + valXOff, y + headerH + i * lineH, {
+          width: colW - valXOff - padd * 2,
+        });
+      });
+    }
+
+    doc.font('Helvetica').fontSize(6).fillColor('gray')
+      .text(
+        `Imprimé le ${new Date().toLocaleString('fr-FR')}`,
+        15, doc.page.height - 20,
+        { align: 'right' },
+      );
+
+    doc.end();
+    return new Promise((resolve) =>
+      doc.on('end', () => resolve(Buffer.concat(buffers))),
+    );
+  }
+
+  async generateBloqueAlertPdf(
+    alertId: number,
+    branchId: number,
+    report: { step: string; count: number }[],
+  ): Promise<Buffer> {
+    const branch = await this.branchRepository.findOne({
+      where: { id: branchId },
+      relations: ['company'],
+    });
+    const company = branch?.company?.id
+      ? await this.companyRepository.findOne({ where: { id: branch.company.id } })
+      : null;
+
+    const doc = new PDFDocument({ margin: 30, size: 'A4' });
+    const buffers: Buffer[] = [];
+    doc.on('data', (b) => buffers.push(b));
+
+    const pageWidth = doc.page.width - 60;
+    let y = 30;
+
+    if (company?.logo) {
+      const logoPath = path.join(__dirname, '..', '..', 'upload', 'company', company.logo);
+      try { if (fs.existsSync(logoPath)) doc.image(logoPath, 30, y, { width: 60 }); } catch {}
+    }
+
+    doc.font('Helvetica-Bold').fontSize(16).fillColor('#135188')
+      .text('Rapport d\'Alerte Blocage', 30, y + 10, { align: 'center', width: pageWidth });
+    y += 30;
+
+    doc.font('Helvetica').fontSize(9).fillColor('black');
+    doc.text(`Agence: ${branch?.name ?? '-'}`, 30, y);
+    y += 12;
+    doc.text(`Date: ${new Date().toLocaleString('fr-FR')}`, 30, y);
+    y += 20;
+
+    const colX = [30, 300];
+    const colW = [260, 200];
+    const headers = ['Étape bloquée', 'Nombre de réparations'];
+    const rowH = 16;
+
+    doc.rect(30, y, pageWidth, rowH).fill('#135188');
+    doc.font('Helvetica-Bold').fontSize(8).fillColor('white');
+    headers.forEach((h, i) => doc.text(h, colX[i] + 4, y + 4, { width: colW[i] - 8 }));
+    y += rowH;
+
+    doc.font('Helvetica').fontSize(8).fillColor('black');
+    report.forEach((item, i) => {
+      const bgColor = i % 2 === 0 ? '#F5F5F5' : 'white';
+      doc.rect(30, y, pageWidth, rowH).fill(bgColor);
+      doc.fillColor('black');
+      doc.text(item.step, colX[0] + 4, y + 4, { width: colW[0] - 8 });
+      doc.text(String(item.count), colX[1] + 4, y + 4, { width: colW[1] - 8 });
+      y += rowH;
+    });
+
+    y += 10;
+    doc.font('Helvetica-Bold').fontSize(9).fillColor('#135188')
+      .text(`Total: ${report.length} étape(s) bloquée(s) (> 50 réparations)`, 30, y);
+
+    doc.font('Helvetica').fontSize(7).fillColor('gray')
+      .text(`Généré le ${new Date().toLocaleString('fr-FR')}`, 30, doc.page.height - 20, { align: 'right' });
+
+    doc.end();
+    return new Promise((resolve) => doc.on('end', () => resolve(Buffer.concat(buffers))));
   }
 }

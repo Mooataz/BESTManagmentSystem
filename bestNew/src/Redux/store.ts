@@ -34,6 +34,7 @@ import DeviceRducer from './Customer/DeviceSlice';
 import PartPriceReducer from './Stock/PartPriceSlice';
 import RepairActionReducer from './Administration/ActionRepairSlice';
 import OutputListReducer from './recptionSlices/OutPutSlice'
+import stockAlertReducer from './Stock/StockAlertSlice'
 //store
 const rootReducer = combineReducers({
       repair: repairReducer,
@@ -66,6 +67,7 @@ const rootReducer = combineReducers({
       PartPrice: PartPriceReducer,
       RepairAction: RepairActionReducer,
       OutputList: OutputListReducer,
+      stockAlert: stockAlertReducer,
 
 });
 const persistConfig = {

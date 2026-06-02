@@ -1,15 +1,16 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState, useCallback } from 'react'
 import { getAllPartPrice } from '../../../Redux/Actions/stock/PartPriceActions'
 import { useAppDispatch } from '../../../Redux/hooks';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../../Redux/store';
 import DynamicTable from '../../../Componants/Global/TableComponat';
 import AddPartPrice from './AddPartPrice';
-import { Button, Checkbox, FormControl, Grid, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, Typography } from '@mui/material';
+import { Button, Checkbox, FormControl, Grid, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, Typography, Snackbar, Alert } from '@mui/material';
 import theme from '../../../Theme/theme';
 import UpdatePartPrice from './UpdatePartPrice';
 import type { TableAction } from '../../../Redux/Types/repairTypes';
 import EditIcon from '@mui/icons-material/Edit';
+import * as XLSX from 'xlsx';
 
 export default function ListPartPrice() {
     const dispatch = useAppDispatch();
@@ -133,6 +134,78 @@ const getUniqueOptions = (key: keyof typeof filters): string[] => {
     -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
     End Multi-Select Filters
 */}
+    const [importResult, setImportResult] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({ open: false, message: '', severity: 'success' });
+
+    const downloadTemplate = useCallback(async () => {
+      const wb = XLSX.utils.book_new();
+      const data = [
+        { Marque: 'Apple', Modèle: 'iPhone 13', Pièce: 'Écran', Prix: 45000, 'Niveau réparation': 'Niveau 1' },
+        { Marque: 'Samsung', Modèle: 'Galaxy S22', Pièce: 'Batterie', Prix: 12000, 'Niveau réparation': 'Niveau 2' },
+      ];
+      const ws1 = XLSX.utils.json_to_sheet(data);
+      XLSX.utils.book_append_sheet(wb, ws1, 'Import Prix');
+
+      try {
+        const res = await fetch('http://localhost:3000/parts-price/references');
+        const refs = (await res.json())?.data;
+        if (refs) {
+          const maxLen = Math.max(refs.brands.length, refs.models.length, refs.allParts.length, refs.levelRepairs.length);
+          const refData: any[] = [];
+          for (let i = 0; i < maxLen; i++) {
+            refData.push({
+              Marque: refs.brands[i] ?? '',
+              Modèle: refs.models[i] ?? '',
+              Pièce: refs.allParts[i] ?? '',
+              'Niveau réparation': refs.levelRepairs[i] ?? '',
+            });
+          }
+          const ws2 = XLSX.utils.json_to_sheet(refData);
+          XLSX.utils.book_append_sheet(wb, ws2, 'Références');
+        }
+      } catch {}
+
+      XLSX.writeFile(wb, 'modele-import-prix.xlsx');
+    }, []);
+
+    const handleFileUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (ev) => {
+        try {
+          const workbook = XLSX.read(ev.target?.result, { type: 'binary' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows: any[] = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+          if (!rows.length) {
+            setImportResult({ open: true, message: 'Fichier vide', severity: 'error' });
+            return;
+          }
+          const body = rows.map((r: any) => ({
+            brandName: String(r.Marque || '').trim(),
+            modelName: String(r.Modèle || '').trim(),
+            allPartDescription: String(r.Pièce || '').trim(),
+            price: Number(r.Prix),
+            levelRepairName: String(r['Niveau réparation'] || '').trim() || undefined,
+          }));
+          const res = await fetch('http://localhost:3000/parts-price/import', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rows: body }),
+          });
+          const result = await res.json();
+          if (!res.ok) throw new Error(result.message || 'Erreur import');
+          const { imported, errors } = result.data;
+          const msg = `${imported} ligne(s) importée(s)` + (errors?.length ? `, ${errors.length} erreur(s)` : '');
+          setImportResult({ open: true, message: msg, severity: errors?.length ? 'error' : 'success' });
+          dispatch(getAllPartPrice());
+        } catch (err: any) {
+          setImportResult({ open: true, message: err.message, severity: 'error' });
+        }
+      };
+      reader.readAsBinaryString(file);
+      e.target.value = '';
+    }, [dispatch]);
+
     return (
         <div>
 
@@ -143,7 +216,15 @@ const getUniqueOptions = (key: keyof typeof filters): string[] => {
                 fontWeight: 'bold',
                 marginBottom: '3%'
             }} >List des prix</Typography   >
-            <AddPartPrice /> <br /> <br />
+            <AddPartPrice />
+            <Button variant="outlined" sx={{ ml: 2, borderColor: theme.palette.secondary.main }} onClick={downloadTemplate}>
+              Modèle Excel
+            </Button>
+            <Button variant="outlined" component="label" sx={{ ml: 1, borderColor: theme.palette.secondary.main }}>
+              Importer Excel
+              <input type="file" hidden accept=".xlsx,.xls" onChange={handleFileUpload} />
+            </Button>
+            <br /> <br />
 
             <Grid container spacing={2} sx={{ mb: 2 }}>
                  {renderMultiSelect('Marque', 'Marque')}
@@ -186,6 +267,11 @@ const getUniqueOptions = (key: keyof typeof filters): string[] => {
                     onClose={handleCloseEdit}
                 />
             )}
+            <Snackbar open={importResult.open} autoHideDuration={4000} onClose={() => setImportResult({ ...importResult, open: false })}>
+              <Alert severity={importResult.severity} onClose={() => setImportResult({ ...importResult, open: false })}>
+                {importResult.message}
+              </Alert>
+            </Snackbar>
         </div>
     )
 }

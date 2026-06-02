@@ -7,7 +7,7 @@ import MenuButton from './MenuButton';
 import ColorModeIconDropdown from '../../shared-theme/ColorModeIconDropdown';
 
 import Search from './Search';
-import { Avatar, Box, createTheme, Divider, IconButton, ListItemIcon, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
+import { Avatar, Badge, Box, createTheme, Divider, IconButton, ListItemIcon, Menu, MenuItem, Paper, Tooltip, Typography } from '@mui/material';
 import { VscStarEmpty } from 'react-icons/vsc';
 import { TbPassword } from 'react-icons/tb';
 import { BiLogOut } from 'react-icons/bi';
@@ -23,6 +23,7 @@ import SelectAgencie from '../../../../Componants/getAgence';
  import theme from '../../../../Theme/theme'
 import { getAgencies } from '../../../../Redux/Actions/Administration/AgenciesActions';
 import { CustomAutocomplete } from '../../../../Componants/Global/CustomAutocomplete';
+import { getStockAlerts } from '../../../../Redux/Actions/stock/StockAlertActions';
 export default function Header() {
 const { t } = useTranslation();
 const navigate = useNavigate()
@@ -31,11 +32,23 @@ const dispatch = useAppDispatch();
  // const [agencies, setAgencies] = React.useState<Agency[]>([]);
   const agencies   = useSelector((state: RootState) => state.agencies.Agency)
    const company   = useSelector((state: RootState) => state.company.company)
+  const stockAlert = useSelector((state: RootState) => state.stockAlert)
+  const user = useSelector((state: RootState) => state.auth.user);
+  const branchId = user?.branch && typeof user.branch === 'object' && 'id' in user.branch ? (user.branch as any).id : undefined;
+
   React.useEffect(() => {
-    dispatch(getAgencies()  )
-    
-  }, [dispatch]);  
- const user = useSelector((state: RootState) => state.auth.user);
+    dispatch(getAgencies())
+  }, [dispatch]);
+
+  React.useEffect(() => {
+    if (!branchId || !user?.id) return;
+    const userId: number = user.id;
+    dispatch(getStockAlerts({ branchId, userId }));
+    const interval = setInterval(() => {
+      dispatch(getStockAlerts({ branchId, userId }));
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [dispatch, branchId, user?.id]);
  
          const roleColors: Record<string, string> = {
     Administrateur: 'gold',
@@ -105,9 +118,11 @@ const dispatch = useAppDispatch();
         )}
 
          
-        <MenuButton showBadge aria-label="Open notifications">
-          <NotificationsRoundedIcon />
-        </MenuButton>
+         <NotificationBell
+           alerts={stockAlert.alerts}
+           unreadCount={stockAlert.unreadCount}
+           agencies={agencies}
+         />
         <ColorModeIconDropdown />
                          <React.Fragment>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
@@ -192,5 +207,92 @@ const dispatch = useAppDispatch();
     </React.Fragment>
       </Stack>
     </Stack>
+  );
+}
+
+function NotificationBell({
+  alerts,
+  unreadCount,
+  agencies,
+}: {
+  alerts: any[];
+  unreadCount: number;
+  agencies: any[];
+}) {
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <>
+      <IconButton onClick={handleClick} size="small">
+        <Badge badgeContent={unreadCount} color="error">
+          <NotificationsRoundedIcon />
+        </Badge>
+      </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        slotProps={{
+          paper: {
+            sx: { maxHeight: 400, width: 360, p: 1 },
+          },
+        }}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+      >
+        <Typography variant="subtitle1" sx={{ px: 1, fontWeight: 600, color: '#B71C1C' }}>
+          Alertes 
+        </Typography>
+        <Divider sx={{ my: 1 }} />
+        {alerts.length === 0 ? (
+          <MenuItem disabled>
+            <Typography variant="body2" color="text.secondary">
+              Aucune alerte
+            </Typography>
+          </MenuItem>
+        ) : (
+          alerts.map((alert) => (
+            <Box key={alert.id} sx={{ px: 1, py: 0.5 }}>
+              <Paper
+                variant="outlined"
+                sx={{
+                  p: 1,
+                  bgcolor: alert.isRead ? 'transparent' : 'action.hover',
+                  cursor: 'pointer',
+                  '&:hover': { bgcolor: 'action.selected' },
+                }}
+                onClick={() => window.open(
+                  `http://localhost:3000/apiApp/stock-alert/${alert.id}/pdf/${alert.branchId}`,
+                  '_blank',
+                )}
+              >
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                  <Stack>
+                    <Typography variant="body2" sx={{ fontWeight: 600, fontSize: 13 }}>
+                      {alert.type === 'reception' ? 'Alerte de réception' : alert.type === 'affectation' ? "Alerte d'affectation" : alert.type === 'reparation' ? 'Alerte de réparation' : alert.type === 'cq' ? 'Alerte CQ' : alert.type === 'bloque' ? 'Alerte blocage' : 'Alerte de stock'}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {agencies.find((a: any) => a.id === alert.branchId)?.name ?? 'Agence ' + alert.branchId}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {new Date(alert.createdAt).toLocaleDateString()}
+                    </Typography>
+                  </Stack>
+                </Stack>
+              </Paper>
+            </Box>
+          ))
+        )}
+      </Menu>
+    </>
   );
 }

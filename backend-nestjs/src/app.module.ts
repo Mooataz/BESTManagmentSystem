@@ -60,6 +60,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { PdfModule } from './pdf/pdf.module';
+import { StockAlertModule } from './stock-alert/stock-alert.module';
 import { CoreModule } from './core/core.module';
 
 @Module({
@@ -114,6 +115,7 @@ import { CoreModule } from './core/core.module';
     OtherCostModule,
     InvoiceModule,
     LevelRepairModule,
+    StockAlertModule,
     SalesModule,
     AdminModule,
     TechnicienModule,

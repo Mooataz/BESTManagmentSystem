@@ -193,6 +193,17 @@ export class StockPartsService {
     return id
   }
 
+  async findMultipleByIds(ids: number[]): Promise<StockPart[]> {
+    return this.stockPartRepositry.find({
+      where: { id: In(ids) },
+      relations: [
+        'bin', 'bin.branch',
+        'reference', 'reference.model', 'reference.model.brand',
+        'reference.model.typeModel', 'reference.allpart',
+      ],
+    });
+  }
+
   async findAppareilComplet(modelId: number, branchId: number): Promise<StockPart[]> {
     return this.stockPartRepositry
       .createQueryBuilder('stockPart')
