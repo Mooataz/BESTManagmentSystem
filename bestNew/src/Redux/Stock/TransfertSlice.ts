@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { TransfertPR } from "../Types/Stock";
-import { AddOneTransfert, GetReceiveTransfert, GetSendTransfert, UpdateOneTransfert } from "../Actions/stock/TransfertAction";
+import { AddOneTransfert, GetReceiveTransfert, GetSendTransfert, UpdateOneTransfert, FetchRepairTransfers, AcceptRepairTransfer, RefuseRepairTransfer, CancelRepairTransfer } from "../Actions/stock/TransfertAction";
 import { getTotransfert } from "../Actions/stock/EtatStockActions";
 
 interface TransfertState {
@@ -106,6 +106,76 @@ const TransfertSlice = createSlice({
                     typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
             })
 
+            .addCase(FetchRepairTransfers.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+                state.success = false;
+            })
+            .addCase(FetchRepairTransfers.fulfilled, (state, action: PayloadAction<TransfertPR[]>) => {
+                state.loading = false;
+                state.success = true;
+                state.Transfert = action.payload;
+            })
+            .addCase(FetchRepairTransfers.rejected, (state, action) => {
+                state.loading = false;
+                state.success = false;
+                state.error =
+                    typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
+            })
+
+            .addCase(AcceptRepairTransfer.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+                state.success = false;
+            })
+            .addCase(AcceptRepairTransfer.fulfilled, (state, action: PayloadAction<TransfertPR>) => {
+                state.loading = false;
+                state.success = true;
+                const index = state.Transfert.findIndex(t => t.id === action.payload.id);
+                if (index !== -1) state.Transfert[index] = action.payload;
+            })
+            .addCase(AcceptRepairTransfer.rejected, (state, action) => {
+                state.loading = false;
+                state.success = false;
+                state.error =
+                    typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
+            })
+
+            .addCase(RefuseRepairTransfer.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+                state.success = false;
+            })
+            .addCase(RefuseRepairTransfer.fulfilled, (state, action: PayloadAction<TransfertPR>) => {
+                state.loading = false;
+                state.success = true;
+                const index = state.Transfert.findIndex(t => t.id === action.payload.id);
+                if (index !== -1) state.Transfert[index] = action.payload;
+            })
+            .addCase(RefuseRepairTransfer.rejected, (state, action) => {
+                state.loading = false;
+                state.success = false;
+                state.error =
+                    typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
+            })
+
+            .addCase(CancelRepairTransfer.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+                state.success = false;
+            })
+            .addCase(CancelRepairTransfer.fulfilled, (state, action: PayloadAction<TransfertPR>) => {
+                state.loading = false;
+                state.success = true;
+                const index = state.Transfert.findIndex(t => t.id === action.payload.id);
+                if (index !== -1) state.Transfert[index] = action.payload;
+            })
+            .addCase(CancelRepairTransfer.rejected, (state, action) => {
+                state.loading = false;
+                state.success = false;
+                state.error =
+                    typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
+            })
 
     },
 });

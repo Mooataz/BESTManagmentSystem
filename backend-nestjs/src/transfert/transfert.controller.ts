@@ -76,6 +76,20 @@ export class TransfertController {
     throw error
   }
   }
+  @Get('/pdf/:id')
+  async getPdf(@Param('id') id: number, @Res() res: any) {
+    try {
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="transfert_${id}.pdf"`);
+      await this.transfertService.generatePdf(id, res);
+    } catch (error) {
+      if (!res.headersSent) {
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Erreur génération PDF', status: 500 });
+      } else {
+        res.end();
+      }
+    }
+  }
   @Get('/findToBranchId/:branchId/:type/:state')
   async getByBranchId(@Param('branchId') branchId: number,
                       @Param('type') type: string,
@@ -101,6 +115,57 @@ export class TransfertController {
   }
   }
 
+  @Get('/repair/branch/:branchId')
+  async findRepairTransfersByBranch(@Param('branchId') branchId: number, @Res() res: any) {
+    try {
+      const data = await this.transfertService.findRepairTransfersByBranch(branchId);
+      return res.status(HttpStatus.OK).json({ message: 'Transferts trouvés', status: HttpStatus.OK, data });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({ message: error.message, status: error.getStatus(), data: null });
+      }
+      throw error;
+    }
+  }
+
+  @Patch('/repair/:id/accept')
+  async acceptRepairTransfer(@Param('id') id: number, @Body('userId') userId: number, @Res() res: any) {
+    try {
+      const data = await this.transfertService.acceptRepairTransfer(id, userId);
+      return res.status(HttpStatus.OK).json({ message: 'Transfert accepté', status: HttpStatus.OK, data });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({ message: error.message, status: error.getStatus(), data: null });
+      }
+      throw error;
+    }
+  }
+
+  @Patch('/repair/:id/refuse')
+  async refuseRepairTransfer(@Param('id') id: number, @Body('userId') userId: number, @Res() res: any) {
+    try {
+      const data = await this.transfertService.refuseRepairTransfer(id, userId);
+      return res.status(HttpStatus.OK).json({ message: 'Transfert refusé', status: HttpStatus.OK, data });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({ message: error.message, status: error.getStatus(), data: null });
+      }
+      throw error;
+    }
+  }
+
+  @Patch('/repair/:id/cancel')
+  async cancelRepairTransfer(@Param('id') id: number, @Body('userId') userId: number, @Res() res: any) {
+    try {
+      const data = await this.transfertService.cancelRepairTransfer(id, userId);
+      return res.status(HttpStatus.OK).json({ message: 'Transfert annulé', status: HttpStatus.OK, data });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({ message: error.message, status: error.getStatus(), data: null });
+      }
+      throw error;
+    }
+  }
 
   @Get()
   async findAll(@Res() res: any) {

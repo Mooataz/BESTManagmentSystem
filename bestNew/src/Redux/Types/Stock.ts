@@ -72,6 +72,18 @@ export interface GetBin {
     branch: Agency
 }
 
+export interface RepairInTransfert {
+  id: number;
+  actuellybranch?: number;
+  customer?: { id: number; name?: string; phone?: number };
+  device?: {
+    id: number;
+    serialenumber?: string;
+    model?: { id: number; name?: string; brand?: { name?: string } };
+  };
+  historyRepair?: { id: number; step: string; date: string }[];
+}
+
 export interface TransfertPR {
     id?: number;
     delivredBy?: string;
@@ -94,6 +106,9 @@ export interface TransfertPR {
     stockPart?: FormStock[];
     bin?: number;
     actuellybranch?:number
+
+    repair?: RepairInTransfert[];
+    previousStep?: string;
 }
 
 export interface TypeBranchTransfert {

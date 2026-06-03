@@ -14,6 +14,8 @@ export interface Company {
   logo: string;
   bank: string;
   quantityAlertStock: number;
+  tva?: number;
+  timbreFiscale?: number;
 }
 export interface LevelRepairForm {
   id?: number;

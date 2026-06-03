@@ -7,6 +7,16 @@ export declare class PartsPriceController {
     constructor(partsPriceService: PartsPriceService);
     create(createPartsPriceDto: CreatePartsPriceDto, res: any): Promise<any>;
     findAll(res: any): Promise<any>;
+    getViewData(branchId: string): Promise<{
+        message: string;
+        status: HttpStatus;
+        data: any;
+    }>;
+    getAvailability(): Promise<{
+        message: string;
+        status: HttpStatus;
+        data: any;
+    }>;
     getReferences(): Promise<{
         message: string;
         status: HttpStatus;
@@ -22,5 +32,9 @@ export declare class PartsPriceController {
     update(id: number, updatePartsPriceDto: UpdatePartsPriceDto, res: any): Promise<any>;
     remove(id: number, res: any): Promise<any>;
     importExcel(file: Express.Multer.File, req: any, res: any): Promise<any>;
+    getDevisInfo(body: {
+        modelId: number;
+        partIds: number[];
+    }, res: any): Promise<any>;
     findPartsPriceByModelAndAllPart(modelId: number, allPartId: number, res: any): Promise<any>;
 }

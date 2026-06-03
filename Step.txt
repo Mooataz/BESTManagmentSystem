@@ -1,11 +1,6 @@
 Dashboard:
-	Statistique
+
 	Factures
 	Vente
-	Transfert produit
-	Consulter pièces
-	Consulter produits
 
-Options:
-	
-	
+	Options: statistique financier

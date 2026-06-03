@@ -39,6 +39,8 @@ const { notify } = useNotification();
   const [rib, setRib] = React.useState({ id: Company.id, rib: Company.rib, })
   const [bank, setBank] = React.useState({ id: Company.id, bank: Company.bank, })
   const [quantityAlertStock, setQuantityAlertStock] = React.useState({ id: Company.id, quantityAlertStock: Company.quantityAlertStock, })
+  const [tva, setTva] = React.useState({ id: Company.id, tva: Company.tva ?? 0 })
+  const [timbreFiscale, setTimbreFiscale] = React.useState({ id: Company.id, timbreFiscale: Company.timbreFiscale ?? 0 })
 
   const handleSubmit = async (data: Partial<Company> & { id: number }) => {
   
@@ -134,6 +136,24 @@ const { notify } = useNotification();
                       onClick={() => handleSubmit({ id: Company.id, quantityAlertStock: quantityAlertStock.quantityAlertStock })} > Mettre à jour</Button>
                  </div>
                                         
+            </FormControl>
+                        <FormControl>
+              <FormLabel>TVA (%)</FormLabel>
+                <div style={{display:'flex'}}>
+                  <Input   sx={underlineInputStyles}  type='number' inputProps={{ min: 0.01, step: 0.01 }} value={tva.tva} onChange={(e) => setTva({ ...tva,  tva: Number(e.target.value) })} />
+                   <Button   variant={'outlined'} color="neutral" style={{width:'160px',marginLeft:'14%'}}
+                      disabled={tva.tva <= 0}
+                      onClick={() => handleSubmit({ id: Company.id, tva: tva.tva })} > Mettre à jour</Button>
+                 </div>
+            </FormControl>
+                        <FormControl>
+              <FormLabel>Timbre fiscale</FormLabel>
+                <div style={{display:'flex'}}>
+                  <Input   sx={underlineInputStyles}  type='number' inputProps={{ min: 0.01, step: 0.01 }} value={timbreFiscale.timbreFiscale} onChange={(e) => setTimbreFiscale({ ...timbreFiscale,  timbreFiscale: Number(e.target.value) })} />
+                   <Button   variant={'outlined'} color="neutral" style={{width:'160px',marginLeft:'14%'}}
+                      disabled={timbreFiscale.timbreFiscale <= 0}
+                      onClick={() => handleSubmit({ id: Company.id, timbreFiscale: timbreFiscale.timbreFiscale })} > Mettre à jour</Button>
+                 </div>
             </FormControl>
             </Stack>
           </form>

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, HttpException, UseInterceptors, UploadedFile, BadRequestException, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, HttpException, UseInterceptors, UploadedFile, BadRequestException, Req, Query } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PartsPriceService, ImportRow } from './parts-price.service';
 import * as ExcelJS from 'exceljs';
@@ -53,6 +53,25 @@ export class PartsPriceController {
 
   throw error
 }
+  }
+
+  @Get('view-data')
+  async getViewData(@Query('branchId') branchId: string) {
+    if (!branchId) throw new BadRequestException('branchId is required');
+    return {
+      message: 'View data found',
+      status: HttpStatus.OK,
+      data: await this.partsPriceService.getViewData(+branchId),
+    };
+  }
+
+  @Get('availability')
+  async getAvailability() {
+    return {
+      message: 'Availability found',
+      status: HttpStatus.OK,
+      data: await this.partsPriceService.getAvailability(),
+    };
   }
 
   @Get('references')
@@ -183,6 +202,23 @@ export class PartsPriceController {
     } catch (error) {
       if (error instanceof HttpException) throw error;
       throw new BadRequestException('Import invalide');
+    }
+  }
+
+  @Post('devis-info')
+  async getDevisInfo(@Body() body: { modelId: number; partIds: number[] }, @Res() res: any) {
+    try {
+      const parts = await this.partsPriceService.findByModelAndPartIds(body.modelId, body.partIds);
+      const { tva, timbreFiscale } = await this.partsPriceService.getCompanyTvaTimbre();
+      
+      return res.status(HttpStatus.OK).json({
+        message: 'Devis info found successfully !',
+        status: HttpStatus.OK,
+        data: { parts, tva, timbreFiscale }
+      });
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      throw error;
     }
   }
 

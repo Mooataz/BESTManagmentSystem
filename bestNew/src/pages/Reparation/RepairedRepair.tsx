@@ -284,12 +284,11 @@ const [saving, setSaving] = useState(false);
       if (!partIds.length) {
         return { ok: false, msg: 'Sélectionner des pièces pour Réparation' };
       }
-    }
-
-    if (partIds.length > 0 && Array.isArray(oneRepair?.approveStock) && oneRepair.approveStock.length > 0) {
-      const allConfirmed = oneRepair.approveStock.every((e: any) => e.state === 'Confirmer');
-      if (!allConfirmed) {
-        return { ok: false, msg: 'Toutes les pièces doivent être confirmées (état Confirmer)' };
+      if (partIds.length > 0 && Array.isArray(oneRepair?.approveStock) && oneRepair.approveStock.length > 0) {
+        const allConfirmed = oneRepair.approveStock.every((e: any) => e.state === 'Confirmer');
+        if (!allConfirmed) {
+          return { ok: false, msg: 'Toutes les pièces doivent être confirmées (état Confirmer)' };
+        }
       }
     }
 

@@ -35,6 +35,7 @@ import PartPriceReducer from './Stock/PartPriceSlice';
 import RepairActionReducer from './Administration/ActionRepairSlice';
 import OutputListReducer from './recptionSlices/OutPutSlice'
 import stockAlertReducer from './Stock/StockAlertSlice'
+
 //store
 const rootReducer = combineReducers({
       repair: repairReducer,

@@ -27,6 +27,12 @@ export class Company {
         @Column()
         quantityAlertStock?: number;
 
+        @Column('float', { default: 0 })
+        tva?: number;
+
+        @Column('float', { default: 0 })
+        timbreFiscale?: number;
+
         @OneToMany(() => Branch,Branch => Branch.company)
         branches?:Branch[]
 }

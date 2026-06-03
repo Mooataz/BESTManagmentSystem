@@ -50,17 +50,20 @@ const common_1 = require("@nestjs/common");
 const parts_price_entity_1 = require("./entities/parts-price.entity");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
+const company_entity_1 = require("../company/entities/company.entity");
 const model_entity_1 = require("../models/entities/model.entity");
 const all_part_entity_1 = require("../all-parts/entities/all-part.entity");
 const level_repair_entity_1 = require("../level-repair/entities/level-repair.entity");
 const ExcelJS = __importStar(require("exceljs"));
 let PartsPriceService = class PartsPriceService {
     partsPriceRepositry;
+    companyRepositry;
     modelRepositry;
     allPartRepositry;
     levelRepairRepositry;
-    constructor(partsPriceRepositry, modelRepositry, allPartRepositry, levelRepairRepositry) {
+    constructor(partsPriceRepositry, companyRepositry, modelRepositry, allPartRepositry, levelRepairRepositry) {
         this.partsPriceRepositry = partsPriceRepositry;
+        this.companyRepositry = companyRepositry;
         this.modelRepositry = modelRepositry;
         this.allPartRepositry = allPartRepositry;
         this.levelRepairRepositry = levelRepairRepositry;
@@ -223,24 +226,107 @@ let PartsPriceService = class PartsPriceService {
         }
         return { imported, errors };
     }
+    async getViewData(branchId) {
+        const company = await this.partsPriceRepositry.manager.query(`SELECT tva, "timbreFiscale" FROM company LIMIT 1`);
+        const tva = company[0]?.tva ?? 0;
+        const timbreFiscale = company[0]?.timbreFiscale ?? 0;
+        const rows = await this.partsPriceRepositry.manager.query(`
+      SELECT
+        b.name AS "brandName",
+        m.name AS "modelName",
+        tm.description AS "typeModelName",
+        ap.description AS "allPartDescription",
+        ap.id AS "allPartId",
+        m.id AS "modelId",
+        pp.id AS "partsPriceId",
+        pp.price AS "basePrice",
+        lr.price AS "levelRepairPrice",
+        lr.name AS "levelRepairName",
+        COALESCE(sp_count.stock_count, 0) AS "stockCount"
+      FROM brand b
+      JOIN model m ON m."brandId" = b.id
+      LEFT JOIN type_model tm ON tm.id = m."typeModelId"
+      JOIN model_allpart_all_part ma ON ma."modelId" = m.id
+      JOIN all_part ap ON ap.id = ma."allPartId"
+      LEFT JOIN parts_price pp ON pp."modelId" = m.id AND pp."allPartId" = ap.id
+      LEFT JOIN level_repair lr ON lr.id = pp."levelRepairId"
+      LEFT JOIN (
+        SELECT rm."modelId", r."allpartId", COUNT(sp.id)::int AS stock_count
+        FROM reference r
+        LEFT JOIN reference_model_model rm ON rm."referenceId" = r.id
+        LEFT JOIN stock_part sp ON sp."referenceId" = r.id
+          AND sp."binId" IN (SELECT b2.id FROM bin b2 WHERE b2.type = 'Bon' AND b2."branchId" = $1)
+        GROUP BY rm."modelId", r."allpartId"
+      ) sp_count ON sp_count."modelId" = m.id AND sp_count."allpartId" = ap.id
+      WHERE b.status = 'Autoriser'
+      ORDER BY b.name, m.name, ap.description
+    `, [branchId]);
+        return rows.map((r) => ({
+            ...r,
+            calculatedPrice: r.basePrice != null && r.levelRepairPrice != null
+                ? ((r.basePrice + r.levelRepairPrice) * (1 + tva / 100) + timbreFiscale)
+                : null,
+        }));
+    }
+    async getAvailability() {
+        const data = await this.partsPriceRepositry.manager.query(`
+      SELECT
+        pp.id, pp.price,
+        m.id AS "modelId", m.name AS "modelName",
+        b.id AS "brandId", b.name AS "brandName",
+        ap.id AS "allPartId", ap.description AS "allPartDescription",
+        lr.id AS "levelRepairId", lr.name AS "levelRepairName", lr.price AS "levelRepairPrice",
+        COALESCE(sp.stock_count, 0) AS "stockCount"
+      FROM parts_price pp
+      JOIN model m ON m.id = pp."modelId"
+      JOIN brand b ON b.id = m."brandId"
+      JOIN all_part ap ON ap.id = pp."allPartId"
+      LEFT JOIN level_repair lr ON lr.id = pp."levelRepairId"
+      LEFT JOIN (
+        SELECT rm."modelId", r."allpartId", COUNT(sp.id)::int AS stock_count
+        FROM reference r
+        LEFT JOIN reference_model_model rm ON rm."referenceId" = r.id
+        LEFT JOIN stock_part sp ON sp."referenceId" = r.id
+        GROUP BY rm."modelId", r."allpartId"
+      ) sp ON sp."modelId" = m.id AND sp."allpartId" = ap.id
+      ORDER BY b.name ASC, m.name ASC, ap.description ASC
+    `);
+        return data;
+    }
     async findByModelallPArt(modelId, allPartId) {
-        const find = await this.partsPriceRepositry.findOne({ where: { model: { id: modelId },
-                allPart: { id: allPartId }, },
-            relations: ['model', 'allPart'], });
+        const find = await this.partsPriceRepositry.findOne({
+            where: { model: { id: modelId }, allPart: { id: allPartId } },
+            relations: ['model', 'allPart', 'levelRepair'],
+        });
         if (!find) {
             throw new common_1.NotFoundException('Data not founded by this Ids');
         }
         return find;
+    }
+    async findByModelAndPartIds(modelId, partIds) {
+        return await this.partsPriceRepositry.find({
+            where: partIds.map(id => ({ model: { id: modelId }, allPart: { id } })),
+            relations: ['allPart', 'levelRepair'],
+        });
+    }
+    async getCompanyTvaTimbre() {
+        const companies = await this.companyRepositry.find({ take: 1 });
+        return {
+            tva: companies[0]?.tva ?? 0,
+            timbreFiscale: companies[0]?.timbreFiscale ?? 0,
+        };
     }
 };
 exports.PartsPriceService = PartsPriceService;
 exports.PartsPriceService = PartsPriceService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(parts_price_entity_1.PartsPrice)),
-    __param(1, (0, typeorm_1.InjectRepository)(model_entity_1.Model)),
-    __param(2, (0, typeorm_1.InjectRepository)(all_part_entity_1.AllPart)),
-    __param(3, (0, typeorm_1.InjectRepository)(level_repair_entity_1.LevelRepair)),
+    __param(1, (0, typeorm_1.InjectRepository)(company_entity_1.Company)),
+    __param(2, (0, typeorm_1.InjectRepository)(model_entity_1.Model)),
+    __param(3, (0, typeorm_1.InjectRepository)(all_part_entity_1.AllPart)),
+    __param(4, (0, typeorm_1.InjectRepository)(level_repair_entity_1.LevelRepair)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
+        typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository,
         typeorm_2.Repository])

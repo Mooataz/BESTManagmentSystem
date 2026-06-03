@@ -6,9 +6,11 @@ import { FileFieldsInterceptor, FilesInterceptor } from '@nestjs/platform-expres
 import { diskStorage } from 'multer';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { AccessTokenGuard } from 'src/guards/accessToken.guard';
- import { AuthGuard } from '@nestjs/passport';
- import { Response } from 'express';
+import { BranchAccessGuard } from 'src/guards/branch-access.guard';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { Response } from 'express';
 @Controller('repair')
+@UseGuards(AccessTokenGuard)
 export class RepairController {
   constructor(private readonly repairService: RepairService) { }
   @Post()
@@ -77,17 +79,14 @@ export class RepairController {
   ) */
    
   async create(  
-    @Body()  body: any, /* createRepairDto:   CreateRepairDto */     
-    //@UploadedFiles() files: Express.Multer.File[],
+    @Body()  body: any,
+    @CurrentUser() user: { sub: number },
     @Res() res: any,
   ) {
     try {
        
-           const {userId, ...createRepairDto} = body; 
-        
-      //createRepairDto.files = files?.map((file) => file.filename) || [];
-       //const userId = req.user.id; 
-      const newCreate = await this.repairService.create(createRepairDto  ,userId );
+      const {userId: _ignored, ...createRepairDto} = body;
+      const newCreate = await this.repairService.create(createRepairDto, user.sub);
       return res.status(HttpStatus.CREATED).json({
         message: 'Created Successfully!',
         status: HttpStatus.CREATED,
@@ -158,6 +157,47 @@ try {
     }
    
 
+  @UseGuards(BranchAccessGuard)
+  @Get('/pdf/:id')
+  async getPdf(@Param('id') id: number, @Res() res: any) {
+    try {
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="reparation_${id}.pdf"`);
+      await this.repairService.generatePdf(id, res);
+    } catch (error) {
+      if (!res.headersSent) {
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: 'Erreur génération PDF', status: 500 });
+      } else {
+        res.end();
+      }
+    }
+  }
+
+ @Get('stats')
+ async getStats(
+   @Query('dateFrom') dateFrom: string,
+   @Query('dateTo') dateTo: string,
+   @Res() res: any
+ ) {
+   try {
+     const stats = await this.repairService.getStats(dateFrom, dateTo);
+     return res.status(HttpStatus.OK).json({
+       message: 'Statistiques récupérées avec succès',
+       status: HttpStatus.OK,
+       data: stats,
+     });
+    } catch (error) {
+      if (error instanceof HttpException) throw error;
+      const err = error as Error;
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        message: err.message,
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        data: null,
+      });
+    }
+  }
+
+  @UseGuards(BranchAccessGuard)
   @Get(':id')
   async findOne(@Param('id') id: number,
     @Res() res: any) {
@@ -181,6 +221,7 @@ try {
 }
   }
 
+@UseGuards(BranchAccessGuard)
 @UseInterceptors(
   FilesInterceptor('files', 5, {
     storage: diskStorage({
@@ -211,7 +252,8 @@ async updateWithPartsFiles(
   };
 }
 
- @Delete(':id/files/:fileId')
+  @UseGuards(BranchAccessGuard)
+  @Delete(':id/files/:fileId')
   async removeFile(
     @Param('id') id: number,
     @Param('fileId') fileId: string,
@@ -236,7 +278,8 @@ async updateWithPartsFiles(
     }
   }
 
- @Patch(':id')
+  @UseGuards(BranchAccessGuard)
+  @Patch(':id')
   async update(@Param('id') id: number,
     @Body() body: any,
     //@UploadedFiles() files: Express.Multer.File[],
@@ -271,6 +314,7 @@ async updateWithPartsFiles(
 }
   }   
  
+  @UseGuards(BranchAccessGuard)
   @Delete(':id')
   async remove(@Param('id') id: number,
     @Res() res: any) {
@@ -368,19 +412,14 @@ async updateWithPartsFiles(
 }
   }
 
-  @Get('filter-by-user/:userId')
-  async getRepairByUser(@Param('userId') userId: string, @Res() res: any) {
+  @Get('mine')
+  async getMine(@CurrentUser() user: { sub: number }, @Res() res: any) {
     try {
-      const id = parseInt(userId, 10);
-      if (isNaN(id)) {
-        throw new Error('Invalid userId');
-      }
-  
-      const user = await this.repairService.filterRepairByUser(id);
+      const repairs = await this.repairService.filterRepairByUser(user.sub);
       return res.status(HttpStatus.OK).json({
         message: 'Repairs found successfully!',
         status: HttpStatus.OK,
-        data: user,
+        data: repairs,
       });
     } catch (error) {
   if (error instanceof HttpException) {
@@ -396,16 +435,16 @@ async updateWithPartsFiles(
     }
  
 
- @Get('FilterUserStep/:branchId/:userId/:steps')
+ @Get('FilterUserStep/:branchId/:steps')
 async getByUserStep(
   @Param('branchId') branchId: string,
-  @Param('userId') userId: string,
   @Param('steps') steps: string,
+  @CurrentUser() user: { sub: number },
   @Res() res: any
 ) {
   try {
     const numericBranchId = Number(branchId);
-    const numericUserId = Number(userId);
+    const numericUserId = user.sub;
 
     const result = await this.repairService.findByBranchAndStep(numericBranchId, steps);
 
@@ -425,6 +464,7 @@ async getByUserStep(
     });
   }
 }
-    
+
 }
-}
+
+ }

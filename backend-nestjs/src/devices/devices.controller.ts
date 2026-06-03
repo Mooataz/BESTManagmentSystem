@@ -61,6 +61,27 @@ export class DevicesController {
 }
   }
 
+  @Get('history')
+  async findAllWithRepairs(@Res() res: any) {
+    try {
+      const data = await this.devicesService.findAllWithRepairs()
+      return res.status(HttpStatus.OK).json({
+        message: "Devices with repairs found successfully !",
+        status: HttpStatus.OK,
+        data
+      })
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+      throw error
+    }
+  }
+
   @Get(':id')
   async findOne( @Param('id') id: number, 
                  @Res() res: any) {

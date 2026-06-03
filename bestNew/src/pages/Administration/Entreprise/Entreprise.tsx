@@ -14,25 +14,7 @@ import theme from '../../../Theme/theme';
 import UpdateEntreprise from './UpdateEntreprise';
 import AdminCard from './AdminCard';
 import { getusers } from '../../../Redux/Actions/Administration/EmployèesActions';
- 
-interface Agency {
-    id: number;
-    name: string;
-    phone: number;
-    email: string;
-    location: string;
-}
-type User = {
-    id: number;
-    name: string;
-    phone: number;
-    password: string;
-    createdDate: string;
-    status: string;
-    login: string;
-    role: string[];
-    branch: Agency
-};
+import type { User } from '../../../Redux/Types/authenTypes';
 export default function Entreprise() {
      const dispatch = useAppDispatch();
        
@@ -64,6 +46,8 @@ export default function Entreprise() {
                     <TableCell sx={{ borderRight: `1px solid ${theme.palette.secondary.main}` }}> MF </TableCell>
                     <TableCell sx={{ borderRight: `1px solid ${theme.palette.secondary.main}` }}> Banque </TableCell>
                     <TableCell sx={{ borderRight: `1px solid ${theme.palette.secondary.main}` }}> RIB </TableCell>
+                    <TableCell sx={{ borderRight: `1px solid ${theme.palette.secondary.main}` }}> TVA (%) </TableCell>
+                    <TableCell sx={{ borderRight: `1px solid ${theme.palette.secondary.main}` }}> Timbre fiscale </TableCell>
                     <TableCell> Quantitè alert stock </TableCell>
                 </TableRow>
             </TableHead>
@@ -74,6 +58,8 @@ export default function Entreprise() {
                     <TableCell sx={{ borderRight: `1px solid ${theme.palette.secondary.main}` }}> {company?.taxRegisterNumber} </TableCell>
                     <TableCell sx={{ borderRight: `1px solid ${theme.palette.secondary.main}` }}> {company?.bank} </TableCell>
                     <TableCell sx={{ borderRight: `1px solid ${theme.palette.secondary.main}` }}> {company?.rib} </TableCell>
+                    <TableCell sx={{ borderRight: `1px solid ${theme.palette.secondary.main}` }}> {company?.tva ?? 0}% </TableCell>
+                    <TableCell sx={{ borderRight: `1px solid ${theme.palette.secondary.main}` }}> {company?.timbreFiscale ?? 0} </TableCell>
                     <TableCell> {company?.quantityAlertStock} </TableCell>
                 </TableRow>
             </TableBody>

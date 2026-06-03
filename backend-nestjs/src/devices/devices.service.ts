@@ -138,7 +138,23 @@ device = this.deviceRepositry.create(deviceData);
   }
 
 
-async deviceHasOpenRepair(serialNumber: string): Promise<boolean> {
+  async findAllWithRepairs(): Promise<Device[]> {
+    return await this.deviceRepositry.find({
+      relations: [
+        'model', 'model.brand', 'model.typeModel',
+        'repair', 'repair.customer', 'repair.customer.distributer',
+        'repair.historyRepair',
+        'repair.historyRepair.tracability',
+        'repair.historyRepair.tracability.user',
+        'repair.historyRepair.tracability.user.branch',
+        'repair.repairAction',
+        'repair.listFault',
+      ],
+      order: { id: 'DESC' },
+    });
+  }
+
+  async deviceHasOpenRepair(serialNumber: string): Promise<boolean> {
   const device = await this.deviceRepositry.findOne({
     where: { serialenumber: serialNumber },
     relations: ['repair', 'repair.historyRepair'],

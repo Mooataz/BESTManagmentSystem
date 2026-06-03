@@ -61,6 +61,10 @@ import ListOutPut from '../../Reception/ListOutPut';
 import Reaffectation from '../../Coordinate/Reaffectation';
 import ApproveParts from '../../Stock/ApproveParts';
 import Demantelement from '../../Stock/Demantelement';
+import ViewPartsAvailablePrice from '../../Stock/ViewPartsAvailablePrice';
+import ShowProductState from '../../Reception/ShowProductState';
+import MenuTransfert from '../../Coordinate/TransfertProduits/MenuTransfert';
+import Statistique from '../../Administration/Statistiques/Statistique';
 
 const xThemeComponents = {
   ...chartsCustomizations,
@@ -76,6 +80,7 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
       <Box sx={{ display: 'flex' }}>
         <SideMenu />
         <AppNavbar />
+      
         {/* Main content */}
         <Box
           component="main"
@@ -154,7 +159,10 @@ export default function Dashboard(props: { disableCustomTheme?: boolean }) {
               <Route path="accessoires" element={<Accessoires />} />
               <Route path='Modéles' element={<ListModel />} />
               <Route path="Démantèlement" element={<Demantelement />} />
-
+              <Route path="ViewParts" element={<ViewPartsAvailablePrice />} />
+              <Route path="Consulterappareille" element={ <ShowProductState />} />
+              <Route path="MenuTransfert" element={ <MenuTransfert />} />
+              <Route path="Statistique" element={ <Statistique />} />
             </Routes>
           </Stack>
         </Box>

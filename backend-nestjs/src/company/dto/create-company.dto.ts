@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmpty, IsNumber, IsString } from "class-validator";
+import { IsEmpty, IsNumber, IsPositive, IsString } from "class-validator";
 
 export class CreateCompanyDto {
     @ApiProperty({
@@ -53,4 +53,18 @@ export class CreateCompanyDto {
         description: "Required"
     })
     quantityAlertStock?: number;
+
+    @ApiProperty({
+        type:Number,
+        description: "TVA en pourcentage"
+    })
+    @IsPositive()
+    tva?: number;
+
+    @ApiProperty({
+        type:Number,
+        description: "Timbre fiscale"
+    })
+    @IsPositive()
+    timbreFiscale?: number;
 }

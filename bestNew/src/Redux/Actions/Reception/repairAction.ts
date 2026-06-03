@@ -118,16 +118,10 @@ export const getByUserStep = createAsyncThunk<
   async (data, { rejectWithValue }) => {
     try {
 
-      const userId = data.userId;
       const branchId = data.branchId
       const steps = data.step
 
-      const response = await API.get(`repair/FilterUserStep/${branchId}/${userId}/${steps}`, {
-        params: {
-          userId: data.userId,
-          steps: data.step,
-        },
-      });
+      const response = await API.get(`repair/FilterUserStep/${branchId}/${steps}`);
       return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Erreur de récupération');

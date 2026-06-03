@@ -17,6 +17,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import theme from '../../../Theme/theme';
 import UpdateAdmin from './UpdateAdmin';
+import type { User } from '../../../Redux/Types/authenTypes';
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -45,24 +46,6 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
     },
   ],
 }));
-interface Agency {
-    id: number;
-    name: string;
-    phone: number;
-    email: string;
-    location: string;
-}
-type User = {
-    id: number;
-    name: string;
-    phone: number;
-    password: string;
-    createdDate: string;
-    status: string;
-    login: string;
-    role: string[];
-    branch: Agency
-};
 export default function AdminCard({ row  }: { row: User  }) {
       const [expanded, setExpanded] = React.useState(false);
 

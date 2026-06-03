@@ -6,7 +6,10 @@ import type { RootState } from '../../Redux/store';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import type { Customer, OutputListForm, RepairForm, TableAction } from '../../Redux/Types/repairTypes';
-import { Box, Button, Checkbox, FormControl, FormLabel, Grid, Input, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, Typography } from '@mui/material';
+import { Box, Button, Checkbox, Dialog, DialogContent, DialogTitle, FormControl, FormLabel, Grid, IconButton, Input, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, Typography } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import { PiEye, PiFilePdf } from 'react-icons/pi';
+import ShowRepair from '../Reparation/ShowRepair';
 import theme from '../../Theme/theme';
 import DynamicTable from '../../Componants/Global/TableComponat';
 import { addHistoryRepair } from '../../Redux/Actions/Reception/History';
@@ -138,6 +141,8 @@ export default function Recuperation() {
         }
     };
 
+
+        const [selectedRepairId, setSelectedRepairId] = useState<number | null>(null);
 
         const [filters, setFilters] = useState({
 
@@ -376,7 +381,22 @@ const getUniqueOptions = (key: keyof FiltersType): string[] => {
                 enableChecked={true}
                 onChecked={setSelected}
 
+                actions={(row) => [
+                    { icon: <PiEye size={18} />, onClick: () => setSelectedRepairId(row.id) },
+                    { icon: <PiFilePdf size={18} style={{ color: theme.palette.primary.main }} />, onClick: () => { const a = document.createElement('a'); a.href = `http://localhost:3000/repair/pdf/${row.id}`; a.download = `reparation_${row.id}.pdf`; document.body.appendChild(a); a.click(); document.body.removeChild(a); } }
+                ]}
             />
+            <Dialog open={!!selectedRepairId} onClose={() => setSelectedRepairId(null)} maxWidth="md" fullWidth>
+                <DialogTitle>
+                    Détail de la réparation
+                    <IconButton onClick={() => setSelectedRepairId(null)} sx={{ position: 'absolute', right: 8, top: 8 }}>
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent>
+                    {selectedRepairId && <ShowRepair repairId={selectedRepairId} />}
+                </DialogContent>
+            </Dialog>
         </Box>
     )
 }

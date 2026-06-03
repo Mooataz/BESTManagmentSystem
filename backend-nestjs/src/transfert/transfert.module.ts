@@ -7,9 +7,11 @@ import { StockPart } from 'src/stock-parts/entities/stock-part.entity';
 import { Repair } from 'src/repair/entities/repair.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Branch } from 'src/branches/entities/branch.entity';
+import { HistoryRepair } from 'src/history-repair/entities/history-repair.entity';
+import { Tracability } from 'src/tracability/entities/tracability.entity';
 
 @Module({
-  imports : [TypeOrmModule. forFeature([Transfert, StockPart, Repair, User, Branch])],
+  imports : [TypeOrmModule. forFeature([Transfert, StockPart, Repair, User, Branch, HistoryRepair, Tracability])],
   controllers: [TransfertController],
   providers: [TransfertService],
 })

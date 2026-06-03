@@ -103,16 +103,16 @@ any,
 
 export const GetReceiveTransfert = createAsyncThunk<
  TransfertPR[],
-any,
+ any,
   AsyncThunkConfig
 >(
   'Transfert/GetReceiveTransfert',
   async (data, { rejectWithValue }) => {
- 
+  
     try {
       const response = await API.get(`transfert/findToBranchId/${data.branchId}/${data.type}/${data.state}` );
   
- 
+   
       return response.data.data;
        
     } catch (error: any) {
@@ -121,4 +121,68 @@ any,
       );
     }
   }
-); 
+);
+
+export const FetchRepairTransfers = createAsyncThunk<
+  TransfertPR[],
+  number,
+  AsyncThunkConfig
+>(
+  'Transfert/FetchRepairTransfers',
+  async (branchId, { rejectWithValue }) => {
+    try {
+      const response = await API.get(`transfert/repair/branch/${branchId}`);
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Échec du chargement');
+    }
+  }
+);
+
+export const AcceptRepairTransfer = createAsyncThunk<
+  TransfertPR,
+  { id: number; userId: number },
+  AsyncThunkConfig
+>(
+  'Transfert/AcceptRepairTransfer',
+  async ({ id, userId }, { rejectWithValue }) => {
+    try {
+      const response = await API.patch(`transfert/repair/${id}/accept`, { userId });
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Échec de l'acceptation");
+    }
+  }
+);
+
+export const RefuseRepairTransfer = createAsyncThunk<
+  TransfertPR,
+  { id: number; userId: number },
+  AsyncThunkConfig
+>(
+  'Transfert/RefuseRepairTransfer',
+  async ({ id, userId }, { rejectWithValue }) => {
+    try {
+      const response = await API.patch(`transfert/repair/${id}/refuse`, { userId });
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Échec du refus');
+    }
+  }
+);
+
+export const CancelRepairTransfer = createAsyncThunk<
+  TransfertPR,
+  { id: number; userId: number },
+  AsyncThunkConfig
+>(
+  'Transfert/CancelRepairTransfer',
+  async ({ id, userId }, { rejectWithValue }) => {
+    try {
+      const response = await API.patch(`transfert/repair/${id}/cancel`, { userId });
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Échec de l'annulation");
+    }
+  }
+);

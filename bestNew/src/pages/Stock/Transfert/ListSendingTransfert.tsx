@@ -7,6 +7,7 @@ import { GetSendTransfert } from '../../../Redux/Actions/stock/TransfertAction';
 import type { TableAction } from '../../../Redux/Types/repairTypes';
 import { useNotification } from '../../../Componants/NotificationContext';
 import { BiShowAlt } from 'react-icons/bi';
+import { PiFilePdf } from 'react-icons/pi';
 import theme from '../../../Theme/theme';
 import ShowPart from './ShowPart';
 import type { getFormStock, TransfertPR } from '../../../Redux/Types/Stock';
@@ -14,12 +15,12 @@ import type { getFormStock, TransfertPR } from '../../../Redux/Types/Stock';
 export default function ListSendingTransfert() {
     const dispatch = useAppDispatch();
     const transfert = useSelector((state: RootState) => state.Transfert.Transfert);
-    const user = useSelector((state: RootState) => state.user);
-    const branchId = user.branch?.id;
+    const authUser = useSelector((state: RootState) => state.auth.user);
+    const branchId = authUser?.branch ? (typeof authUser.branch === 'object' ? authUser.branch.id : authUser.branch) : undefined;
 
     useEffect(() => {
     
-    if (branchId) {
+    if (branchId != null && branchId > 0) {
         dispatch(GetSendTransfert({ branchId, type: 'Pieces' }));
     }
 }, [dispatch, branchId]);
@@ -35,7 +36,21 @@ export default function ListSendingTransfert() {
 
     const handleClose = () => setOpen(false);
 
+    const handleDownloadPdf = (transfertId: number) => {
+        const url = `http://localhost:3000/transfert/pdf/${transfertId}`;
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `transfert_${transfertId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
+
     const actions: TableAction[] = [
+        {
+            icon: <PiFilePdf style={{ color: theme.palette.primary.main }} />,
+            onClick: (row: Record<string, any>) => handleDownloadPdf(row.transfertId),
+        },
         {
             icon: <BiShowAlt style={{ color: theme.palette.primary.main }} />,
             onClick: (row: Record<string, any>) => handleOpenEdit(row),

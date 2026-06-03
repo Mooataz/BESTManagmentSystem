@@ -4,13 +4,6 @@
     "module": "Node16",
     "moduleResolution": "node16",
 
-    "baseUrl": ".",
-    "paths": {
-      "#/*": ["src/*"],
-      "#modules/*": ["src/modules/*"],
-      "#common/*": ["src/common/*"]
-    },
-
     "rootDir": "./src",
     "outDir": "./dist",
 
@@ -30,8 +23,8 @@
     "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-
-
+    "baseUrl": ".",
+    "ignoreDeprecations": "5.0"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

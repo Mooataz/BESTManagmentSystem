@@ -97,6 +97,22 @@ let PartsPriceController = class PartsPriceController {
             throw error;
         }
     }
+    async getViewData(branchId) {
+        if (!branchId)
+            throw new common_1.BadRequestException('branchId is required');
+        return {
+            message: 'View data found',
+            status: common_1.HttpStatus.OK,
+            data: await this.partsPriceService.getViewData(+branchId),
+        };
+    }
+    async getAvailability() {
+        return {
+            message: 'Availability found',
+            status: common_1.HttpStatus.OK,
+            data: await this.partsPriceService.getAvailability(),
+        };
+    }
     async getReferences() {
         return {
             message: 'References found',
@@ -213,6 +229,22 @@ let PartsPriceController = class PartsPriceController {
             throw new common_1.BadRequestException('Import invalide');
         }
     }
+    async getDevisInfo(body, res) {
+        try {
+            const parts = await this.partsPriceService.findByModelAndPartIds(body.modelId, body.partIds);
+            const { tva, timbreFiscale } = await this.partsPriceService.getCompanyTvaTimbre();
+            return res.status(common_1.HttpStatus.OK).json({
+                message: 'Devis info found successfully !',
+                status: common_1.HttpStatus.OK,
+                data: { parts, tva, timbreFiscale }
+            });
+        }
+        catch (error) {
+            if (error instanceof common_1.HttpException)
+                throw error;
+            throw error;
+        }
+    }
     async findPartsPriceByModelAndAllPart(modelId, allPartId, res) {
         try {
             const partsPrice = await this.partsPriceService.findByModelallPArt(modelId, allPartId);
@@ -250,6 +282,19 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], PartsPriceController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)('view-data'),
+    __param(0, (0, common_1.Query)('branchId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PartsPriceController.prototype, "getViewData", null);
+__decorate([
+    (0, common_1.Get)('availability'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], PartsPriceController.prototype, "getAvailability", null);
 __decorate([
     (0, common_1.Get)('references'),
     __metadata("design:type", Function),
@@ -298,6 +343,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], PartsPriceController.prototype, "importExcel", null);
+__decorate([
+    (0, common_1.Post)('devis-info'),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], PartsPriceController.prototype, "getDevisInfo", null);
 __decorate([
     (0, common_1.Get)(':modelId/:allPartId'),
     __param(0, (0, common_1.Param)('modelId')),

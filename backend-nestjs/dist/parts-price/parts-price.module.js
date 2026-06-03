@@ -13,6 +13,7 @@ const parts_price_controller_1 = require("./parts-price.controller");
 const typeorm_1 = require("@nestjs/typeorm");
 const parts_price_entity_1 = require("./entities/parts-price.entity");
 const all_part_entity_1 = require("../all-parts/entities/all-part.entity");
+const company_entity_1 = require("../company/entities/company.entity");
 const model_entity_1 = require("../models/entities/model.entity");
 const level_repair_entity_1 = require("../level-repair/entities/level-repair.entity");
 let PartsPriceModule = class PartsPriceModule {
@@ -20,7 +21,7 @@ let PartsPriceModule = class PartsPriceModule {
 exports.PartsPriceModule = PartsPriceModule;
 exports.PartsPriceModule = PartsPriceModule = __decorate([
     (0, common_1.Module)({
-        imports: [typeorm_1.TypeOrmModule.forFeature([parts_price_entity_1.PartsPrice, all_part_entity_1.AllPart, model_entity_1.Model, level_repair_entity_1.LevelRepair])],
+        imports: [typeorm_1.TypeOrmModule.forFeature([parts_price_entity_1.PartsPrice, all_part_entity_1.AllPart, company_entity_1.Company, model_entity_1.Model, level_repair_entity_1.LevelRepair])],
         controllers: [parts_price_controller_1.PartsPriceController],
         providers: [parts_price_service_1.PartsPriceService],
     })

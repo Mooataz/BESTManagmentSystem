@@ -32,6 +32,8 @@ export class Transfert {
     
     @Column({ nullable: true }) typePart?:string;
 
+    @Column({ nullable: true }) previousStep?: string;
+
     @ManyToMany(() => Repair, (repair) => repair.transfert, { cascade: true })
     @JoinTable()
     repair?: Repair[];
