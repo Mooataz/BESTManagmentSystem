@@ -1,6 +1,6 @@
+﻿import { API } from '../../services/api';
 import React, { useEffect, useMemo, useState } from 'react'
-import {
-  Accordion, AccordionDetails, AccordionSummary,
+import { Accordion, AccordionDetails, AccordionSummary,
   Box, Button, Card, CardContent, Checkbox, Chip, Dialog, DialogContent, DialogTitle, FormControl, Grid,
   IconButton, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, TextField, Typography
 } from '@mui/material';
@@ -79,8 +79,8 @@ export default function ShowProductState() {
   });
 
   useEffect(() => {
-    fetch('http://localhost:3000/devices/history')
-      .then(r => r.json())
+    API.get('/devices/history')
+      .then(r => r.data)
       .then(res => setDevices(res.data ?? []))
       .catch(() => setDevices([]));
   }, []);

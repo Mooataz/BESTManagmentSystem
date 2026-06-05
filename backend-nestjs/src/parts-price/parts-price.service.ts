@@ -86,22 +86,29 @@ export class PartsPriceService {
   }
 
   async create(createPartsPriceDto: CreatePartsPriceDto):Promise<PartsPrice> {
+   let model = null;
+   if (createPartsPriceDto.modelId) {
+     model = await this.modelRepositry.findOne({ where: { id: createPartsPriceDto.modelId } });
+     if (!model) throw new NotFoundException(`Model with ID ${createPartsPriceDto.modelId} not found`);
+   }
+
+   let allPart = null;
+   if (createPartsPriceDto.allPartId) {
+     allPart = await this.allPartRepositry.findOne({ where: { id: createPartsPriceDto.allPartId } });
+     if (!allPart) throw new NotFoundException(`AllPart with ID ${createPartsPriceDto.allPartId} not found`);
+   }
+
+   const levelRepair = await this.levelRepairRepositry.findOne({ where: { id: createPartsPriceDto.laborCharge }})
+   if (!levelRepair) { throw new NotFoundException('Level repair not found')};
+
+   const partsPrice = this.partsPriceRepositry.create({
+     price: createPartsPriceDto.price,
+     model: model ?? undefined,
+     allPart: allPart ?? undefined,
+     levelRepair,
+   }) as unknown as PartsPrice;
    
-   const model = await this.modelRepositry.findOne({ where: { id: createPartsPriceDto.modelId }, });
-  if (!model) { throw new NotFoundException(`Model with ID ${createPartsPriceDto.modelId} not found`);}
-
-  // Chargez l'entité AllPart à partir de allPartId
-  const allPart = await this.allPartRepositry.findOne({ where: { id: createPartsPriceDto.allPartId }, });
-  if (!allPart) { throw new NotFoundException(`AllPart with ID ${createPartsPriceDto.allPartId} not found`);}
-
-  const levelRepair = await this.levelRepairRepositry.findOne({ where: { id: createPartsPriceDto.laborCharge}})
-  if (!levelRepair) { throw new NotFoundException('Level repair not found')};
-
-  // Créez une nouvelle instance de PartsPrice
-  const partsPrice = this.partsPriceRepositry.create({ ...createPartsPriceDto, model,  allPart, levelRepair});
-  
-  // Sauvegardez l'entité PartsPrice
-  return this.partsPriceRepositry.save(partsPrice);
+   return this.partsPriceRepositry.save(partsPrice);
   }
 
   async findAll():Promise<PartsPrice[]> {

@@ -69,10 +69,9 @@ async create(createOutputListDto: CreateOutputListDto): Promise<OutputList> {
   async findOne(id: number): Promise<OutputList> {
     const Onefin= await this.outputListRepositry.findOne({ where: { id },
         relations: ['customer', 'customer.distributer',
-        'device', 'device.model', 'device.model.brand', 'device.model.allpart', 'device.model.typeModel',
-        'repair','repair.customer',  
+        'repair', 'repair.customer', 'repair.device', 'repair.device.model', 'repair.device.model.brand', 'repair.device.model.allpart', 'repair.device.model.typeModel',
         'user',
-          ], // 👈 ajoute les relations nécessaires ici
+          ],
     })
     if ( !Onefin){
       throw new NotFoundException("There is no user data Available")
@@ -91,11 +90,7 @@ async findByBranchId(branchId: number): Promise<OutputList[]> {
     .where("user.branch = :branchId", { branchId })
     .getMany();
 
-  if (!findAll || findAll.length === 0) {
-    throw new NotFoundException("There is no data Available");
-  }
-
-  return findAll;
+  return findAll ?? [];
 }
 
 

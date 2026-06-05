@@ -1,3 +1,4 @@
+﻿import { API } from '../../../services/api';
 import React, { useEffect, useMemo, useState, useCallback } from 'react'
 import { getAllPartPrice } from '../../../Redux/Actions/stock/PartPriceActions'
 import { useAppDispatch } from '../../../Redux/hooks';
@@ -146,8 +147,8 @@ const getUniqueOptions = (key: keyof typeof filters): string[] => {
       XLSX.utils.book_append_sheet(wb, ws1, 'Import Prix');
 
       try {
-        const res = await fetch('http://localhost:3000/parts-price/references');
-        const refs = (await res.json())?.data;
+        const res = await API.get('/parts-price/references');
+        const refs = res.data?.data;
         if (refs) {
           const maxLen = Math.max(refs.brands.length, refs.models.length, refs.allParts.length, refs.levelRepairs.length);
           const refData: any[] = [];
@@ -187,13 +188,9 @@ const getUniqueOptions = (key: keyof typeof filters): string[] => {
             price: Number(r.Prix),
             levelRepairName: String(r['Niveau réparation'] || '').trim() || undefined,
           }));
-          const res = await fetch('http://localhost:3000/parts-price/import', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ rows: body }),
-          });
-          const result = await res.json();
-          if (!res.ok) throw new Error(result.message || 'Erreur import');
+          const res = await API.post('/parts-price/import', { rows: body });
+          const result = res.data;
+          if (res.status !== 200 && res.status !== 201) throw new Error(result.message || 'Erreur import');
           const { imported, errors } = result.data;
           const msg = `${imported} ligne(s) importée(s)` + (errors?.length ? `, ${errors.length} erreur(s)` : '');
           setImportResult({ open: true, message: msg, severity: errors?.length ? 'error' : 'success' });

@@ -1,16 +1,12 @@
+﻿import { API } from '../../../services/api';
 
 
-import axios from 'axios';
 import { store } from '../../store';
 import type { FormHistoryRepair  } from '../../Types/repairTypes'
 import type { AsyncThunkConfig  } from '../../Types/authenTypes';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { Bin, BinBranchType } from '../../Types/Stock';
 
-const API = axios.create({
-  baseURL: 'http://localhost:3000/',
-  withCredentials: true, // utile si tu envoies des cookies / tokens
-});
 // ✅ Crée d'abord un type pour ce que tu envoies (sans ID)
 export interface BinCreateDto {
   id?: number;

@@ -3,31 +3,18 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CompanyModule } from './company/company.module';
-import { Company } from './company/entities/company.entity';
 import { BrandsModule } from './brands/brands.module';
-import { Brand } from './brands/entities/brand.entity';
 import { CustomersModule } from './customers/customers.module';
-import { Customer } from './customers/entities/customer.entity';
 import { UsersModule } from './users/users.module';
-import { User } from './users/entities/user.entity';
 import { DistributeurModule } from './distributeur/distributeur.module';
-import { Distributeur } from './distributeur/entities/distributeur.entity';
 import { BranchesModule } from './branches/branches.module';
-import { Branch } from './branches/entities/branch.entity';
 import { PermissionModule } from './permission/permission.module';
-import { Permission } from './permission/entities/permission.entity';
 import { ModelsModule } from './models/models.module';
-import { Model } from './models/entities/model.entity';
 import { TypeModelModule } from './type-model/type-model.module';
-import { TypeModel } from './type-model/entities/type-model.entity';
 import { AllPartsModule } from './all-parts/all-parts.module';
-import { AllPart } from './all-parts/entities/all-part.entity';
 import { DevicesModule } from './devices/devices.module';
-import { Device } from './devices/entities/device.entity';
 import { TracabilityModule } from './tracability/tracability.module';
-import { Tracability } from './tracability/entities/tracability.entity';
 import { TransfertModule } from './transfert/transfert.module';
-import { Transfert } from './transfert/entities/transfert.entity';
 import { PartsPriceModule } from './parts-price/parts-price.module';
 import { ReferencesModule } from './references/references.module';
 import { BinModule } from './bin/bin.module';
@@ -54,7 +41,7 @@ import { StocKeeperModule } from './stoc-keeper/stoc-keeper.module';
 import { CoordinateModule } from './coordinate/coordinate.module';
 import { ReceptionistModule } from './receptionist/receptionist.module';
 import { AuthModule } from './auth/auth.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { NotificationModule } from './notification/notification.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -65,24 +52,27 @@ import { CoreModule } from './core/core.module';
 
 @Module({
   imports: [
-       ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'upload'), // Dossier où sont stockées les images
-      serveRoot: '/upload', // URL publique
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        type: 'postgres',
+        host: config.get<string>('DB_HOST', 'localhost'),
+        port: config.get<number>('DB_PORT', 5432),
+        username: config.get<string>('DB_USERNAME', 'postgres'),
+        password: config.get<string>('DB_PASSWORD', 'mtz.123'),
+        database: config.get<string>('DB_NAME', 'BEST_Managment_System'),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        synchronize: config.get<string>('DB_SYNCHRONIZE', 'true') === 'true',
+      }),
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'upload'),
+      serveRoot: '/upload',
     }),
     ScheduleModule.forRoot(),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'mtz.123',
-      database: 'BEST_Managment_System',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-                 
-      synchronize: true,
- 
-    }),
-   CoreModule,
+    CoreModule,
     CompanyModule,
     BrandsModule,
     CustomersModule,
@@ -123,13 +113,11 @@ import { CoreModule } from './core/core.module';
     CoordinateModule,
     ReceptionistModule,
     AuthModule,
-    ConfigModule.forRoot({isGlobal: true}),
     NotificationModule,
     PdfModule,
-    CoreModule
   ],
   controllers: [AppController],
   providers: [AppService],
-  exports:[AppService]
+  exports: [AppService],
 })
 export class AppModule {}

@@ -1,3 +1,4 @@
+﻿import { API } from '../../../services/api';
 import React, { useEffect, useMemo, useState } from 'react'
 import { Box, Button, Card, CardContent, Chip, Dialog, DialogContent, DialogTitle, FormControl, Grid, IconButton, InputLabel, MenuItem, Select, Tab, Table, TableBody, TableCell, TableHead, TableRow, Tabs, Typography } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
@@ -47,8 +48,8 @@ export default function MenuTransfert() {
       }
     }
     Promise.all([
-      fetch(`http://localhost:3000/repair/byBranchAndStep?branchId=${branchId}&step=On affectation`, { credentials: 'include' }).then(r => r.json()),
-      fetch(`http://localhost:3000/repair/byBranchAndStep?branchId=${branchId}&step=CQ`, { credentials: 'include' }).then(r => r.json()),
+      API.get(`/repair/byBranchAndStep?branchId=${branchId}&step=On affectation`).then(r => r.data),
+      API.get(`/repair/byBranchAndStep?branchId=${branchId}&step=CQ`).then(r => r.data),
     ]).then(([res1, res2]) => {
       const combined = [...(res1.data ?? []), ...(res2.data ?? [])]
       setAvailableRepairs(combined.filter((r: any) => !pendingIds.has(r.id)))

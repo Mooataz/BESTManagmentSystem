@@ -117,6 +117,85 @@ export class SalesController {
   }
   }
 
+  @Get('/accessories')
+  async getAccessories(@Res() res: any) {
+    try {
+      const data = await this.salesService.getAccessories();
+      return res.status(HttpStatus.OK).json({
+        message:"Accessories found",
+        status:HttpStatus.OK,
+        data
+      });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        });
+      }
+      throw error;
+    }
+  }
+
+  @Get('stock-parts/:saleId/:branchId')
+  async findStockPartsForSale(@Param('saleId') saleId: number, @Param('branchId') branchId: number, @Res() res: any) {
+    try {
+      const data = await this.salesService.findForSale(+saleId, +branchId);
+      return res.status(HttpStatus.OK).json({
+        message: 'Stock parts found',
+        status: HttpStatus.OK,
+        data,
+      });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        });
+      }
+      throw error;
+    }
+  }
+
+  @Patch('stock-parts/batch-change-bin')
+  async batchChangeBin(@Body() body: { stockPartIds: number[], binId: number, userId: number, saleId: number }, @Res() res: any) {
+    try {
+      const data = await this.salesService.batchChangeBin(body.stockPartIds, body.binId, body.userId, body.saleId);
+      return res.status(HttpStatus.OK).json({
+        message: 'Stock parts updated successfully',
+        status: HttpStatus.OK,
+        data,
+      });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        });
+      }
+      throw error;
+    }
+  }
+
+  @Get('pdf/:id')
+  async generatePdf(@Param('id') id: number, @Res() res: any) {
+    try {
+      await this.salesService.generatePdf(+id, res);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        });
+      }
+      throw error;
+    }
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: number, 
   @Res() res: any) {
@@ -138,6 +217,27 @@ export class SalesController {
   
     throw error
   }
+  }
+
+  @Patch('validate/:id')
+  async validate(@Param('id') id: number, @Body('adminId') adminId: number, @Res() res: any) {
+    try {
+      const data = await this.salesService.validate(+id, +adminId);
+      return res.status(HttpStatus.OK).json({
+        message:"Vente validée avec succès",
+        status:HttpStatus.OK,
+        data
+      });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        });
+      }
+      throw error;
+    }
   }
 
   @Patch(':id')

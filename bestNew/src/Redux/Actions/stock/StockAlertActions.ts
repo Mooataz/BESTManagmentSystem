@@ -1,10 +1,6 @@
-import axios from 'axios';
+import { API } from '../../../services/api';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-const API = axios.create({
-  baseURL: 'http://localhost:3000/',
-  withCredentials: true,
-});
 
 export const getStockAlerts = createAsyncThunk<
   any[],

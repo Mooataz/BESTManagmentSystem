@@ -52,26 +52,32 @@ export default function AddPartPrice() {
 
 
     const handleSubmit = async () => {
-
-
-
-        try {
-            await dispatch(AddOnePartPrice(formData));
-            setOpen(false)
-            dispatch(getAllPartPrice());
-            notify("Ajouter avec succès !", "success");
-           /*  setFormData({
-                price: 0,
-                model: 0,
-                allPart: 0,
-                levelRepair: 0,
-            }) */
-
-        } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
-            notify(errorMessage, "error");
+        if (!formData.price || formData.price <= 0) {
+            notify('Le prix doit être supérieur à 0', 'error');
+            return;
+        }
+        if (!formData.levelRepair) {
+            notify('Veuillez sélectionner un niveau de réparation', 'error');
+            return;
         }
 
+        const payload = {
+            price: formData.price,
+            modelId: formData.model || undefined,
+            allPartId: formData.allPart || undefined,
+            laborCharge: formData.levelRepair,
+        };
+
+        try {
+            await dispatch(AddOnePartPrice(payload as any)).unwrap();
+            setOpen(false);
+            dispatch(getAllPartPrice());
+            notify('Ajouté avec succès !', 'success');
+            setFormData({ price: 0, model: 0, allPart: 0, levelRepair: 0 });
+        } catch (err: any) {
+            const msg = typeof err === 'string' ? err : err?.message || 'Erreur inconnue';
+            notify(msg, 'error');
+        }
     };
     return (
         <React.Fragment>

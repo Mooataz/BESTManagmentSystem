@@ -1,12 +1,8 @@
-import axios from 'axios';
+﻿import { API } from '../../../services/api';
  import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { AsyncThunkConfig, Distributor } from '../../Types/repairTypes';
 import type { UpdateDistributerPayload } from '../../../pages/Administration/Distributeurs/UpdateDistributer';
  
-const API = axios.create({
-  baseURL: 'http://localhost:3000/',
-  withCredentials: true, // utile si tu envoies des cookies / tokens
-});
 
 
   export const getDistributers = createAsyncThunk< 

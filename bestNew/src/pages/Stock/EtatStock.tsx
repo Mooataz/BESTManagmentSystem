@@ -1,3 +1,4 @@
+﻿import { API } from '../../services/api';
  
 import React, { useState, useMemo, useCallback } from 'react';
 import {
@@ -149,13 +150,8 @@ export default function EtatStock() {
   const handlePrintTickets = useCallback(async () => {
     if (!selectedIds.length) return;
     try {
-      const res = await fetch('http://localhost:3000/stock-parts/tickets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ids: selectedIds }),
-      });
-      if (!res.ok) throw new Error('Failed to generate tickets');
-      const blob = await res.blob();
+      const res = await API.post('/stock-parts/tickets', { ids: selectedIds }, { responseType: 'blob' });
+      const blob = new Blob([res.data], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       window.open(url, '_blank');
       setTimeout(() => URL.revokeObjectURL(url), 60000);

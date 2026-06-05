@@ -1,3 +1,4 @@
+﻿import { API } from '../../services/api';
 import React, { useEffect, useMemo, useState } from 'react'
 import DynamicTable from '../../Componants/Global/TableComponat';
 import { useSelector } from 'react-redux';
@@ -5,7 +6,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import type { RootState } from '../../Redux/store';
 import { useAppDispatch } from '../../Redux/hooks';
 import { DeleteRepairFile, getByUserStep, getOneRepair, UpdateOneRepair, UpdatePartFileRepair } from '../../Redux/Actions/Reception/repairAction';
-import { Box, Button, Card, Divider, IconButton, Input, MenuItem, Select, Table, TableCell, TableRow, Typography, type SelectChangeEvent } from '@mui/material';
+import { Box, Button, Card, Divider, IconButton, Input, MenuItem, Paper, Select, Table, TableCell, TableRow, Typography, type SelectChangeEvent } from '@mui/material';
 import ShowHeadRepair from './ShowHeadRepair';
 import { CustomAutocomplete } from '../../Componants/Global/CustomAutocomplete';
 import { getAllExpertiseRaisons } from '../../Redux/Actions/Administration/RaisonsExpertiseActions';
@@ -113,6 +114,29 @@ export default function RepairedRepair() {
       .filter((e: any) => e.state === 'Confirmer')
       .map((e: any) => Number(e.idPartRepair));
   }, [oneRepair?.approveStock]);
+
+  const actionName = useMemo(() => {
+    const ids = formRepair?.repairAction ?? [];
+    if (!ids.length) return '';
+    const action = repairActions.find((a: any) => a.id === ids[0]);
+    return action?.name ?? '';
+  }, [formRepair?.repairAction, repairActions]);
+
+  const showPrice = useMemo(() => {
+    return actionName === 'Devis' || (actionName === 'Réparation' && formRepair?.warrenty === false);
+  }, [actionName, formRepair?.warrenty]);
+
+  const [priceDetails, setPriceDetails] = useState<any>(null);
+  const [loadingPrice, setLoadingPrice] = useState(false);
+
+  useEffect(() => {
+    if (!showPrice || !oneRepair?.id) { setPriceDetails(null); return; }
+    setLoadingPrice(true);
+    API.get(`repair/price-details/${oneRepair.id}`)
+      .then(r => setPriceDetails(r.data.data))
+      .catch(() => setPriceDetails(null))
+      .finally(() => setLoadingPrice(false));
+  }, [showPrice, oneRepair?.id]);
 
   const approveStockRows = (() => {
     if (!Array.isArray(oneRepair?.approveStock)) return [];
@@ -507,6 +531,42 @@ const [saving, setSaving] = useState(false);
             columnsToShow={['garantie', 'device.model.brand.name', 'device.model.name', 'piece', 'etat', 'date']}
           />
         </Box>
+
+        {showPrice && priceDetails && (
+          <Box sx={{ p: 2 }}>
+            <Typography sx={{ fontWeight: 'bold', mb: 1, color: theme.palette.primary.main }}>Détail des prix</Typography>
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              {priceDetails.parts?.length > 0 && (
+                <Table size="small" sx={{ mb: 1 }}>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 600 }}>Pièce</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }} align="right">Prix HT</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }} align="right">Main-d'œuvre</TableCell>
+                  </TableRow>
+                  {priceDetails.parts.map((p: any, i: number) => (
+                    <TableRow key={i}>
+                      <TableCell>{p.partName}</TableCell>
+                      <TableCell align="right">{p.price.toFixed(3)} DT</TableCell>
+                      <TableCell align="right">{p.levelRepairPrice > 0 ? `${p.levelRepairPrice.toFixed(3)} DT` : '-'}</TableCell>
+                    </TableRow>
+                  ))}
+                </Table>
+              )}
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.5 }}>
+                <Typography variant="body2">Total pièces: {priceDetails.partsTotal.toFixed(3)} DT</Typography>
+                {priceDetails.levelRepairPrice > 0 && (
+                  <Typography variant="body2">Main-d'œuvre: {priceDetails.levelRepairPrice.toFixed(3)} DT</Typography>
+                )}
+                <Typography variant="body2">Total HT: {priceDetails.totalHT.toFixed(3)} DT</Typography>
+                <Typography variant="body2">TVA ({priceDetails.tva}%): {priceDetails.tvaAmount.toFixed(3)} DT</Typography>
+                <Typography variant="body2">Timbre fiscale: {priceDetails.timbreFiscale.toFixed(3)} DT</Typography>
+                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
+                  Total TTC: {priceDetails.totalTTC.toFixed(3)} DT
+                </Typography>
+              </Box>
+            </Paper>
+          </Box>
+        )}
 
         <Divider />
 

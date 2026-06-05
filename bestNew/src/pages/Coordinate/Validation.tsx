@@ -1,3 +1,4 @@
+﻿import { API } from '../../services/api';
 import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, IconButton } from '@mui/material'
 import React, { useState } from 'react'
 import theme from '../../Theme/theme'
@@ -63,14 +64,8 @@ export default function Validation() {
       const modelId = row.device?.model?.id;
       if (modelId) {
         try {
-          const token = localStorage.getItem('token');
-          const res = await fetch(`http://localhost:3000/parts-price/devis-info`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-            body: JSON.stringify({ modelId, partIds: row.partsNeed }),
-          });
-          const json = await res.json();
-          const parts = json?.data?.parts ?? [];
+          const res = await API.post('/parts-price/devis-info', { modelId, partIds: row.partsNeed });
+          const parts = res?.data?.parts ?? [];
           if (parts.length < row.partsNeed.length) {
             notify('Certaines pièces du devis n\'ont pas de prix configuré. Veuillez les renseigner avant validation.', 'error');
             return;

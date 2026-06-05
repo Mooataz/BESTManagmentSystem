@@ -74,6 +74,27 @@ export class ApproveStockController {
   }
   }
 
+  @Get('/findByBranchForSale/:branchId')
+  async getByBranchForSale(@Param('branchId') branchId: number, @Res() res: any) {
+    try {
+      const allfind = await this.approveStockService.findByBranchIdForSale(branchId)
+      return res.status(HttpStatus.OK).json({
+        message: "Sale approvals found",
+        status: HttpStatus.OK,
+        data: allfind
+      })
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        })
+      }
+      throw error
+    }
+  }
+
   @Get('/findByBranch/:branchId')
   async getByBranchId(@Param('branchId') branchId: number,
                       @Res() res: any) {

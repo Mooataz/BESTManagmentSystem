@@ -1,3 +1,4 @@
+﻿import { API } from '../../services/api';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../Redux/store';
@@ -14,12 +15,7 @@ import type { FormAllParts } from '../../Redux/Types/administrationTypes';
 import { Autocomplete, Box, Button, Card, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, FormControlLabel, MenuItem, Radio, RadioGroup, Select, TextField, Typography } from '@mui/material';
 import { useNotification } from '../../Componants/NotificationContext';
 import DynamicTable from '../../Componants/Global/TableComponat';
-import axios from 'axios';
 
-const API = axios.create({
-  baseURL: 'http://localhost:3000/',
-  withCredentials: true,
-});
 
 export default function ApproveParts() {
   const dispatch = useAppDispatch();

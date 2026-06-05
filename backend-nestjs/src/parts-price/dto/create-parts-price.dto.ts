@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsNumber, IsPositive } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsPositive } from "class-validator";
 
 export class CreatePartsPriceDto {
     @ApiProperty({
@@ -12,10 +12,12 @@ export class CreatePartsPriceDto {
     price!: number;
 
     @ApiProperty({ type: Number, description: 'ID of the associated model' })
+    @IsOptional()
     @IsNumber()
     modelId?: number;
 
     @ApiProperty({ type: Number, description: 'ID of the associated allPart' })
+    @IsOptional()
     @IsNumber()
     allPartId?: number;
 

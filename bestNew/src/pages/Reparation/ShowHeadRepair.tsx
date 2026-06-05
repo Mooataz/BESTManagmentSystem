@@ -3,12 +3,27 @@ import { useAppDispatch } from '../../Redux/hooks';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../Redux/store';
 import { getOneRepair } from '../../Redux/Actions/Reception/repairAction';
-import { Box, Divider, Table, TableCell, TableRow } from '@mui/material';
+import { Box, Divider, Stack } from '@mui/material';
 import ShowStepper from '../../Componants/Global/ShowStepper';
-import { TbBackground } from 'react-icons/tb';
+
 interface ShowHeadRepairProps {
     idRep: string;
 }
+
+const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null;
+
+const Item = ({ label, children }: { label: string; children: React.ReactNode }) => (
+    <Box sx={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '4px 12px', fontSize: 12 }}>
+        <Box sx={{ color: 'text.secondary', whiteSpace: 'nowrap' }}>{label}&nbsp;:</Box>
+        <Box>{children}</Box>
+    </Box>
+);
+
+const ListSection = ({ items }: { items: { name: string }[] }) => (
+    <Box component="ul" sx={{ m: 0, pl: 2.5 }}>
+        {items.map((item, i) => <Box component="li" key={i}>{item.name}</Box>)}
+    </Box>
+);
 
 export default function ShowHeadRepair({ idRep }: ShowHeadRepairProps) {
     const dispatch = useAppDispatch();
@@ -20,165 +35,55 @@ export default function ShowHeadRepair({ idRep }: ShowHeadRepairProps) {
     }, [dispatch, idRep]);
 
     const model = (oneRepair?.device as any)?.model;
-const brand = model?.brand;
+    const brand = model?.brand;
+    const fmtDate = (d: string) => d ? new Date(d).toLocaleDateString('fr-FR') : '-';
+    const customer = isObj(oneRepair?.customer) ? oneRepair.customer : null;
+    const device = isObj(oneRepair?.device) ? oneRepair.device as Record<string, unknown> : null;
+
     return (
         <Box>
-            Rèparation n° {idRep}
-            <br /> <br />
-
+            Réparation n° {idRep}
+            <br /><br />
             {oneRepair ? <ShowStepper rows={oneRepair.historyRepair || []} /> : '_'}
-            <Divider ></Divider>< br />< br />
-            <Box sx={{ display: 'flex' }}>
-                <Box key='Customer'>
-                    {typeof oneRepair?.customer === 'object' && oneRepair.customer !== null
-                        ? (
-                            <Table >
-                                <TableRow  >
-                                    <TableCell sx={linesTable}>Code client</TableCell>
-                                    <TableCell sx={linesTable2}>{oneRepair.customer.id}</TableCell>
-                                </TableRow>
-
-                                <TableRow   >
-                                    <TableCell sx={linesTable}>Nom</TableCell>
-                                    <TableCell sx={linesTable2}>  {oneRepair.customer.name} </TableCell>
-                                </TableRow>
-
-                                <TableRow  >
-                                    <TableCell sx={linesTable}>Tèlèphone</TableCell>
-                                    <TableCell sx={linesTable2}>  {oneRepair.customer.phone} </TableCell>
-                                </TableRow>
-                                {typeof oneRepair?.customer.distributer === 'object' && oneRepair.customer.distributer !== null
-                                    ? (
-                                        <TableRow >
-                                            <TableCell sx={linesTable}>Distributeur</TableCell>
-                                            <TableCell sx={linesTable2}>  {oneRepair.customer.distributer.name} </TableCell>
-                                        </TableRow>
-                                    ) : '-'}
-                            </Table>
-                        )
-                        : '-'}
-
+            <Divider sx={{ my: 2 }} />
+            <Stack direction="row" divider={<Divider orientation="vertical" flexItem />} spacing={2} flexWrap="wrap" useFlexGap>
+                {customer ? (
+                    <Box>
+                        <Item label="Code client">{customer.id as string}</Item>
+                        <Item label="Nom">{customer.name as string}</Item>
+                        <Item label="Téléphone">{customer.phone as string}</Item>
+                        {isObj(customer.distributer) && (
+                            <Item label="Distributeur">{(customer.distributer as Record<string, unknown>).name as string}</Item>
+                        )}
+                    </Box>
+                ) : <Box sx={{ color: '#FF7043', fontSize: 12 }}>Aucun client</Box>}
+                {device ? (
+                    <Box>
+                        <Item label="Code appareil">{device.id as string}</Item>
+                        <Item label="Imei">{device.serialenumber as string}</Item>
+                        <Item label="Date d'achat">{fmtDate(device.purchaseDate as string)}</Item>
+                        <Item label="Modèle">{brand?.name ?? '-'} - {model?.name ?? '-'}</Item>
+                    </Box>
+                ) : <Box sx={{ color: '#FF7043', fontSize: 12 }}>Aucun appareil</Box>}
+                <Box>
+                    <Item label="Type de modèle">{model?.typeModel?.description ?? '-'}</Item>
+                    <Item label="Etat">{oneRepair?.deviceStateReceive ?? '-'}</Item>
+                    <Item label="Accessoire">
+                        {oneRepair?.accessory?.length ? <ListSection items={oneRepair.accessory} /> : <Box sx={{ color: '#FF7043' }}>Pas d'accessoires</Box>}
+                    </Item>
                 </Box>
-                <Divider orientation="vertical" flexItem />
-                <Box key='Device'>
-                    {typeof oneRepair?.device === 'object' && oneRepair.device !== null
-                        ? (
-                            <Table sx={{ marginLeft: '20px' }}>
-                                <TableRow>
-                                    <TableCell sx={linesTable}>Code appareille</TableCell>
-                                    <TableCell sx={linesTable2}>  {(oneRepair.device as any).id} </TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell sx={linesTable}>Imei</TableCell>
-                                    <TableCell sx={linesTable2}>{(oneRepair.device as any).serialenumber}</TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell sx={linesTable}>Date d'achat</TableCell>
-                                    <TableCell sx={linesTable2} >
-                                        {new Date((oneRepair.device as any).purchaseDate).toISOString().split('T')[0]}
-
-                                    </TableCell>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell sx={linesTable}>Modèle</TableCell>
-
-                                    <TableCell sx={linesTable2}>
-
-                                        {brand?.name ?? '-'} - {model?.name ?? '-'}
-                                    </TableCell>
-
-                                </TableRow>
-                            </Table>
-
-                        ) : '-'}
+                <Box>
+                    <Item label="Problèmes">
+                        {oneRepair?.listFault?.length ? <ListSection items={oneRepair.listFault} /> : '-'}
+                    </Item>
                 </Box>
-                <Divider orientation="vertical" flexItem />
-                <Box key='State Accessory'>
-                    <Table>
-                        <TableRow>
-                            <TableCell sx={linesTable}>Type de modèle</TableCell>
-                            <TableCell sx={linesTable2}>
-                                {model?.typeModel.description ?? '-'}
-                            </TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell sx={linesTable}>Etat</TableCell>
-                            <TableCell sx={linesTable2}>{oneRepair?.deviceStateReceive} </TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell sx={linesTable}>Accessoire</TableCell>
-                            <TableCell sx={linesTable2}>
-                                {
-                                    oneRepair?.accessory && oneRepair?.accessory.length > 0 ? (
-                                        oneRepair?.accessory.map((item, index) => (
-                                            <li key={index}>{item.name}</li>
-                                        ))
-                                    ) : (
-                                        <Box sx={{ color: '#FF7043' }}>Pas d'accessories</Box>
-                                    )
-                                }
-                            </TableCell>
-                        </TableRow>
-                    </Table>
-
+                <Box>
+                    <Item label="Demande client">
+                        {oneRepair?.customerRequest?.length ? <ListSection items={oneRepair.customerRequest} /> : <Box sx={{ color: '#FF7043' }}>Pas de demande</Box>}
+                    </Item>
                 </Box>
-                <Divider orientation="vertical" flexItem />
-                <Box key='Problems'>
-                    <Table>
-                        <TableRow>
-                            <TableCell sx={linesTable}>Problèmes</TableCell>
-                            <TableCell sx={linesTable2} >
-                                {
-                                    oneRepair?.listFault && oneRepair?.listFault.length > 0 ? (
-                                        oneRepair?.listFault.map((item, index) => (
-                                            <li key={index}>{item.name}</li>
-                                        ))
-                                    ) : (
-                                        <Box sx={{ color: '#FF7043' }}>_</Box>
-                                    )
-                                }
-                            </TableCell>
-                        </TableRow>
-                    </Table>
-
-                </Box>
-                <Divider orientation="vertical" flexItem />
-                <Box key='Request'>
-                    <Table>
-                        <TableRow>
-                            <TableCell sx={linesTable}>Demande client</TableCell>
-                            <TableCell sx={linesTable2}>
-                               {
-  Array.isArray(oneRepair?.customerRequest) && oneRepair.customerRequest.length > 0 ? (
-    oneRepair.customerRequest.map((item, index) => (
-      <li key={index}>{item.name}</li>
-    ))
-  ) : (
-    <Box sx={{ color: '#FF7043' }}>Pas de demande</Box>
-  )
-}
-
-                            </TableCell>
-                        </TableRow>
-                    </Table>
-
-                </Box>
-
-            </Box>
+            </Stack>
             <br />
         </Box>
     )
-}
-
-const linesTable = {
-    lineHeight: '0.9',
-    padding: '4px 8px',
-    fontSize: '12px',
-    background: '#EEEEEE'
-}
-const linesTable2 = {
-    lineHeight: '0.9',
-    padding: '4px 8px',
-    fontSize: '12px',
-
 }

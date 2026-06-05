@@ -10,6 +10,13 @@ import { Company } from 'src/company/entities/company.entity';
 import { Legislation } from 'src/legislation/entities/legislation.entity';
 import { Branch } from 'src/branches/entities/branch.entity';
 
+type PDFSectionConfig = {
+  showLegislation?: boolean;
+  showPreviousRepairs?: boolean;
+  showCompanyHeader?: boolean;
+  showSignature?: boolean;
+};
+
 @Injectable()
 export class PdfService {
   constructor(
@@ -66,8 +73,9 @@ export class PdfService {
 
     const pageWidth = doc.page.width - 30;
     const ml = 15;
-    const fsN = 7;
-    const fsS = 6.5;
+    const fsN = 6.5;
+    const fsS = 5.5;
+    const gap = 5;
 
     const tryImage = (filePath: string, x: number, y: number, w: number) => {
       try {
@@ -76,192 +84,200 @@ export class PdfService {
       return false;
     };
 
-    const drawSection = (y0: number, isSociete: boolean, title: string): number => {
-      let y = y0;
+    const drawTextLine = (text: string, x: number, y: number, opts?: { bold?: boolean; color?: string; size?: number; w?: number }) => {
+      doc.font(opts?.bold ? 'Helvetica-Bold' : 'Helvetica')
+        .fontSize(opts?.size ?? fsN)
+        .fillColor(opts?.color ?? 'black')
+        .text(text, x, y, opts?.w ? { width: opts.w } : undefined);
+    };
 
-      // Title
-      doc.fontSize(9).font('Helvetica-Bold').fillColor('#135188')
-        .text(title, ml, y, { width: pageWidth, align: 'center' });
-      y += 12;
-
-      // Logos: company left, brand right
-      const logoSize = 30;
-      if (company?.logo) {
-        const p = path.join(__dirname, '..', '..', 'upload', 'company', company.logo);
-        tryImage(p, ml, y, logoSize);
-      }
-      if (brand?.logo) {
-        const p = path.join(__dirname, '..', '..', 'upload', 'brands', brand.logo);
-        tryImage(p, ml + pageWidth - logoSize, y, logoSize);
-      }
-      y += logoSize + 6;
-
-      // Combined info box with 3 columns
+    const drawSharedHeader = (y: number): number => {
       const bx = ml;
       const by = y;
       const bw = pageWidth;
-      const colW = (bw - 10) / 3;
-      const c1x = bx + 5;
-      const c2x = bx + 5 + colW + 5;
-      const c3x = bx + 5 + 2 * (colW + 5);
+      const colW = (bw - gap * 2) / 3;
+      const pad = 4;
+      const lh = 6.5;
 
-      // Column 1: Repair info
-      let c1y = by + 5;
-      doc.fontSize(fsN).font('Helvetica-Bold').text('Réparation:', c1x, c1y);
-      c1y += 9;
-      doc.font('Helvetica');
-      [
-        `N°: ${repair.id}`,
-        `Date: ${safeDateTime(firstHistory?.date)}`,
-        `Étape: ${firstHistory?.step ?? '-'}`,
-        `Technicien: ${firstTrace?.user?.name ?? '-'}`,
-        `Agence: ${branch?.name ?? '-'}`,
-        `Tél agence: ${branch?.phone?.toString() ?? '-'}`,
-      ].forEach(t => { doc.text(t, c1x + 3, c1y); c1y += 7; });
+      const cols: [string, string[]][] = [
+        ['Réparation:', [
+          `N°: ${repair.id}`,
+          `Date: ${safeDateTime(firstHistory?.date)}`,
+          `Étape: ${firstHistory?.step ?? '-'}`,
+          `Tech: ${firstTrace?.user?.name ?? '-'}`,
+          `Agence: ${branch?.name ?? '-'}`,
+        ]],
+        ['Appareil:', [
+          `S/N: ${repair.device?.serialenumber ?? '-'}`,
+          `${brand?.name ?? '-'} ${model?.name ?? '-'}`,
+          `Type: ${model?.typeModel?.description ?? '-'}`,
+          `État: ${repair.deviceStateReceive ?? '-'}`,
+        ]],
+        ['Client:', [
+          `Nom: ${customer?.name ?? '-'}`,
+          `Tél: ${customer?.phone?.toString() ?? '-'}`,
+          `Dist: ${distributer?.name ?? '-'}`,
+        ]],
+      ];
 
-      // Column 2: Device info
-      let c2y = by + 5;
-      doc.font('Helvetica-Bold').text('Appareil:', c2x, c2y);
-      c2y += 9;
-      doc.font('Helvetica');
-      [
-        `N° série: ${repair.device?.serialenumber ?? '-'}`,
-        `Marque: ${brand?.name ?? '-'}`,
-        `Modèle: ${model?.name ?? '-'}`,
-        `Type: ${model?.typeModel?.description ?? '-'}`,
-        `État reçu: ${repair.deviceStateReceive ?? '-'}`,
-      ].forEach(t => { doc.text(t, c2x + 3, c2y); c2y += 7; });
+      let maxY = by;
+      cols.forEach(([title, items], ci) => {
+        const cx = bx + pad + ci * (colW + gap);
+        doc.font('Helvetica-Bold').fontSize(fsN).fillColor('#135188').text(title, cx, by + pad);
+        let iy = by + pad + 8;
+        doc.font('Helvetica').fontSize(fsN).fillColor('black');
+        items.forEach(t => { doc.text(t, cx + 2, iy); iy += lh; });
+        maxY = Math.max(maxY, iy);
+      });
 
-      // Column 3: Customer info
-      let c3y = by + 5;
-      doc.font('Helvetica-Bold').text('Client:', c3x, c3y);
-      c3y += 9;
-      doc.font('Helvetica');
-      [
-        `Nom: ${customer?.name ?? '-'}`,
-        `Tél: ${customer?.phone?.toString() ?? '-'}`,
-        `Distributeur: ${distributer?.name ?? '-'}`,
-      ].forEach(t => { doc.text(t, c3x + 3, c3y); c3y += 7; });
+      const boxH = maxY - by + pad;
+      doc.rect(bx, by, bw, boxH).stroke();
+      y = by + boxH + gap;
 
-      const boxEnd = Math.max(c1y, c2y, c3y, by + 50);
-      doc.rect(bx, by, bw, boxEnd - by).stroke();
-      y = boxEnd + 4;
+      const drawInlineField = (label: string, value: string) => {
+        doc.font('Helvetica-Bold').fontSize(fsN).fillColor('black').text(`${label}: `, bx + pad, y, { continued: true });
+        doc.font('Helvetica').text(value || '-', { width: bw - 20 });
+        y += lh + 1;
+      };
 
-      // Accessories
-      doc.fontSize(fsN).font('Helvetica-Bold').text('Accessoires:', bx + 5, y);
-      doc.font('Helvetica');
-      const acc = repair.accessory?.length ? repair.accessory.map(a => a.name).join(', ') : 'Aucun';
-      doc.text(acc, bx + 62, y, { width: pageWidth - 80 });
-      y += 10;
+      drawInlineField('Accessoires', repair.accessory?.length ? repair.accessory.map(a => a.name).join(', ') : 'Aucun');
+      drawInlineField('Pannes', repair.listFault?.length ? repair.listFault.map(f => f.name).join(', ') : 'Aucune');
+      drawInlineField('Demande client', repair.customerRequest?.length ? repair.customerRequest.map(r => r.name).join(', ') : 'Aucune');
 
-      // Faults
-      doc.font('Helvetica-Bold').text('Pannes:', bx + 5, y);
-      doc.font('Helvetica');
-      const flt = repair.listFault?.length ? repair.listFault.map(f => f.name).join(', ') : 'Aucune';
-      doc.text(flt, bx + 42, y, { width: pageWidth - 60 });
-      y += 10;
+      return y + 2;
+    };
 
-      // Customer requests
-      doc.font('Helvetica-Bold').text('Demandes client:', bx + 5, y);
-      doc.font('Helvetica');
-      const req = repair.customerRequest?.length ? repair.customerRequest.map(r => r.name).join(', ') : 'Aucune';
-      doc.text(req, bx + 82, y, { width: pageWidth - 100 });
-      y += 10;
+    const drawSection = (y0: number, cfg: PDFSectionConfig): number => {
+      let y = y0;
+      if (cfg.showCompanyHeader) {
+        y = drawCompanyHeader(y) + 2;
+      }
+      y = drawSharedHeader(y);
+      const bx = ml;
+      const bw = pageWidth;
 
-      // Section-specific content
-      if (isSociete && filteredPrevious.length > 0) {
-        y += 2;
-        doc.font('Helvetica-Bold').fontSize(fsN).fillColor('#135188')
-          .text('Réparations antérieures:', bx + 5, y);
-        y += 8;
-        doc.font('Helvetica').fillColor('black').fontSize(fsS);
+      if (cfg.showPreviousRepairs && filteredPrevious.length > 0) {
+        y += 1;
+        drawTextLine('Réparations antérieures:', bx + gap, y, { bold: true, color: '#135188', size: fsN });
+        y += 7;
+        doc.font('Helvetica').fontSize(fsS).fillColor('black');
         filteredPrevious.slice(0, 5).forEach((prev, i) => {
           const ph = prev.historyRepair?.[0];
           const pt = ph?.tracability?.[0];
-          doc.text(
-            `${i + 1}. N°${prev.id} - ${safeDateTime(ph?.date)} - ${ph?.step ?? '-'} (${pt?.user?.name ?? '-'})`,
-            bx + 10, y
-          );
-          y += 7;
+          doc.text(`${i + 1}. N°${prev.id} - ${safeDateTime(ph?.date)} - ${ph?.step ?? '-'} (${pt?.user?.name ?? '-'})`, bx + gap + 4, y);
+          y += 6.5;
         });
-        y += 2;
+        y += 1;
       }
 
-      if (!isSociete) {
-        y += 2;
-        doc.font('Helvetica-Bold').fontSize(fsN).fillColor('#135188')
-          .text('Législations:', bx + 5, y);
-        y += 8;
-        doc.font('Helvetica').fillColor('black').fontSize(fsS);
-        const nCol = 3;
-        const cw = (bw - 30) / nCol;
+      if (cfg.showLegislation) {
+        y += 1;
+        drawTextLine('Législations:', bx + gap, y, { bold: true, color: '#135188', size: fsN });
+        y += 7;
+        doc.font('Helvetica').fontSize(fsS).fillColor('black');
+        const nCol = 2;
+        const cw = (bw - gap * 3) / nCol;
         const legRows = Math.ceil(legislations.length / nCol);
-        legislations.forEach((leg, i) => {
-          const col = i % nCol;
-          const row = Math.floor(i / nCol);
-          doc.text(`☐ ${leg.name}`, bx + 10 + col * cw, y + row * 7, { width: cw - 5 });
-        });
-        y += legRows * 7 + 6;
+        for (let r = 0; r < legRows; r++) {
+          let rowH = 8;
+          for (let c = 0; c < nCol; c++) {
+            const idx = r * nCol + c;
+            if (idx >= legislations.length) break;
+            const lx = bx + gap + c * (cw + gap);
+            doc.text(`☐ ${legislations[idx].name}`, lx, y, { width: cw });
+            const h = doc.heightOfString(`☐ ${legislations[idx].name}`, { width: cw });
+            if (h > rowH) rowH = h;
+          }
+          y += rowH;
+        }
+        y += gap;
 
-        doc.font('Helvetica-Bold').fontSize(fsN).fillColor('#135188')
-          .text('Société / Agence:', bx + 5, y);
-        y += 8;
-        doc.font('Helvetica').fillColor('black').fontSize(fsS);
-        [
-          `Société: ${company?.name ?? '-'}`,
-          `Adresse: ${company?.headquarterslocation ?? '-'}`,
-          `N° fiscal: ${company?.taxRegisterNumber ?? '-'}`,
-          `RIB: ${company?.rib?.toString() ?? '-'}`,
-          `Banque: ${company?.bank ?? '-'}`,
-          `Agence: ${branch?.name ?? '-'}`,
-        ].forEach(t => { doc.text(t, bx + 10, y); y += 7; });
-        y += 3;
+        drawTextLine('Agence:', bx + gap, y, { bold: true, color: '#135188', size: fsN });
+        y += 7;
+        doc.font('Helvetica').fontSize(fsS).fillColor('black');
+        doc.text(`Agence: ${branch?.name ?? '-'}`, bx + gap + 4, y); y += 6.5;
+        doc.text(`Tél: ${branch?.phone?.toString() ?? '-'}`, bx + gap + 4, y); y += 6.5;
+        y += gap;
+      }
 
-        doc.fontSize(fsS).font('Helvetica')
-          .text('Signature client:', bx + 5, y);
-        doc.moveTo(bx + 65, y + 3).lineTo(bx + 180, y + 3).stroke();
-        y += 10;
+      if (cfg.showSignature) {
+        doc.font('Helvetica').fontSize(fsS).text('Signature client:', bx + gap, y);
+        doc.moveTo(bx + 60, y + 2).lineTo(bx + 150, y + 2).stroke();
+        y += 9;
       }
 
       return y;
     };
 
-    const endY1 = drawSection(15, false, 'COPIE CLIENT');
-    const sepY = endY1 + 4;
-    doc.moveTo(ml, sepY).lineTo(ml + pageWidth, sepY).stroke('#CCCCCC');
-    drawSection(sepY + 4, true, 'COPIE SOCIÉTÉ');
+    const drawCompanyHeader = (y: number): number => {
+      const bx = ml;
+      const bw = pageWidth;
+      const pad = 5;
+      const lh = 7;
+      const logoSize = 64;
+      const logoPad = 4;
 
-    doc.fontSize(6).fillColor('gray')
-      .text(
-        `Généré le ${new Date().toLocaleString('fr-FR')}`,
-        ml, doc.page.height - 16,
-        { align: 'right' },
-      );
+      const hasLogo = company?.logo && fs.existsSync(path.join(__dirname, '..', '..', 'upload', 'company', company.logo));
+      const hasBrandLogo = brand?.logo && fs.existsSync(path.join(__dirname, '..', '..', 'upload', 'brands', brand.logo));
+
+      const logoAreaH = hasLogo || hasBrandLogo ? pad + logoPad + logoSize + pad : 0;
+      const fieldAreaH = 22;
+      const headerH = logoAreaH + fieldAreaH + pad;
+
+      doc.rect(bx, y, bw, headerH).stroke('#135188');
+
+      const logoY = y + pad + logoPad;
+      if (hasLogo) {
+        tryImage(path.join(__dirname, '..', '..', 'upload', 'company', company.logo!), bx + pad + 2, logoY, logoSize);
+      }
+      if (hasBrandLogo) {
+        tryImage(path.join(__dirname, '..', '..', 'upload', 'brands', brand.logo!), bx + bw - logoSize - pad - 2, logoY, logoSize);
+      }
+
+      const titleX = bx + (hasLogo ? logoSize + pad * 2 + 6 : pad);
+      const titleW = bw - (hasLogo ? logoSize + pad * 2 + 6 : pad) - (hasBrandLogo ? logoSize + pad * 2 + 6 : pad);
+      doc.font('Helvetica-Bold').fontSize(11).fillColor('#135188')
+        .text(company?.name ?? 'Société', titleX, logoY + 6, { width: titleW, align: 'center' });
+
+      const fieldY = y + logoAreaH + pad;
+      doc.font('Helvetica').fontSize(6.5).fillColor('black');
+      const fields: [string, string | undefined][] = [
+        ['Adresse', company?.headquarterslocation],
+        ['N° fiscal', company?.taxRegisterNumber],
+        ['RIB', company?.rib?.toString()],
+        ['Banque', company?.bank],
+        ['Agence', branch?.name],
+      ];
+      const fieldColW = (bw - pad * 4) / 3;
+      fields.forEach(([label, value], i) => {
+        const col = i % 3;
+        const row = Math.floor(i / 3);
+        const cx = bx + pad + 4 + col * (fieldColW + 4);
+        const ry = fieldY + row * (lh + 1);
+        doc.font('Helvetica-Bold').text(`${label}: `, cx, ry, { continued: true });
+        doc.font('Helvetica').text(value ?? '-');
+      });
+
+      return y + headerH + 2;
+    };
+
+    let cy = 12;
+    cy = drawSection(cy, { showLegislation: true, showCompanyHeader: true, showSignature: true });
+    const sepY = cy + 2;
+    doc.moveTo(ml, sepY).lineTo(ml + pageWidth, sepY).stroke('#CCCCCC');
+    cy = drawSection(sepY + 4, { showPreviousRepairs: true, showCompanyHeader: true, showSignature: true });
+
+    const pRange = doc.bufferedPageRange();
+    const wasOnLastPage = pRange.count - 1;
+    if (pRange.count > 1) doc.switchToPage(0);
+    doc.fontSize(5.5).fillColor('gray')
+      .text(`Généré le ${new Date().toLocaleString('fr-FR')}`, ml, doc.page.height - 24, { align: 'right' });
+    if (pRange.count > 1) doc.switchToPage(wasOnLastPage);
 
     doc.end();
     return new Promise((resolve) =>
       doc.on('end', () => resolve(Buffer.concat(buffers))),
     );
-  }
-
-  private drawTwoColumnBox(
-    doc: typeof PDFDocument,
-    x: number,
-    y: number,
-    width: number,
-    title: string,
-    items: string[],
-  ) {
-    const colWidth = width / 2 - 10;
-    const lineHeight = 10;
-    doc.rect(x, y, width, 70).stroke();
-    doc.font('Helvetica-Bold').fontSize(8).text(title, x, y + 5, { width, align: 'center' });
-    doc.font('Helvetica').fontSize(7);
-    items.forEach((item, i) => {
-      const colX = i % 2 === 0 ? x + 5 : x + colWidth + 15;
-      const rowY = y + 20 + Math.floor(i / 2) * lineHeight;
-      doc.text(`• ${item}`, colX, rowY, { width: colWidth });
-    });
   }
 
   async generateStockReport(

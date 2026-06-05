@@ -6,9 +6,13 @@ import { Invoice } from './entities/invoice.entity';
 import { Repair } from 'src/repair/entities/repair.entity';
 import { User } from 'src/users/entities/user.entity';
 import { OtherCost } from 'src/other-cost/entities/other-cost.entity';
+import { PartsPrice } from 'src/parts-price/entities/parts-price.entity';
+import { LevelRepair } from 'src/level-repair/entities/level-repair.entity';
+import { AllPart } from 'src/all-parts/entities/all-part.entity';
+import { Company } from 'src/company/entities/company.entity';
 
 @Module({
-  imports : [TypeOrmModule.forFeature([Invoice, Repair, User, OtherCost])],
+  imports: [TypeOrmModule.forFeature([Invoice, Repair, User, OtherCost, PartsPrice, LevelRepair, AllPart, Company])],
   controllers: [InvoiceController],
   providers: [InvoiceService],
 })

@@ -3,46 +3,44 @@ import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
-import { Typography } from '@mui/material';
-import type { FormHistoryRepair, RepairForm, StateHistoryRepair } from '../../Redux/Types/repairTypes';
+import { Typography, Tooltip } from '@mui/material';
+import type { StateHistoryRepair } from '../../Redux/Types/repairTypes';
+
 type RepairFormState = {
-    rows: StateHistoryRepair[] 
-
+    rows: StateHistoryRepair[]
 }
+
 export default function ShowStepper({ rows }: RepairFormState) {
-     
+    if (!rows?.length) {
+        return <Typography color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>Aucun historique</Typography>;
+    }
+
+    const sorted = [...rows].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
     return (
-        <div>
-            <Box sx={{ width: '100%', display: 'flex' }}>
-                <Box>
-
-                    <Typography sx={{ marginTop: '30px' ,color:'gray' }}>Status</Typography>
-                    <Typography sx={{ color:'gray' }}> Date </Typography>
-                    <Typography sx={{ marginTop: '19px' ,color:'gray'}}>Par</Typography>
-                    <br />
-                    <br />
-
-                </Box>
-                <Stepper activeStep={rows.length} alternativeLabel>
-                    {rows.map((label: any) => (
-                        <Step key={`${label.step}-${label.date}`}>
+        <Box sx={{ width: '100%', overflowX: 'auto' }}>
+            <Stepper activeStep={sorted.length}>
+                {sorted.map((label, i) => {
+                    const user = label.tracability?.[0]?.user;
+                    return (
+                        <Step key={`${label.step}-${i}`}>
                             <StepLabel>
-                                <Typography>{label.step}</Typography>
-                                <Typography>
-                                    {new Date(label.date).toISOString().split('T')[0]} <br />
-                                    {new Date(label.date).toTimeString().split(' ')[0]}
-                                </Typography>
-
-                                <Typography>{label.tracability[0]?.user.name}</Typography>
+                                <Typography variant="body2" fontWeight={600}>{label.step}</Typography>
+                                <Tooltip title={new Date(label.date).toLocaleString('fr-FR')}>
+                                    <Typography variant="caption" color="text.secondary">
+                                        {new Date(label.date).toLocaleDateString('fr-FR')}
+                                    </Typography>
+                                </Tooltip>
+                                {user?.name && (
+                                    <Typography variant="caption" color="text.secondary" display="block">
+                                        {user.name}
+                                    </Typography>
+                                )}
                             </StepLabel>
-
                         </Step>
-                    ))}
-                </Stepper>
-
-
-                
-            </Box>
-        </div>
+                    );
+                })}
+            </Stepper>
+        </Box>
     )
 }

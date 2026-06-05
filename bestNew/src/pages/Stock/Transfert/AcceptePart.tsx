@@ -1,4 +1,4 @@
-import { Backdrop, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Fade, Input, Modal, Slide, Typography } from '@mui/material';
+﻿import { Backdrop, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Fade, Input, Modal, Slide, Typography } from '@mui/material';
 import type { TransitionProps } from '@mui/material/transitions';
 import React, { useEffect, useState } from 'react'
 import type { TransfertPR } from '../../../Redux/Types/Stock';
@@ -7,7 +7,6 @@ import { useNotification } from '../../../Componants/NotificationContext';
 import type { RootState } from '../../../Redux/store';
 import { useSelector } from 'react-redux';
 import { GetReceiveTransfert, UpdateOneTransfert } from '../../../Redux/Actions/stock/TransfertAction';
-import axios from 'axios';
 import { findByBranchType } from '../../../Redux/Actions/stock/Bin';
 import { CustomAutocomplete } from '../../../Componants/Global/CustomAutocomplete';
 import theme from '../../../Theme/theme';

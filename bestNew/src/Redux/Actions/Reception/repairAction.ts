@@ -1,13 +1,9 @@
+﻿import { API } from '../../../services/api';
 //repairAction.ts
-import axios from 'axios';
 import { store } from '../../store';
 import type { FormHistoryRepair, RepairForm, RepairFormInput, TypeForm, UploadRepairFilesPayload } from '../../Types/repairTypes'
 import type { AsyncThunkConfig, LoginCredentials } from '../../Types/authenTypes';
 import { createAsyncThunk } from '@reduxjs/toolkit';
-const API = axios.create({
-  baseURL: 'http://localhost:3000/',
-  withCredentials: true, // utile si tu envoies des cookies / tokens
-});
 interface GetByBranchStepParams {
   branch: number;
   step: string;

@@ -74,12 +74,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth','user','userr','repair','bin','references','models','allParts',
-              'company','agencies','customer', 'accessory', 'listfault','CustomerRequest',
-              'Employèes','Marques','stockParts','expertiseReasons','DemandeClient','NotesCustomer',
-              'LevelRepair','Transfert','OtherCost', 'TypeModel', 'device', 'PartPrice','RepairAction',
-              'OutputList'
-  ] // Seulement persister l'auth si nécessaire
+  whitelist: ['auth', 'user', 'company']
 }
 const persistedReducer = persistReducer(persistConfig,rootReducer)
 

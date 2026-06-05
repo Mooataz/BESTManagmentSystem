@@ -1,3 +1,4 @@
+﻿import { API } from '../../../services/api';
 import React, { useEffect, useState } from 'react'
 import { GetReceiveTransfert, UpdateOneTransfert } from '../../../Redux/Actions/stock/TransfertAction';
 import type { RootState } from '../../../Redux/store';
@@ -11,7 +12,6 @@ import theme from '../../../Theme/theme';
 import { BiShowAlt } from 'react-icons/bi';
 import type { TableAction } from '../../../Redux/Types/repairTypes';
 import { Button } from '@mui/material';
-import axios from 'axios';
 import AcceptePart from './AcceptePart';
 import { AddhistoryOnePart } from '../../../Redux/Actions/stock/EtatStockActions';
 
@@ -27,11 +27,7 @@ export default function EnAttente() {
     typeof branch === 'number' ? branch : branch?.id;
 
   const branchId = getBranchId(user?.branch);
-    const API = axios.create({
-        baseURL: 'http://localhost:3000/',
-        withCredentials: true,
-    });
-    const type = 'Pieces';
+        const type = 'Pieces';
     const state = 'Encours';
     const [transferts, setTransferts] = useState<TransfertPR[]>([]);
      const loadTransferts = async () => {

@@ -8,7 +8,7 @@ export class Invoice {
     @PrimaryGeneratedColumn()
     id! : number;
 
-    @Column()
+    @Column({ nullable: true })
     paymentMethod?: string;
 
     @Column()
@@ -17,8 +17,26 @@ export class Invoice {
     @Column()
     state!: string;
 
-    @Column()
+    @Column({ type: 'float', nullable: true })
     totalPrice?: number;
+
+    @Column({ type: 'float', nullable: true })
+    tva?: number;
+
+    @Column({ type: 'float', nullable: true })
+    timbreFiscale?: number;
+
+    @Column({ type: 'float', nullable: true })
+    partsTotal?: number;
+
+    @Column({ type: 'float', nullable: true })
+    levelRepairPrice?: number;
+
+    @Column({ type: 'float', nullable: true })
+    otherCostsTotal?: number;
+
+    @Column('jsonb', { nullable: true })
+    details?: object;
 
     @ManyToMany( () => OtherCost, (otherCost) => otherCost.invoice)
     @JoinTable()
@@ -30,4 +48,11 @@ export class Invoice {
 
     @ManyToOne( () => User, (user) => user.invoice)
     user!: User;
+
+    @ManyToOne(() => User, { nullable: true })
+    @JoinColumn({ name: 'validated_by' })
+    validatedBy?: User;
+
+    @Column({ type: 'timestamptz', nullable: true })
+    validatedAt?: Date;
 }

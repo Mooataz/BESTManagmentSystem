@@ -1,10 +1,10 @@
+﻿import { API } from '../../services/api';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../../Redux/hooks';
 import type { RootState } from '../../Redux/store';
 import { getModelsAuthorised, getOneModel } from '../../Redux/Actions/ModelAndAccessory/Models';
 import { findByBranchType } from '../../Redux/Actions/stock/Bin';
-import axios from 'axios';
 import {
   Autocomplete, Box, Button, Card, CircularProgress,
   Table, TableBody, TableCell, TableHead, TableRow,
@@ -12,10 +12,6 @@ import {
 } from '@mui/material';
 import { useNotification } from '../../Componants/NotificationContext';
 
-const API = axios.create({
-  baseURL: 'http://localhost:3000/',
-  withCredentials: true,
-});
 
 export default function Demantelement() {
   const dispatch = useAppDispatch();

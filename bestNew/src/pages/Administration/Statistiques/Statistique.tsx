@@ -1,5 +1,5 @@
+﻿import { API } from '../../../services/api';
 import React, { useEffect, useState, useCallback } from 'react'
-import axios from 'axios';
 import {
   Box, Card, CardContent, Chip, CircularProgress,
   Grid, TextField, Typography
@@ -44,7 +44,6 @@ interface StatsData {
   byTechnicianByBranch: TechnicianByBranch[];
 }
 
-const API = axios.create({ baseURL: 'http://localhost:3000/', withCredentials: true });
 
 const defaultStats: StatsData = { byWeek: [], byBranch: [], byTechnicianByBranch: [] };
 

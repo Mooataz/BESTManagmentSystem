@@ -1,3 +1,4 @@
+﻿import { API } from '../../services/api';
 import React, { useEffect, useMemo, useState } from 'react'
 import { Checkbox, FormControl, Grid, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, Typography } from '@mui/material';
 import theme from '../../Theme/theme';
@@ -13,8 +14,8 @@ export default function ViewPartsAvailablePrice() {
 
     useEffect(() => {
         if (!branchId) return;
-        fetch(`http://localhost:3000/parts-price/view-data?branchId=${branchId}`)
-            .then(r => r.json())
+        API.get(`/parts-price/view-data?branchId=${branchId}`)
+            .then(r => r.data)
             .then(res => setData((res.data ?? []).map((row: any) => ({
                 ...row,
                 stockDisplay: (row.stockCount ?? 0) > 0 ? 'Disponible' : 'Non disponible'

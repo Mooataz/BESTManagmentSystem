@@ -49,7 +49,8 @@ async findBySaleId(saleId: number): Promise<ApproveStock[]> {
   const findAll = await this.approveStockRepositry
             .createQueryBuilder('approveStock')
             .leftJoinAndSelect('approveStock.sale', 'sale')
-            .where('sale.id = :saleId', { saleId }) // Filtre sur l'ID de repair
+            .leftJoinAndSelect('sale.allPart', 'allPart')
+            .where('sale.id = :saleId', { saleId })
             .getMany();
   if (!findAll || findAll.length === 0) {
         throw new NotFoundException("There is no data Available") }
@@ -71,6 +72,21 @@ async findByBranchId(branchId: number): Promise<ApproveStock[]> {
         throw new NotFoundException("There is no data Available") }
     return findAll
 } 
+
+async findByBranchIdForSale(branchId: number): Promise<ApproveStock[]> {
+  const findAll = await this.approveStockRepositry
+        .createQueryBuilder("approveStock")
+        .leftJoinAndSelect("approveStock.sale", "sale")
+        .leftJoinAndSelect("sale.allPart", "allPart")
+        .leftJoinAndSelect("sale.user", "user")
+        .leftJoinAndSelect("user.branch", "branch")
+        .where("branch.id = :branchId", { branchId })
+        .andWhere("approveStock.type = 'Vente'")
+        .getMany();
+  if (!findAll || findAll.length === 0) {
+        throw new NotFoundException("There is no data Available") }
+    return findAll
+}
 
 async findByType(types: string): Promise<ApproveStock[]> {
   const findAll =  await this.approveStockRepositry

@@ -134,27 +134,34 @@ try {
   
 }
   @Get()
-  async findAll(@Res() res: any) {
+  async findAll(
+    @Query('page') page: string = '',
+    @Query('limit') limit: string = '',
+    @Res() res: any
+  ) {
     try {
-      const allfind = await  this.repairService.findAll()
+      const pageNum = page ? parseInt(page, 10) : undefined;
+      const limitNum = limit ? parseInt(limit, 10) : undefined;
+      const result = await this.repairService.findAll(pageNum, limitNum);
       return res.status(HttpStatus.OK).json({
-        message:" founded Successfuly !",
-        status:HttpStatus.OK,
-        data:allfind
-      })
+        message: 'found Successfuly !',
+        status: HttpStatus.OK,
+        data: result.data,
+        total: result.total,
+        page: pageNum || 1,
+        limit: limitNum || result.total,
+      });
     } catch (error) {
-  if (error instanceof HttpException) {
-    return res.status(error.getStatus()).json({
-      message: error.message,
-      status: error.getStatus(),
-      data: null,
-    })
-  }
-
-  throw error
-}
-
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        });
+      }
+      throw error;
     }
+  }
    
 
   @UseGuards(BranchAccessGuard)
@@ -194,6 +201,27 @@ try {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         data: null,
       });
+    }
+  }
+
+  @Get('price-details/:id')
+  async getPriceDetails(@Param('id') id: number, @Res() res: any) {
+    try {
+      const details = await this.repairService.getPriceDetails(+id);
+      return res.status(HttpStatus.OK).json({
+        message: 'Price details found',
+        status: HttpStatus.OK,
+        data: details,
+      });
+    } catch (error) {
+      if (error instanceof HttpException) {
+        return res.status(error.getStatus()).json({
+          message: error.message,
+          status: error.getStatus(),
+          data: null,
+        });
+      }
+      throw error;
     }
   }
 

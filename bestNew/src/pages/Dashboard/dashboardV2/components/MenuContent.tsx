@@ -111,7 +111,6 @@ export default function MenuContent() {
         { label: 'Démantèlement', page: 'Démantèlement', icon: <RiPageSeparator /> },
       ]
     },
-
     {
       label: 'Reception',
       icon: <FcVoicePresentation />,
@@ -121,9 +120,9 @@ export default function MenuContent() {
         { label: 'Envoyeraffectation', page: 'EnvoyeAffectation', icon: <VscGitPullRequestGoToChanges /> },
         { label: 'ReciveQC', page: 'RecevoireQC', icon: <GrValidate /> },
         { label: 'Récupererproduit', page: 'RécupererProduit', icon: <BsPhone /> },
-        { label: 'Etatrécuperation', page: 'EtatRécupération', icon: <BsClipboardData /> },
-        { label: 'Factures', page: 'Factures', icon: <FcSalesPerformance /> },
-        { label: 'Vente', page: 'Vente', icon: <BsShop /> },
+        { label: 'Etatrécuperation', page: 'ListOutPut', icon: <BsClipboardData /> },
+        { label: 'Factures', page: 'Invoices', icon: <FcSalesPerformance /> },
+       
       ]
     },
 
@@ -156,6 +155,8 @@ export default function MenuContent() {
     {
       label: 'Consulterappareille', page: 'ConsulterAppareille', icon: <FcSearch />
     },
+          { label: 'Vente', page: 'Sales', icon: <BsShop /> },
+
   ];
 
   const handleToggle = (label: string) => {
@@ -168,12 +169,12 @@ export default function MenuContent() {
         let tempFiltered: MenuItem[] = [];
 
         if (userr?.role.includes('Reception')) {
-          tempFiltered = [menuItems[2], menuItems[4]];
+          tempFiltered = [menuItems[2], menuItems[4], menuItems[9]];
         }
 
         if (userr?.role.includes('Technicien')) { tempFiltered = [...tempFiltered, menuItems[5]] }
 
-        if (userr?.role.includes('Gestionnaire_de_stocks')) { tempFiltered = [...tempFiltered, menuItems[3]]; }
+        if (userr?.role.includes('Gestionnaire_de_stocks')) { tempFiltered = [...tempFiltered, menuItems[3], menuItems[9]]; }
 
         if (userr?.role.includes('Coordinateur')) { tempFiltered = [...tempFiltered, menuItems[6]] }
 

@@ -105,8 +105,8 @@ export class RepairService {
   }
 
 
-  async findAll(): Promise<Repair[]> {
-    const allfind = await this.repairRepositry.find({
+  async findAll(page?: number, limit?: number): Promise<{ data: Repair[]; total: number }> {
+    const [data, total] = await this.repairRepositry.findAndCount({
       relations: ['customer', 'customer.distributer',
         'device', 'device.model', 'device.model.brand', 'device.model.allpart', 'device.model.typeModel',
         'accessory',
@@ -120,13 +120,17 @@ export class RepairService {
         'outputList',
         'transfert',
         'invoice',
-        'historyRepair', 'historyRepair.tracability', 'historyRepair.tracability.user', 'historyRepair.tracability.user.branch', 'historyRepair.tracability.user.branch.company'], // 👈 ajoute les relations nécessaires ici
-    })
+        'historyRepair', 'historyRepair.tracability', 'historyRepair.tracability.user', 'historyRepair.tracability.user.branch', 'historyRepair.tracability.user.branch.company'],
+      skip: page && limit ? (page - 1) * limit : undefined,
+      take: limit,
+      order: { id: 'DESC' },
+    });
 
-    if (!allfind || allfind.length === 0) {
-      throw new NotFoundException('There is no data available')
+    if (!data || data.length === 0) {
+      throw new NotFoundException('There is no data available');
     }
-    return allfind;
+
+    return { data, total };
   }
 
   async findOne(id: number): Promise<Repair> {
@@ -471,6 +475,45 @@ if (updateRepairDto.partsNeed) {
     return await this.repairRepositry.save(repair);
   }
 
+  async getPriceDetails(id: number): Promise<any> {
+    const repair = await this.repairRepositry.findOne({
+      where: { id },
+      relations: ['device', 'device.model', 'repairAction'],
+    });
+    if (!repair) throw new NotFoundException('Repair not found');
+
+    const partIds: number[] = (repair.partsNeed ?? []).map(Number).filter(id => id > 0);
+    const modelId = (repair.device as any)?.model?.id;
+    let parts: any[] = [];
+    let levelRepairPrice = 0;
+
+    if (modelId && partIds.length > 0) {
+      const prices = await this.partsPriceRepositry.find({
+        where: { model: { id: modelId }, allPart: { id: In(partIds) } },
+        relations: ['allPart', 'levelRepair'],
+      });
+      parts = prices.map(pp => ({
+        partId: pp.allPart?.id ?? 0,
+        partName: pp.allPart?.description ?? `Pièce #${pp.allPart?.id}`,
+        price: pp.price ?? 0,
+        levelRepairName: pp.levelRepair?.name ?? null,
+        levelRepairPrice: pp.levelRepair?.price ?? 0,
+      }));
+      const levelPrices = prices.map(pp => pp.levelRepair?.price ?? 0).filter(p => p > 0);
+      levelRepairPrice = levelPrices.length > 0 ? Math.max(...levelPrices) : 0;
+    }
+
+    const companies = await this.companyRepositry.find({ take: 1 });
+    const tva = companies[0]?.tva ?? 0;
+    const timbreFiscale = companies[0]?.timbreFiscale ?? 0;
+    const partsTotal = parts.reduce((s: number, p: any) => s + p.price, 0);
+    const totalHT = partsTotal + levelRepairPrice;
+    const tvaAmount = totalHT * (tva / 100);
+    const totalTTC = totalHT + tvaAmount + timbreFiscale;
+
+    return { parts, partsTotal, levelRepairPrice, tva, timbreFiscale, tvaAmount, totalHT, totalTTC };
+  }
+
   async generatePdf(id: number, res: any): Promise<void> {
     return new Promise<void>(async (resolve, reject) => {
       try {
@@ -485,6 +528,7 @@ if (updateRepairDto.partsNeed) {
         const actionName = (repair.repairAction?.[0]?.name ?? '').trim();
         const isDevis = actionName === 'Devis';
         const isReparation = actionName === 'Réparation';
+        const isHorsGarantie = repair.warrenty === false;
         const allParts = repair.device?.model?.allpart ?? [];
 
         // ── Company info ──
@@ -736,10 +780,88 @@ if (updateRepairDto.partsNeed) {
 
         // ── Pièces : Réparation ──
         if (isReparation && repair.approveStock?.length) {
-          if (y + 30 > doc.page.height - 70) { doc.addPage(); y = 40; }
-          sectionTitle('PIÈCES CHANGÉES');
           const confirmed = repair.approveStock.filter(a => a.state === 'Confirmer');
-          if (confirmed.length > 0) {
+          if (confirmed.length === 0) { /* skip */ }
+          else if (isHorsGarantie) {
+            if (y + 30 > doc.page.height - 70) { doc.addPage(); y = 40; }
+            sectionTitle('PIÈCES CHANGÉES — FACTURATION');
+            const modelId = repair.device?.model?.id;
+            const partIds = confirmed.map(a => Number(a.idPartRepair)).filter(id => id > 0);
+            const prices = (modelId && partIds.length > 0)
+              ? await this.partsPriceRepositry.find({
+                  where: { model: { id: modelId }, allPart: { id: In(partIds) } },
+                  relations: ['allPart', 'levelRepair'],
+                })
+              : [];
+            const priceMap = new Map<number, { price: number; levelPrice: number }>();
+            for (const p of prices) {
+              priceMap.set(Number(p.allPart?.id), { price: p.price ?? 0, levelPrice: p.levelRepair?.price ?? 0 });
+            }
+            const reparationParts = confirmed.map(a => {
+              const pid = Number(a.idPartRepair);
+              const part = allParts.find(p => Number(p.id) === pid);
+              const pp = priceMap.get(pid);
+              return {
+                description: part?.description ?? `Pièce #${pid}`,
+                price: pp?.price ?? 0,
+                levelPrice: pp?.levelPrice ?? 0,
+              };
+            });
+            const company = await this.companyRepositry.findOne({ where: {} });
+            const tva = company?.tva ?? 0;
+            const timbre = company?.timbreFiscale ?? 0;
+            const sumParts = reparationParts.reduce((s, p) => s + p.price, 0);
+            const highestLevel = Math.max(...reparationParts.map(p => p.levelPrice), 0);
+            const col = { desc: 40, price: 240, level: 340 };
+            const headY = y;
+            doc.roundedRect(40, y, pw, 14, 3);
+            doc.fillColor('#009650').fill();
+            doc.fillColor('#ffffff').fontSize(7).font('Helvetica-Bold');
+            doc.text('Pièce', col.desc + 3, y + 2, { width: 190 });
+            doc.text('Prix (DT)', col.price + 3, y + 2, { width: 80 });
+            doc.text('Main-d\'œuvre', col.level + 3, y + 2, { width: 100 });
+            y += 16;
+            reparationParts.forEach((p, i) => {
+              if (y + 12 > doc.page.height - 60) { doc.addPage(); y = 50; }
+              if (i % 2 === 1) { doc.rect(40, y, pw, 12); doc.fillColor('#f0fff4').fill(); }
+              doc.fillColor('#222222').fontSize(7).font('Helvetica');
+              doc.text(p.description, col.desc + 2, y + 1, { width: 190 });
+              doc.text(p.price.toFixed(3), col.price + 2, y + 1, { width: 80 });
+              doc.text(p.levelPrice.toFixed(3), col.level + 2, y + 1, { width: 100 });
+              doc.strokeColor('#c0e0d0').lineWidth(0.3).moveTo(40, y + 12).lineTo(40 + pw, y + 12).stroke();
+              y += 13;
+            });
+            const subtotal = sumParts + highestLevel;
+            const tvaAmount = subtotal * (tva / 100);
+            const total = subtotal + tvaAmount + timbre;
+            y += 3;
+            doc.roundedRect(40, y, pw, 14, 3);
+            doc.fillColor('#f9fafc').fill();
+            doc.strokeColor('#009650').lineWidth(0.5).stroke();
+            y += 2;
+            const totW = 80;
+            const totX = pw - 110;
+            doc.fillColor('#222222').fontSize(7.5).font('Helvetica');
+            doc.text('Total pièces', 42, y, { width: 120 });
+            doc.text(`${sumParts.toFixed(3)} DT`, totX, y, { width: totW, align: 'right' });
+            y += 10;
+            doc.text('Main-d\'œuvre (niv. max)', 42, y, { width: 180 });
+            doc.text(`${highestLevel.toFixed(3)} DT`, totX, y, { width: totW, align: 'right' });
+            y += 10;
+            doc.text(`TVA ${tva}%`, 42, y, { width: 120 });
+            doc.text(`${tvaAmount.toFixed(3)} DT`, totX, y, { width: totW, align: 'right' });
+            y += 10;
+            doc.text('Timbre fiscal', 42, y, { width: 120 });
+            doc.text(`${timbre.toFixed(3)} DT`, totX, y, { width: totW, align: 'right' });
+            y += 12;
+            doc.rect(42, y - 1, pw - 4, 16).fillColor('#009650').fill();
+            doc.fillColor('#ffffff').fontSize(8).font('Helvetica-Bold');
+            doc.text('Total TTC', 42, y + 1, { width: 120 });
+            doc.text(`${total.toFixed(3)} DT`, totX, y + 1, { width: totW, align: 'right' });
+            y += 20;
+          } else {
+            if (y + 30 > doc.page.height - 70) { doc.addPage(); y = 40; }
+            sectionTitle('PIÈCES CHANGÉES');
             const labels = confirmed.map(a => {
               const part = allParts.find(p => Number(p.id) === Number(a.idPartRepair));
               return part?.description ?? `Pièce #${a.idPartRepair}`;

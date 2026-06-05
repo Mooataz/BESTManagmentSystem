@@ -1,12 +1,8 @@
+﻿import { API } from '../../../services/api';
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import type { Accessory } from "../../Types/repairTypes";
 import type { FormLisFrais } from "../../Types/administrationTypes";
  
-const API = axios.create({
-  baseURL: 'http://localhost:3000/',
-  withCredentials: true, // utile si tu envoies des cookies / tokens
-});
 
 
 export const AddFrais = createAsyncThunk<

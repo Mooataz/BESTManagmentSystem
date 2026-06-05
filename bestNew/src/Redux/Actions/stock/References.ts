@@ -1,13 +1,9 @@
-import axios from 'axios';
+﻿import { API } from '../../../services/api';
   import type { AsyncThunkConfig  } from '../../Types/authenTypes';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { Model } from '../../Types/repairTypes';
 import type { References } from '../../Types/Stock';
  
-const API = axios.create({
-  baseURL: 'http://localhost:3000/',
-  withCredentials: true, // utile si tu envoies des cookies / tokens
-});
 
 
   export const getReferences = createAsyncThunk< 

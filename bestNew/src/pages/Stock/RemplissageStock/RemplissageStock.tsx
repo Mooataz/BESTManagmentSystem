@@ -10,16 +10,10 @@ import { getBin, findByBinName, findByBranchType } from '../../../Redux/Actions/
 import { getByMaterialCode, getOneReference, getReferences, } from '../../../Redux/Actions/stock/References';
 import { Box, Button, Typography, TextField } from '@mui/material';
 import { AddOneStockPart } from '../../../Redux/Actions/stock/RemplissageStock';
+import { getAllStockPartBranch } from '../../../Redux/Actions/stock/EtatStockActions';
 import { getOnePart } from '../../../Redux/Actions/Administration/ListAllPart';
 import theme from '../../../Theme/theme';
 
-interface ExcelRow {
-
-    bin: string;
-    reference: string;
-    remark?: string;
-    serialNumber?: string;
-}
 interface ProcessedItem {
     binId: number;
     originalLine: number;
@@ -36,7 +30,6 @@ export default function RemplissageStock() {
     const references = useSelector((state: RootState) => state.references.references);
     const OneReferencePart = useSelector((state: RootState) => state.references.oneReference);
     const part = useSelector((state: RootState) => state.allParts.onePart);
-    const [addedStockPartIds, setAddedStockPartIds] = useState<number[]>([]);
 
     const [formRempStock, setFormRempStock] = React.useState({
         bin: 0,
@@ -73,6 +66,7 @@ export default function RemplissageStock() {
     };
     const handleSelectionReference = async (nb: number) => {
         setFormRempStock({ ...formRempStock, reference: nb });
+        dispatch(getOneReference(nb));
     };
     const handleFormStock = async () => {
         if (!formRempStock.bin || !formRempStock.reference || quantity <= 0) {
@@ -112,21 +106,29 @@ export default function RemplissageStock() {
 
         setIsSubmitting(true);
         try {
+            let successCount = 0;
+            let errorCount = 0;
             for (const field of fields) {
-                const result = await dispatch(AddOneStockPart({
-                    bin: formRempStock.bin,
-                    reference: formRempStock.reference,
-                    remark: field.remark,
-                    serialNumber: field.serialNumber,
-                    userId: UserID || 0,
-                })).unwrap();
-                if (result.id !== undefined) {
-                    setAddedStockPartIds(prev => [...prev, result.id as number]);
+                try {
+                    await dispatch(AddOneStockPart({
+                        bin: formRempStock.bin,
+                        reference: formRempStock.reference,
+                        remark: field.remark,
+                        serialNumber: field.serialNumber,
+                        userId: UserID || 0,
+                    })).unwrap();
+                    successCount++;
+                } catch {
+                    errorCount++;
                 }
-
             }
 
-            notify('Remplissage du stock effectué avec succès', 'success');
+            if (errorCount === 0) {
+                notify('Remplissage du stock effectué avec succès', 'success');
+            } else {
+                notify(`${successCount} succès, ${errorCount} échec(s)`, 'warning');
+            }
+            if (user) dispatch(getAllStockPartBranch(user));
             setFields([]);
             setQuantity(1);
             setFormRempStock({
@@ -168,7 +170,8 @@ export default function RemplissageStock() {
             notify(`Importation terminée: ${successCount} succès, ${errorCount} échecs`,
                 errorCount > 0 ? 'warning' : 'success');
 
-            // Réinitialiser après import
+            if (user) dispatch(getAllStockPartBranch(user));
+
             setFields([]);
             setQuantity(1);
             setFormRempStock({
@@ -188,28 +191,38 @@ export default function RemplissageStock() {
         const reader = new FileReader();
         reader.onload = async (e) => {
             try {
-                const data = e.target?.result;
-                if (!data) {
+                const buffer = e.target?.result;
+                if (!buffer) {
                     notify('Erreur de lecture du fichier', 'error');
                     return;
                 }
-                // 1. Lecture du fichier Excel
-                const workbook = XLSX.read(data, { type: 'binary' });
+                const workbook = XLSX.read(buffer, { type: 'array' });
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
-                // 2. Conversion en JSON avec typage strict
-                const jsonData = XLSX.utils.sheet_to_json<{
-                    bin: string;
-                    reference: string;
-                    remark?: string;
-                    serialnumber?: string;
-                }>(worksheet, {
-                    raw: false,
-                    defval: "",
-                    header: ['bin', 'reference', 'remark', 'serialnumber']
-                });
-                if (jsonData.length === 0) {
+                const rows = XLSX.utils.sheet_to_json<any[][]>(worksheet, { header: 1 });
+                if (rows.length === 0) {
                     notify('Le fichier Excel est vide', 'warning');
+                    return;
+                }
+                const startIdx = (rows[0]?.[0] && typeof rows[0][0] === 'string' && isNaN(Number(rows[0][0]))) ? 1 : 0;
+                const dataRows = rows.slice(startIdx);
+                if (dataRows.length === 0) {
+                    notify('Aucune ligne de données trouvée', 'warning');
+                    return;
+                }
+                const jsonData: { bin: string; reference: string; remark: string; serialnumber: string }[] = [];
+                for (let i = 0; i < dataRows.length; i++) {
+                    const row = dataRows[i];
+                    if (!row || row.length < 2 || !row[0]) continue;
+                    jsonData.push({
+                        bin: String(row[0] ?? '').trim(),
+                        reference: String(row[1] ?? '').trim(),
+                        remark: String(row[2] ?? '').trim(),
+                        serialnumber: String(row[3] ?? '').trim(),
+                    });
+                }
+                if (jsonData.length === 0) {
+                    notify('Aucune donnée valide dans le fichier', 'warning');
                     return;
                 }
                 setIsImporting(true);
@@ -288,10 +301,6 @@ export default function RemplissageStock() {
                         serialNumber: item.serialNumber
                     }))
                 );
-                setFormRempStock({
-                    bin: successfulItems[0].binId,
-                    reference: successfulItems[0].referenceId
-                });
                 // 7. Confirmation avant import final
                 if (
                     window.confirm(
@@ -314,7 +323,7 @@ export default function RemplissageStock() {
                 setIsImporting(false);
             }
         };
-        reader.readAsBinaryString(file);
+        reader.readAsArrayBuffer(file);
     };
     return (
         <div style={{ width: '100%' }}>

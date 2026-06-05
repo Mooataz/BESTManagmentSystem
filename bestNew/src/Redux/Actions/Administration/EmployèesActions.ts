@@ -1,12 +1,8 @@
+﻿import { API } from '../../../services/api';
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import type { AsyncThunkConfig } from "../../Types/repairTypes";
 import type { User } from "../../Types/authenTypes";
     
-const API = axios.create({
-  baseURL: 'http://localhost:3000/',
-  withCredentials: true, // utile si tu envoies des cookies / tokens
-});
 interface Employees{
     name: string;
     phone: number;

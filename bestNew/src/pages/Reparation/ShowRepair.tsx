@@ -1,3 +1,4 @@
+﻿import { API } from '../../services/api';
 import React, { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import { Box, Card, CardContent, Chip, Grid, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
@@ -92,8 +93,8 @@ export default function ShowRepair({ repairId: propRepairId }: ShowRepairProps =
 
   useEffect(() => {
     if (!repairId) return;
-    fetch(`http://localhost:3000/repair/${repairId}`, { credentials: 'include' })
-      .then(r => r.json())
+    API.get(`/repair/${repairId}`)
+      .then(r => r.data)
       .then(res => setRepair(res.data ?? null))
       .catch(() => setRepair(null));
   }, [repairId]);
@@ -109,13 +110,8 @@ export default function ShowRepair({ repairId: propRepairId }: ShowRepairProps =
 
   useEffect(() => {
     if (!isDevis || !modelId || partIds.length === 0) { setDevisInfo(null); return; }
-    fetch('http://localhost:3000/parts-price/devis-info', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ modelId, partIds }),
-    })
-      .then(r => r.json())
+    API.post('/parts-price/devis-info', { modelId, partIds })
+      .then(r => r.data)
       .then(res => setDevisInfo(res.data ?? null))
       .catch(() => setDevisInfo(null));
   }, [isDevis, modelId, partIds]);
