@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { fetchDistributeur, updateDistributeur } from '../../../api/administration/Administration';
 import type { TableAction } from '../../../Redux/Types/repairTypes';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, Button, FormLabel, Input, Modal, Stack, Typography } from '@mui/material';
