@@ -1,4 +1,5 @@
 import { Branch } from "src/branches/entities/branch.entity";
+import { Legislation } from "src/legislation/entities/legislation.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -35,5 +36,8 @@ export class Company {
 
         @OneToMany(() => Branch,Branch => Branch.company)
         branches?:Branch[]
+
+        @OneToMany(() => Legislation, (legislation) => legislation.company)
+        legislation?: Legislation[]
 }
  

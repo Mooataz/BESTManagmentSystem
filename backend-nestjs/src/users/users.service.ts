@@ -4,14 +4,12 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { In, Repository } from 'typeorm';
-import { Permission } from 'src/permission/entities/permission.entity';
 import { Branch } from 'src/branches/entities/branch.entity';
 import { AppService } from 'src/app.service';
 
 @Injectable()
 export class UsersService {
   constructor ( @InjectRepository(User) private readonly  userRepositry:Repository<User>,
-                @InjectRepository(Permission) private readonly  permissionRepositry:Repository<Permission>,
                 @InjectRepository(Branch) private readonly  branchRepositry:Repository<Branch>,
                 private appService: AppService 
                 )
@@ -32,12 +30,19 @@ export class UsersService {
   }
  
 
-  async findAll():Promise<User[]> {
-    const allUsers= await this.userRepositry.find({relations: ['branch','branch.company'],})
-      if ( !allUsers || allUsers.length === 0){
-        throw new NotFoundException("There is no users data Available")
-      }
-      return allUsers
+  async findAll(page?: number, limit?: number): Promise<{ data: User[]; total: number }> {
+    const [data, total] = await this.userRepositry.findAndCount({
+      relations: ['branch', 'branch.company'],
+      skip: page && limit ? (page - 1) * limit : undefined,
+      take: limit,
+      order: { id: 'DESC' },
+    });
+
+    if (!data || data.length === 0) {
+      throw new NotFoundException("There is no users data Available");
+    }
+
+    return { data, total };
   }
 
   async findOne(id: number):Promise<User> {

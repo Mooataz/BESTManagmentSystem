@@ -45,10 +45,6 @@ res.cookie('access_token', token.accessToken, {
     return this.authService.logout(userId);
   }
 
-  @Get('id')
- async getUserId(@Param('id') id: number, @Res() res: any){
-
- }
   
   @ApiBearerAuth('access-token')
 @UseGuards(AccessTokenGuard)

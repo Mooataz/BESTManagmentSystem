@@ -69,10 +69,12 @@ export class StockAlertService {
     if (type) where.type = type;
     const alerts = await this.stockAlertRepo.find({
       where,
+      relations: ['branch'],
       order: { createdAt: 'DESC' },
     });
     return alerts.map((a) => ({
       ...a,
+      branchName: a.branch?.name ?? `Agence ${a.branchId}`,
       isRead: a.readBy?.includes(String(userId)) ?? false,
     }));
   }

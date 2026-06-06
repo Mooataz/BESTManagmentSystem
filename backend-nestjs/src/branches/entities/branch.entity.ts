@@ -1,5 +1,7 @@
 import { Bin } from "src/bin/entities/bin.entity";
 import { Company } from "src/company/entities/company.entity";
+import { Notification } from "src/notification/Entity/notification.entity";
+import { StockAlert } from "src/stock-alert/entities/stock-alert.entity";
 import { User } from "src/users/entities/user.entity";
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
@@ -28,4 +30,10 @@ export class Branch {
 
     @OneToMany( () => Bin, bin => bin.branch)
     bin? : Bin[];
+
+    @OneToMany(() => StockAlert, (stockAlert) => stockAlert.branch)
+    stockAlert?: StockAlert[];
+
+    @OneToMany(() => Notification, (notification) => notification.branch)
+    notification?: Notification[];
 }

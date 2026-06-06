@@ -1,0 +1,335 @@
+@startuml BEST Management System - Diagramme de Classes
+
+' Polices et couleurs
+skinparam defaultFontName Arial
+skinparam class {
+  BackgroundColor #F8F9FA
+  BorderColor #2C3E50
+  HeaderBackgroundColor #2C3E50
+  HeaderFontColor white
+}
+
+' ======================== SOCIÉTÉ & AGENCES ========================
+class Company {
+  + id: number
+  + name: string
+  + headquarterslocation: string
+  + taxRegisterNumber: string [unique]
+  + rib: bigint
+  + bank: string
+  + logo: string
+  + quantityAlertStock: number
+  + tva: float
+  + timbreFiscale: float
+}
+
+class Branch {
+  + id: number
+  + name: string
+  + location: string
+  + phone: number
+  + email: string
+}
+
+class Bin {
+  + id: number
+  + name: string [unique]
+  + type: string
+}
+
+Company "1" --> "*" Branch : branches
+Branch "1" --> "*" Bin : bin
+Branch "1" --> "*" User : user
+
+' ======================== UTILISATEURS ========================
+class User {
+  + id: number
+  + name: string
+  + phone: number
+  + password: string
+  + createdDate: Date
+  + status: string
+  + login: string [unique]
+  + role: string[]
+  + refreshToken: string
+}
+
+class Admin {
+  + adminCode: string
+}
+
+Admin --|> User : extends
+
+class Permission {
+  + id: number
+  + description: string
+}
+
+' ======================== DISTRIBUTEURS & CLIENTS ========================
+class Distributeur {
+  + id: number
+  + name: string
+  + phone: number
+  + email: string
+  + location: string
+  + taxRegisterNumber: string
+}
+
+class Customer {
+  + id: number
+  + name: string
+  + phone: number
+}
+
+Distributeur "1" --> "*" Customer : distributer
+
+' ======================== CATALOGUE ========================
+class Brand {
+  + id: number
+  + name: string [unique]
+  + logo: string
+  + status: string
+}
+
+class TypeModel {
+  + id: number
+  + description: string
+}
+
+class Model {
+  + id: number
+  + name: string
+  + picture: string
+}
+
+class Device {
+  + id: number
+  + serialenumber: string
+  + purchaseDate: Date
+}
+
+class AllPart {
+  + id: number
+  + description: string
+}
+
+class Reference {
+  + id: number
+  + materialCode: string [unique]
+  + description: string
+}
+
+class PartsPrice {
+  + id: number
+  + price: float
+}
+
+class LevelRepair {
+  + id: number
+  + name: string
+  + price: float
+}
+
+Brand "1" --> "*" Model : model
+TypeModel "1" --> "*" Model : model
+Model "1" --> "*" Device : device
+Model "1" --> "*" PartsPrice : partsPrice
+Model "*" --> "*" AllPart : allpart
+Model "*" --> "*" Reference : reference
+Brand "*" --> "*" LevelRepair : levelRepair
+AllPart "1" --> "*" Reference : reference
+AllPart "1" --> "*" PartsPrice : partsPrice
+LevelRepair "1" --> "*" PartsPrice : partsPrice
+
+' ======================== STOCK ========================
+class StockPart {
+  + id: number
+  + remark: string
+  + serialNumber: string
+}
+
+class StockAlert {
+  + id: number
+  + branchId: number
+  + type: string
+  + report: jsonb
+  + readBy: string[]
+  + createdAt: Date
+}
+
+class HistoryStockPart {
+  + id: number
+  + date: Date
+  + step: string
+}
+
+Bin "1" --> "*" StockPart : stockPart
+Reference "1" --> "*" StockPart : stockPart
+StockPart "1" --> "*" HistoryStockPart : historyStockPart
+
+' ======================== RÉPARATIONS ========================
+class Repair {
+  + id: number
+  + warrenty: boolean
+  + approveRepair: boolean
+  + newserialnumber: string
+  + actuellybranch: number
+  + files: jsonb
+  + partsNeed: number[]
+  + remark: string
+  + deviceStateReceive: string
+}
+
+class HistoryRepair {
+  + id: number
+  + date: Date
+  + step: string
+}
+
+class Tracability {
+  + id: number
+}
+
+class ApproveStock {
+  + id: number
+  + type: string
+  + date: Date
+  + state: string
+  + idPartRepair: number
+}
+
+class OutputList {
+  + id: number
+  + date: Date
+  + remark: string
+}
+
+class Accessory {
+  + id: number
+  + name: string
+}
+
+class ListFault {
+  + id: number
+  + name: string
+}
+
+class CustomerRequest {
+  + id: number
+  + name: string
+}
+
+class NotesCustomer {
+  + id: number
+  + name: string
+}
+
+class ExpertiseReason {
+  + id: number
+  + name: string
+}
+
+class RepairAction {
+  + id: number
+  + name: string
+}
+
+Device "1" --> "*" Repair : repair
+Customer "1" --> "*" Repair : repair
+User "1" --> "*" Repair : user
+Repair "1" --> "*" HistoryRepair : historyRepair
+Repair "1" --> "*" ApproveStock : approveStock
+HistoryRepair "1" --> "*" Tracability : tracability
+HistoryStockPart "1" --> "*" Tracability : tracability
+Tracability "*" --> "1" User : user
+ApproveStock "1" --> "1" StockPart : stockPart
+
+Repair "*" --> "*" Accessory : accessory
+Repair "*" --> "*" ListFault : listFault
+Repair "*" --> "*" CustomerRequest : customerRequest
+Repair "*" --> "*" NotesCustomer : notesCustomer
+Repair "*" --> "*" ExpertiseReason : expertiseReason
+Repair "*" --> "*" RepairAction : repairAction
+
+OutputList "1" --> "*" Repair : repair
+OutputList "1" --> "1" Customer : customer
+OutputList "1" --> "1" User : user
+
+' ======================== TRANSFERTS ========================
+class Transfert {
+  + id: number
+  + delivredBy: string
+  + sendingDate: Date
+  + frombranch: number
+  + sendUser: number
+  + receivedDate: Date
+  + tobranch: number
+  + receiveUser: number
+  + type: string
+  + state: string
+  + remark: string
+  + typePart: string
+  + previousStep: string
+}
+
+Transfert "*" --> "*" Repair : repair
+Transfert "*" --> "*" StockPart : stockPart
+
+' ======================== FACTURATION & VENTES ========================
+class Invoice {
+  + id: number
+  + paymentMethod: string
+  + date: Date
+  + state: string
+  + totalPrice: float
+  + tva: float
+  + timbreFiscale: float
+  + partsTotal: float
+  + levelRepairPrice: float
+  + otherCostsTotal: float
+  + details: jsonb
+  + validatedAt: Date
+}
+
+class OtherCost {
+  + id: number
+  + price: float
+  + name: string
+  + status: string
+}
+
+class Sale {
+  + id: number
+  + state: string
+  + totalPrice: float
+  + date: Date
+  + details: jsonb
+  + validatedAt: Date
+  + confirmedAt: Date
+}
+
+Invoice "1" --> "1" Repair : repair
+Invoice "1" --> "1" User : user
+Invoice "*" --> "*" OtherCost : otherCost
+Invoice "*" --> "1" User : validatedBy
+Sale "1" --> "1" User : user
+Sale "1" --> "1" Customer : customer
+Sale "*" --> "*" AllPart : allPart
+Sale "1" --> "*" ApproveStock : approveStock
+Sale "*" --> "1" User : validatedBy
+Sale "*" --> "1" User : confirmedBy
+ApproveStock "*" --> "1" Sale : sale
+
+' ======================== AUTRES ========================
+class Legislation {
+  + id: number
+  + name: string
+}
+
+class Notification {
+  + id: number
+  + title: string
+  + body: string
+}
+
+@enduml

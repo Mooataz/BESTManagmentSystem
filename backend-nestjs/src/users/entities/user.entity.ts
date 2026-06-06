@@ -1,7 +1,7 @@
 import { Branch } from 'src/branches/entities/branch.entity';
 import { Invoice } from 'src/invoice/entities/invoice.entity';
+import { Notification } from 'src/notification/Entity/notification.entity';
 import { OutputList } from 'src/output-list/entities/output-list.entity';
-import { Permission } from 'src/permission/entities/permission.entity';
 import { Repair } from 'src/repair/entities/repair.entity';
 import { Sale } from 'src/sales/entities/sale.entity';
 import { Tracability } from 'src/tracability/entities/tracability.entity';
@@ -53,6 +53,9 @@ export class User {
     
     @OneToMany( () => Sale, (sale) => sale.user)
     sale?: Sale[];
+
+    @OneToMany(() => Notification, (notification) => notification.user)
+    notification?: Notification[];
 
     @Column({nullable: true, default: null, type: 'varchar'})
     refreshToken?: string | null

@@ -8,7 +8,6 @@ import { CustomersModule } from './customers/customers.module';
 import { UsersModule } from './users/users.module';
 import { DistributeurModule } from './distributeur/distributeur.module';
 import { BranchesModule } from './branches/branches.module';
-import { PermissionModule } from './permission/permission.module';
 import { ModelsModule } from './models/models.module';
 import { TypeModelModule } from './type-model/type-model.module';
 import { AllPartsModule } from './all-parts/all-parts.module';
@@ -36,10 +35,6 @@ import { InvoiceModule } from './invoice/invoice.module';
 import { LevelRepairModule } from './level-repair/level-repair.module';
 import { SalesModule } from './sales/sales.module';
 import { AdminModule } from './admin/admin.module';
-import { TechnicienModule } from './technicien/technicien.module';
-import { StocKeeperModule } from './stoc-keeper/stoc-keeper.module';
-import { CoordinateModule } from './coordinate/coordinate.module';
-import { ReceptionistModule } from './receptionist/receptionist.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { NotificationModule } from './notification/notification.module';
@@ -79,7 +74,6 @@ import { CoreModule } from './core/core.module';
     UsersModule,
     DistributeurModule,
     BranchesModule,
-    PermissionModule,
     ModelsModule,
     TypeModelModule,
     AllPartsModule,
@@ -108,10 +102,6 @@ import { CoreModule } from './core/core.module';
     StockAlertModule,
     SalesModule,
     AdminModule,
-    TechnicienModule,
-    StocKeeperModule,
-    CoordinateModule,
-    ReceptionistModule,
     AuthModule,
     NotificationModule,
     PdfModule,

@@ -281,7 +281,7 @@ function NotificationBell({
                       {alert.type === 'reception' ? 'Alerte de réception' : alert.type === 'affectation' ? "Alerte d'affectation" : alert.type === 'reparation' ? 'Alerte de réparation' : alert.type === 'cq' ? 'Alerte CQ' : alert.type === 'bloque' ? 'Alerte blocage' : 'Alerte de stock'}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {agencies.find((a: any) => a.id === alert.branchId)?.name ?? 'Agence ' + alert.branchId}
+                      {alert.branchName}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       {new Date(alert.createdAt).toLocaleDateString()}

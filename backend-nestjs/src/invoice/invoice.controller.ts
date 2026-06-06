@@ -1,11 +1,15 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, HttpException } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
+import { InvoicePdfService } from './invoice-pdf.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { UpdateInvoiceDto } from './dto/update-invoice.dto';
 
 @Controller('invoice')
 export class InvoiceController {
-  constructor(private readonly invoiceService: InvoiceService) { }
+  constructor(
+    private readonly invoiceService: InvoiceService,
+    private readonly invoicePdfService: InvoicePdfService,
+  ) { }
 
   @Post()
   async create(@Body() createInvoiceDto: CreateInvoiceDto, @Res() res: any) {
@@ -94,7 +98,7 @@ export class InvoiceController {
   @Get('/pdf/:id')
   async getPdf(@Param('id') id: number, @Res() res: any) {
     try {
-      await this.invoiceService.generatePdf(id, res);
+      await this.invoicePdfService.generatePdf(id, res);
     } catch (error) {
       if (!res.headersSent) {
         if (error instanceof HttpException) {

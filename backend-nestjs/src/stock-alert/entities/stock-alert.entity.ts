@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Branch } from "src/branches/entities/branch.entity";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class StockAlert {
@@ -7,6 +8,9 @@ export class StockAlert {
 
     @Column()
     branchId!: number;
+
+    @ManyToOne(() => Branch, (branch) => branch.stockAlert)
+    branch?: Branch;
 
     @Column({ default: 'stock' })
     type!: string;

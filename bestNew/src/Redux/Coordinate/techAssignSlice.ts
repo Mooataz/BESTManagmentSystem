@@ -21,7 +21,7 @@ const initialState: userState = {
 };
 
 const techAssignSlice = createSlice({
-  name: 'user',
+  name: 'techAssign',
   initialState,
   reducers: {
     clearError: (state) => {
