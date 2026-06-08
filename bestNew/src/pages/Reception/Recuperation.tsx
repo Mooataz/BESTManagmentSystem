@@ -1,11 +1,11 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import { API_BASE_URL } from '../../services/api';
+import React, { useMemo, useState } from 'react'
 import { getByBranchStep } from '../../Redux/Actions/Reception/repairAction';
 import { useAppDispatch } from '../../Redux/hooks';
 import { useNotification } from '../../Componants/NotificationContext';
 import type { RootState } from '../../Redux/store';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import type { Customer, OutputListForm, RepairForm, TableAction } from '../../Redux/Types/repairTypes';
+import type { Customer, OutputListForm, RepairForm } from '../../Redux/Types/repairTypes';
 import { Box, Button, Checkbox, Dialog, DialogContent, DialogTitle, FormControl, FormLabel, Grid, IconButton, Input, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { PiEye, PiFilePdf } from 'react-icons/pi';
@@ -24,8 +24,6 @@ export default function Recuperation() {
     const dispatch = useAppDispatch();
     const { notify } = useNotification();
     const userr = useSelector((state: RootState) => state.auth.user);
-    const repairs = useSelector((state: RootState) => state.repair.repairs)
-    
     const [results, setResults] = useState<RepairForm[]>([]);
 
     const getLastStep = (history: any[] = []) => {
@@ -35,17 +33,12 @@ export default function Recuperation() {
         return sorted[0]?.step ?? '-';
     };
 
-    if (!userr?.id || !userr?.branch) return;
-
-    const branchId = typeof userr.branch === 'object' ? userr.branch.id : userr.branch;
-    if (!branchId || isNaN(userr.id)) return;
+    const branchId = userr?.branch
+        ? (typeof userr.branch === 'object' ? userr.branch.id : userr.branch)
+        : undefined;
 
     React.useEffect(() => {
-        // Vérifier si userr ou branchId est absent
-        if (!userr?.id || !userr?.branch) return;
-
-        const branchId = typeof userr.branch === 'object' ? userr.branch.id : userr.branch;
-        if (!branchId || isNaN(userr.id)) return;
+        if (!userr?.id || !branchId || isNaN(userr.id)) return;
 
         dispatch(getByBranchStep({
             branch: branchId,
@@ -85,7 +78,7 @@ export default function Recuperation() {
     const handleSelectionCustomer = async (ids: number) => {
         const result = await dispatch(getOneCustomer(ids))
         const customer = unwrapResult(result);
-        setFormCustomer({ ...formCustomer, name: customer.name, phone: customer.phone, distributer: customer.distributer });
+        setFormCustomer({ ...formCustomer, name: customer.name, phone: customer.phone, distributer: typeof customer.distributer === 'object' ? customer.distributer?.id : customer.distributer });
 
     };
     const handleSetPhone = async (nb: number) => {
@@ -95,7 +88,7 @@ export default function Recuperation() {
     const [returned, setReturned] = useState<OutputListForm>({
         date: new Date(),
         remark: '',
-        user: userr.id,
+        user: userr?.id || 0,
         customer: 0,
         repairIds: [],
     })
@@ -119,7 +112,7 @@ export default function Recuperation() {
                     dispatch(addHistoryRepair({
                         date: new Date(),
                         step: 'Récupérer',
-                        user: { id: userr.id || 0 },
+                        user: { id: userr!.id || 0 },
                         repair: item || 0
                     }));
                 });
@@ -127,7 +120,7 @@ export default function Recuperation() {
                 notify('Récupération terminée', 'success');
 
                 dispatch(getByBranchStep({
-                    branch: branchId,
+                    branch: branchId!,
                     step: 'Prêt à récupérer'
                 }))
                     .then((resultAction) => {
@@ -137,6 +130,9 @@ export default function Recuperation() {
                             notify(`Erreur lors du chargement : ${resultAction.payload}`, 'error');
                         }
                     });
+            } else {
+                const errorMsg = typeof resAddOutPut.payload === 'string' ? resAddOutPut.payload : 'Erreur lors de la récupération';
+                notify(errorMsg, 'error');
             }
         }
     };
@@ -383,7 +379,7 @@ const getUniqueOptions = (key: keyof FiltersType): string[] => {
 
                 actions={(row) => [
                     { icon: <PiEye size={18} />, onClick: () => setSelectedRepairId(row.id) },
-                    { icon: <PiFilePdf size={18} style={{ color: theme.palette.primary.main }} />, onClick: () => { const a = document.createElement('a'); a.href = `http://localhost:3000/repair/pdf/${row.id}`; a.download = `reparation_${row.id}.pdf`; document.body.appendChild(a); a.click(); document.body.removeChild(a); } }
+                    { icon: <PiFilePdf size={18} style={{ color: theme.palette.primary.main }} />, onClick: () => { const a = document.createElement('a'); a.href = `${API_BASE_URL}/repair/pdf/${row.id}`; a.download = `reparation_${row.id}.pdf`; document.body.appendChild(a); a.click(); document.body.removeChild(a); } }
                 ]}
             />
             <Dialog open={!!selectedRepairId} onClose={() => setSelectedRepairId(null)} maxWidth="md" fullWidth>

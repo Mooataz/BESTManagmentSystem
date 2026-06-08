@@ -22,11 +22,7 @@ export class CompanyService {
   }
 
   async findAll():Promise<Company[]> {
-    const comp= await this.companyRepositry.find()
-    if ( !comp || comp.length === 0){
-      throw new NotFoundException("There is no user sata Available")
-    }
-    return comp
+    return await this.companyRepositry.find()
   }
 
   async findOne(id: number):Promise<Company> {

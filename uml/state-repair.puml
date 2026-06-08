@@ -1,0 +1,48 @@
+@startuml
+skinparam state {
+  BackgroundColor #E8F5E9
+  BorderColor #2E7D32
+}
+skinparam arrow {
+  Color #2E7D32
+}
+
+state "Déposé" as DEPOSED
+state "Diagnostic posé" as DIAG
+state "Devis validé" as APPROVED
+state "Attribué" as ASSIGNED
+state "Réparé" as REPAIRED
+state "Validé CQ" as QC_OK
+state "Prêt à récupérer" as READY
+state "Récupéré" as RECOVERED
+state "Retour CQ" as QC_FAIL
+state "En attente pièces" as WAITING_PARTS
+
+[*] --> DEPOSED : Client dépose
+DEPOSED --> DIAG : Diagnostic effectué
+
+DIAG --> APPROVED : Client valide devis
+DIAG --> DEPOSED : Refus client\n(retour)
+
+APPROVED --> ASSIGNED : Attribution\nau technicien
+
+ASSIGNED --> WAITING_PARTS : Demande pièces
+WAITING_PARTS --> ASSIGNED : Pièces reçues
+
+ASSIGNED --> REPAIRED : Réparation\nterminée
+
+REPAIRED --> QC_OK : CQ accepté
+REPAIRED --> QC_FAIL : CQ refusé
+QC_FAIL --> ASSIGNED : Reprise réparation
+
+QC_OK --> READY : Transfert\nagence récupération
+
+READY --> RECOVERED : Client récupère\n+ facture
+
+RECOVERED --> [*]
+
+note right of WAITING_PARTS
+  Délai variable selon
+  disponibilité fournisseur
+end note
+@enduml

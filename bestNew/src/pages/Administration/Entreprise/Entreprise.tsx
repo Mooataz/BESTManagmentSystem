@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../../services/api';
 import * as React from 'react';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -31,7 +32,7 @@ export default function Entreprise() {
         <Card sx={{ maxWidth: '90%', marginTop:'100px' }}>
       <CardMedia
         sx={{ height: 300 }}
-        image={company?.logo ? `http://localhost:3000/upload/company/${company.logo}` : "https://via.placeholder.com/150"}
+        image={company?.logo ? `${API_BASE_URL}/upload/company/${company.logo}` : "https://via.placeholder.com/150"}
         title="green iguana"
       /> <br/>
       <CardContent>

@@ -44,10 +44,7 @@ export class HistoryRepairService {
   }
 
   async findAll():Promise<HistoryRepair[]> {
-    const allfind = await this.historyRepairRepositry.find()
-
-    if (!allfind || allfind.length === 0) { throw new NotFoundException ("There is no data available")}
-    return allfind
+    return this.historyRepairRepositry.find()
   }
 
   async findOne(id: number):Promise<HistoryRepair> {

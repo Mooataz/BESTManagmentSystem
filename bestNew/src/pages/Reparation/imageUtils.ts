@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../services/api';
 // utils/imageUtils.ts
 export const getRepairImageUrl = (file: string | File): string => {
   if (!file) return '/fallback-repair.jpg';
@@ -12,7 +13,7 @@ export const getRepairImageUrl = (file: string | File): string => {
       .replace(/^\/+|\/+$/g, '') // Remove leading/trailing slashes
       .replace(/\\/g, '/'); // Convert Windows paths
     
-    return `http://localhost:3000/upload/repairs/${encodeURIComponent(cleanFilename)}`;
+    return `${API_BASE_URL}/upload/repairs/${encodeURIComponent(cleanFilename)}`;
   }
   
   // Handle File objects (for local uploads)

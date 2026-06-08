@@ -19,11 +19,18 @@ export class UsersService {
     createUserDto.name =this.appService.cleanSpaces(createUserDto.name)
     createUserDto.login =this.appService.cleanSpaces(createUserDto.login)
 
-    const branch = createUserDto.branch ? await this.branchRepositry.findOne({ where: { id: createUserDto.branch } }):undefined;
+    if (createUserDto.branch == null) {
+      throw new NotFoundException("No valid branch found.");
+    }
+    const branch = await this.branchRepositry.findOne({ where: { id: createUserDto.branch } });
     if (!branch) { throw new NotFoundException("No valid branch found.");}
 
-    const newCreate =  this.userRepositry.create( { ...createUserDto , branch: branch || undefined ,role: Array.isArray(createUserDto.role)
-      ? createUserDto.role : [createUserDto.role], })
+    const data = {
+      ...createUserDto,
+      createdDate: new Date(createUserDto.createdDate),
+      branch,
+    };
+    const newCreate = this.userRepositry.create(data);
     return await this.userRepositry.save(newCreate);
 
     
@@ -38,10 +45,6 @@ export class UsersService {
       order: { id: 'DESC' },
     });
 
-    if (!data || data.length === 0) {
-      throw new NotFoundException("There is no users data Available");
-    }
-
     return { data, total };
   }
 
@@ -55,9 +58,12 @@ export class UsersService {
 
 
 async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-  const { branch,  ...rest } = updateUserDto; // Exclure branch et permissionsIds de updateUserDto
+  const { branch, createdDate, ...rest } = updateUserDto;
 
-  const updateData: Partial<User> = { ...rest,    role: rest.role ? (Array.isArray(rest.role) ? rest.role : [rest.role]) : undefined,
+  const updateData: Partial<User> = {
+    ...rest,
+    ...(createdDate ? { createdDate: new Date(createdDate) } : {}),
+    role: rest.role ? (Array.isArray(rest.role) ? rest.role : [rest.role]) : undefined,
   };
 
   // Vérifier si une mise à jour de branch est nécessaire

@@ -60,11 +60,8 @@ async create(createOutputListDto: CreateOutputListDto): Promise<OutputList> {
 
 
   async findAll(): Promise<OutputList[]> {
-    const allfind= await this.outputListRepositry.find()
-    if ( !allfind || allfind.length === 0){
-      throw new NotFoundException("There is no data Available")
-    }
-    return allfind  }
+    return await this.outputListRepositry.find()
+  }
 
   async findOne(id: number): Promise<OutputList> {
     const Onefin= await this.outputListRepositry.findOne({ where: { id },

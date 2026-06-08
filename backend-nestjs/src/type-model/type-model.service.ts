@@ -24,12 +24,7 @@ export class TypeModelService {
   }
 
   async findAll():Promise<TypeModel[]> {
-    const findAll = await this.typeModelRepositry.find()
-    if (!findAll || findAll.length === 0){
-      throw new NotFoundException('No Type model found')
-    }
-    return findAll;
-    
+    return await this.typeModelRepositry.find()
   }
 
   async findOne(id: number):Promise<TypeModel> {

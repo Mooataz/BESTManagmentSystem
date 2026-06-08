@@ -55,11 +55,7 @@ async create(createReferenceDto: CreateReferenceDto): Promise<Reference> {
 }
 
   async findAll(): Promise<Reference[]> {
-    const findAll = await this.referenceRepositry.find({  relations: ['allpart','model']})
-    if (!findAll || findAll.length === 0) {
-      throw new NotFoundException('No Reference found')
-    }
-    return findAll;
+    return this.referenceRepositry.find({  relations: ['allpart','model']})
   }
 
   async findOne(id: number): Promise<Reference> {

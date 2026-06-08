@@ -1,0 +1,76 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam actor {
+  BackgroundColor #E1F5FE
+  BorderColor #0288D1
+}
+skinparam usecase {
+  BackgroundColor #FFF3E0
+  BorderColor #E65100
+}
+
+actor "Client" as Client
+actor "Agent\nRéception" as Reception
+actor "Technicien" as Technicien
+actor "Coordinateur" as Coord
+actor "Contrôleur\nQualité" as CQ
+actor "Gestionnaire\nStock" as Stock
+actor "Administrateur" as Admin
+
+rectangle "BEST Management System" {
+  usecase "Déposer un appareil" as UC1
+  usecase "Créer fiche de réparation" as UC2
+  usecase "Diagnostiquer" as UC3
+  usecase "Estimer coût" as UC4
+  usecase "Valider devis" as UC5
+  usecase "Attribuer à technicien" as UC6
+  usecase "Réparer" as UC7
+  usecase "Demander pièces" as UC8
+  usecase "Contrôler qualité" as UC9
+  usecase "Transférer appareil" as UC10
+  usecase "Récupérer appareil" as UC11
+  usecase "Générer facture" as UC12
+  usecase "Gérer stock" as UC13
+  usecase "Gérer références" as UC14
+  usecase "Gérer utilisateurs" as UC15
+  usecase "Consulter historique" as UC16
+  usecase "Vente de pièces" as UC17
+  usecase "Gérer paramètres" as UC18
+  usecase "Notifier événements" as UC19
+  usecase "Gérer alertes stock" as UC20
+}
+
+Client --> UC1
+Client --> UC5
+Client --> UC11
+Reception --> UC1
+Reception --> UC2
+Reception --> UC11
+Reception --> UC12
+Reception --> UC16
+Reception --> UC17
+Technicien --> UC3
+Technicien --> UC4
+Technicien --> UC7
+Technicien --> UC8
+Technicien --> UC16
+Coord --> UC6
+Coord --> UC10
+CQ --> UC9
+Stock --> UC13
+Stock --> UC14
+Stock --> UC20
+Admin --> UC15
+Admin --> UC18
+Admin --> UC13
+Admin --> UC14
+
+UC2 ..> UC3 : <<include>>
+UC3 ..> UC4 : <<include>>
+UC4 ..> UC6 : <<extend>>
+UC7 ..> UC8 : <<include>>
+UC7 ..> UC9 : <<extend>>
+UC11 ..> UC12 : <<include>>
+
+@enduml

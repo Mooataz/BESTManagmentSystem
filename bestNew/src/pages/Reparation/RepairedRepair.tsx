@@ -1,4 +1,4 @@
-﻿import { API } from '../../services/api';
+﻿import { API, API_BASE_URL } from '../../services/api';
 import React, { useEffect, useMemo, useState } from 'react'
 import DynamicTable from '../../Componants/Global/TableComponat';
 import { useSelector } from 'react-redux';
@@ -596,7 +596,7 @@ const [saving, setSaving] = useState(false);
                   <Box display="flex" gap={1} flexWrap="wrap">
                     {files.map((f: any, index: number) => (
                       <Box key={f.id ?? index} position="relative">
-                        <img src={`http://localhost:3000/upload/repairs/${f}`} alt="uploaded" width={100} height={100} style={{ objectFit: 'cover', borderRadius: 4 }} />
+                        <img src={`${API_BASE_URL}/upload/repairs/${f}`} alt="uploaded" width={100} height={100} style={{ objectFit: 'cover', borderRadius: 4 }} />
                         <IconButton size="small" onClick={() => handleDeleteImage(f)} sx={{ position: 'absolute', top: -8, right: -8, background: 'white' }}>✖</IconButton>
                       </Box>
                     ))}

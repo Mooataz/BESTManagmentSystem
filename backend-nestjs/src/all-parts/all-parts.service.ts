@@ -16,11 +16,7 @@ export class AllPartsService {
     return await this.allPartRepositry.save(createAllPartDto);  }
 
   async findAll():Promise<AllPart[]> {
-    const allfind = await this.allPartRepositry.find()
-    if (!allfind || allfind.length === 0) {
-      throw new NotFoundException ('There is no data available')
-    }
-    return allfind;
+    return await this.allPartRepositry.find()
   }
 
   async findOne(id: number):Promise<AllPart> {

@@ -18,11 +18,7 @@ export class BrandsService {
   }
 
   async findAll():Promise<Brand[]> {
-    const allBrands= await this.brandRepositry.find()
-      if ( !allBrands || allBrands.length === 0){
-        throw new NotFoundException("There is no brands data Available")
-      }
-      return allBrands
+    return await this.brandRepositry.find()
   }
 
   async findOne(id: number):Promise<Brand> {

@@ -25,7 +25,7 @@ import imgAcceuille from '../../../assets/imgAcceuille.jpg'
 const Agencies = React.lazy(() => import('../../Administration/Agencies/Agencies'));
 const ListRepair = React.lazy(() => import('../../Reception/ListRepair'));
 const SendToAssign = React.lazy(() => import('../../Reception/SendToAssign'));
-const Bin = React.lazy(() => import('../../Stock/Bin/Bin'));
+const Bin = React.lazy(() => import('../../Stock/Bin/Bin').then(m => ({ default: m.Bin })));
 const RecieveReception = React.lazy(() => import('../../Coordinate/RecieveReception'));
 const Assign = React.lazy(() => import('../../Coordinate/Assign'));
 const AcceptAssign = React.lazy(() => import('../../Reparation/AcceptAssign'));

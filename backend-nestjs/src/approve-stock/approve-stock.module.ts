@@ -16,9 +16,10 @@ import { Tracability } from 'src/tracability/entities/tracability.entity';
 import { Branch } from 'src/branches/entities/branch.entity';
 import { BranchesModule } from 'src/branches/branches.module';
 import { Company } from 'src/company/entities/company.entity';
+import { Repair } from 'src/repair/entities/repair.entity';
 
 @Module({
-  imports :[BranchesModule,ModelsModule,ReferencesModule,StockPartsModule,TypeOrmModule.forFeature([ApproveStock, StockPart, Branch, Bin, Company, Reference, HistoryStockPart, Tracability])],
+  imports :[BranchesModule,ModelsModule,ReferencesModule,StockPartsModule,TypeOrmModule.forFeature([ApproveStock, StockPart, Branch, Bin, Company, Reference, HistoryStockPart, Tracability, Repair])],
   controllers: [ApproveStockController],
   providers: [ApproveStockService, StockPartsService,AppService],
   exports: [TypeOrmModule, ApproveStockService],

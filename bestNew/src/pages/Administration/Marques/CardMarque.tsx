@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../../services/api';
 import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -33,7 +34,7 @@ export default function CardMarque(item:any) {
         <CardMedia
         component="img"
         sx={{ width: 200 , height:90}}
-        image={`http://localhost:3000/upload/brands/${item.logo}`}
+        image={`${API_BASE_URL}/upload/brands/${item.logo}`}
         alt="Un marque"
       />  
     </Card>

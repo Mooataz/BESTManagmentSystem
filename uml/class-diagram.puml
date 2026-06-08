@@ -1,0 +1,255 @@
+@startuml
+skinparam class {
+  BackgroundColor #FAFAFA
+  BorderColor #1565C0
+}
+skinparam package {
+  BackgroundColor #E3F2FD
+  BorderColor #1565C0
+}
+skinparam arrow {
+  Color #1565C0
+}
+
+package "Société & Agences" {
+  class Company {
+    + id: number
+    + name: string
+    + headquarterslocation: string
+    + taxRegisterNumber: string
+    + rib: Number
+    + bank: string
+    + logo: string
+    + quantityAlertStock: number
+    + tva: number
+    + timbreFiscale: number
+  }
+  class Branch {
+    + id: number
+    + name: string
+    + location: string
+    + phone: number
+    + email: string
+  }
+  class User {
+    + id: number
+    + name: string
+    + phone: number
+    + login: string
+    + password: string
+    + role: string[]
+    + status: string
+    + createdDate: Date
+  }
+  class Notification {
+    + id: number
+    + title: string
+    + body: string
+    + description: string
+  }
+}
+
+Company "1" --o{ "0..*" Branch : branches
+Branch "1" --o{ "0..*" User : employees
+Branch "1" --o{ "0..*" Notification : branchNotif
+User "1" --o{ "0..*" Notification : userNotif
+
+package "Clients & Distributeurs" {
+  class Customer {
+    + id: number
+    + name: string
+    + phone: number
+  }
+  class Distributeur {
+    + id: number
+    + name: string
+    + phone: number
+    + email: string
+    + location: string
+    + taxRegisterNumber: string
+  }
+  class OutputList {
+    + id: number
+    + date: Date
+    + remark: string
+  }
+}
+
+Distributeur "1" --o{ "0..*" Customer : distributer
+Customer "1" --o{ "0..*" OutputList : outputList
+User "1" --o{ "0..*" OutputList : createdBy
+Customer "1" --o{ "0..*" OutputList : forCustomer
+
+package "Appareils & Modèles" {
+  class Device {
+    + id: number
+    + serialenumber: string
+    + purchaseDate: Date
+  }
+  class Model {
+    + id: number
+    + name: string
+    + picture: string
+  }
+  class Brand {
+    + id: number
+    + name: string
+    + logo: string
+    + status: string
+  }
+  class TypeModel {
+    + id: number
+    + description: string
+  }
+  class LevelRepair {
+    + id: number
+    + name: string
+    + price: float
+  }
+}
+
+Brand "1" --o{ "0..*" Model : models
+TypeModel "1" --o{ "0..*" Model : models
+Model "1" --o{ "0..*" Device : devices
+Brand "*" --o{ "*" LevelRepair : levels
+
+package "Pièces & Stock" {
+  class AllPart {
+    + id: number
+    + description: string
+  }
+  class Reference {
+    + id: number
+    + materialCode: string
+    + description: string
+  }
+  class PartsPrice {
+    + id: number
+    + price: float
+  }
+  class Bin {
+    + id: number
+    + name: string
+    + type: string
+  }
+  class StockPart {
+    + id: number
+    + remark: string
+    + serialNumber: string
+  }
+  class ApproveStock {
+    + id: number
+    + type: string
+    + date: Date
+    + state: string
+    + idPartRepair: number
+  }
+  class StockAlert {
+    + id: number
+    + branchId: number
+    + type: string
+    + report: jsonb
+    + readBy: string[]
+    + createdAt: Date
+  }
+}
+
+AllPart "1" --o{ "0..*" Reference : references
+Reference "0..*" --o{ "1" AllPart : part
+Model "0..*" --o{ "*" Reference : models
+Model "0..*" --o{ "*" AllPart : compatibleParts
+Model "1" --o{ "0..*" PartsPrice : priceByModel
+AllPart "1" --o{ "0..*" PartsPrice : priceByPart
+LevelRepair "1" --o{ "0..*" PartsPrice : levelPrice
+Bin "1" --o{ "0..*" StockPart : parts
+Reference "1" --o{ "0..*" StockPart : stockEntries
+Branch "1" --o{ "0..*" Bin : bins
+Branch "1" --o{ "0..*" StockAlert : alerts
+ApproveStock "1" -- "*" StockPart : stockPart
+
+package "Réparation" {
+  class Repair {
+    + id: number
+    + warrenty: boolean
+    + approveRepair: boolean
+    + newserialnumber: string
+    + actuellybranch: number
+    + files: string[]
+    + partsNeed: number[]
+    + remark: string
+    + deviceStateReceive: string
+  }
+  class HistoryRepair {
+    + id: number
+    + date: Date
+    + step: string
+  }
+  class Accessory
+  class ListFault
+  class ExpertiseReason
+  class RepairAction
+  class CustomerRequest
+  class NotesCustomer
+  class Transfert {
+    + id: number
+    + delivredBy: string
+    + sendingDate: Date
+    + frombranch: number
+    + sendUser: number
+    + receivedDate: Date
+    + tobranch: number
+    + receiveUser: number
+    + type: string
+    + state: string
+  }
+  class Invoice {
+    + id: number
+    + paymentMethod: string
+    + date: Date
+    + state: string
+    + totalPrice: float
+    + tva: float
+    + timbreFiscale: float
+    + partsTotal: float
+    + levelRepairPrice: float
+    + otherCostsTotal: float
+    + details: jsonb
+  }
+  class Sale {
+    + id: number
+    + state: string
+    + totalPrice: float
+    + date: Date
+    + details: jsonb
+  }
+  class OtherCost {
+    + id: number
+    + price: float
+    + name: string
+    + status: string
+  }
+}
+
+User "1" --o{ "0..*" Repair : assignedTo
+Device "1" --o{ "0..*" Repair : repairs
+Customer "1" --o{ "0..*" Repair : customerRepairs
+OutputList "0..1" --o{ "0..*" Repair : outputList
+Repair "1" --o{ "0..*" HistoryRepair : history
+Repair "1" --o{ "0..*" ApproveStock : stockApprovals
+Invoice "0..1" -- "0..1" Repair : invoice
+Repair "*" --o{ "*" Accessory : accessories
+Repair "*" --o{ "*" ListFault : faults
+Repair "*" --o{ "*" ExpertiseReason : reasons
+Repair "*" --o{ "*" RepairAction : actions
+Repair "*" --o{ "*" CustomerRequest : requests
+Repair "*" --o{ "*" NotesCustomer : notes
+Transfert "*" --o{ "*" Repair : transferredRepairs
+Transfert "*" --o{ "*" StockPart : transferredParts
+Invoice "*" --o{ "*" OtherCost : costs
+User "1" --o{ "0..*" Invoice : createdInvoices
+User "1" --o{ "0..*" Sale : sales
+Customer "1" --o{ "0..*" Sale : customerSales
+AllPart "*" --o{ "*" Sale : soldParts
+ApproveStock "0..*" -- "1" Sale : saleStock
+
+@enduml

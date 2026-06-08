@@ -1,29 +1,26 @@
 import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
-import MuiToolbar from '@mui/material/Toolbar';
-import { tabsClasses } from '@mui/material/Tabs';
-import Typography from '@mui/material/Typography';
-import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
-import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
-import SideMenuMobile from './SideMenuMobile';
-import MenuButton from './MenuButton';
-import ColorModeIconDropdown from '../../../Athentification/shared-theme/ColorModeIconDropdown';
-import type { RootState } from '../../../../Redux/store';
 import { useSelector } from 'react-redux';
+import type { RootState } from '../../../../Redux/store';
 import { useAppDispatch } from '../../../../Redux/hooks';
-import { getCompany } from '../../../../Redux/Actions/Administration/Company';
+import { AppBar, Avatar, Box, Divider, IconButton, ListItemIcon, Menu, MenuItem, Stack, Toolbar, Tooltip, Typography } from '@mui/material';
+import { tabsClasses } from '@mui/material/Tabs';
+import { styled } from '@mui/material/styles';
+import { API_BASE_URL } from '../../../../services/api';
 import theme from '../../../../Theme/theme';
-import { Avatar, Divider, IconButton, ListItemIcon, Menu, MenuItem, Tooltip } from '@mui/material';
+import logoFallback from '../../../../assets/BestV2.png';
 import { TbPassword } from 'react-icons/tb';
 import { BiLogOut } from 'react-icons/bi';
 import { useTranslation } from 'react-i18next';
- import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import ColorModeIconDropdown from '../../shared-theme/ColorModeIconDropdown';
+import MenuButton from './MenuButton';
+import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
+import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import { VscStarEmpty } from 'react-icons/vsc';
+import { getCompany } from '../../../../Redux/Actions/Administration/Company';
+import SideMenuMobile from './SideMenuMobile';
  
-const Toolbar = styled(MuiToolbar)({
+const StyledToolbar = styled(Toolbar)({
   width: '100%',
   padding: '12px',
   display: 'flex',
@@ -73,7 +70,7 @@ export default function AppNavbar() {
         top: 'var(--template-frame-height, 0px)',
       }}
     >
-      <Toolbar variant="regular">
+      <StyledToolbar variant="regular">
         <Stack
           direction="row"
           sx={{
@@ -95,7 +92,7 @@ export default function AppNavbar() {
                             borderRadius: '30%',
                             marginLeft:'70px' }}
                     >
-                      <img  src={company?.logo ? `http://localhost:3000/upload/company/${company.logo}` : "https://via.placeholder.com/150"} 
+                      <img  src={company?.logo ? `${API_BASE_URL}/upload/company/${company.logo}` : logoFallback} 
                             style={{  width: '50px', 
                                       borderRadius: '30px' }} />
                     </IconButton>
@@ -116,7 +113,7 @@ export default function AppNavbar() {
           
           <SideMenuMobile open={open} toggleDrawer={toggleDrawer} />
         </Stack>
-      </Toolbar>
+      </StyledToolbar>
     </AppBar>
   );
 }

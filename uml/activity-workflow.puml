@@ -1,0 +1,49 @@
+@startuml
+start
+:Client dépose l'appareil;
+:Chercher/Créer client;
+:Chercher/Créer appareil (modèle, IMEI);
+:Créer fiche de réparation\n(panne déclarée, accessoires,\nnotes client);
+:Historique: "Déposé";
+
+if (Devis validé ?) then (Oui)
+  :Attribuer à technicien;
+  :Historique: "Attribué";
+else (Non)
+  :Expertiser;
+  :Établir devis\n(levelRepair + pièces);
+  :Historique: "Diagnostic posé";
+  repeat
+    :Présenter devis au client;
+  repeat while (Client valide ?) is (Non)
+  -> Oui;
+  :Historique: "Devis validé";
+  :Attribuer à technicien;
+  :Historique: "Attribué";
+endif
+
+:Réparer;
+:Demander pièces (approve-stock);
+if (Nouvel IMEI ?) then (Oui)
+  :Enregistrer nouvel IMEI;
+endif
+:Historique: "Réparé";
+
+:Contrôle Qualité;
+if (CQ validé ?) then (Oui)
+  :Historique: "Validé CQ";
+  :Transférer vers agence\n(Prêt à récupérer);
+  :Historique: "Prêt à récupérer";
+else (Non)
+  :Retour en réparation;
+  :Historique: "Retour CQ";
+  note right: Retour à l'étape Réparation
+  --> Réparer;
+endif
+
+:Client récupère;
+:Générer facture (PDF);
+:Enregistrer sortie (output-list);
+:Historique: "Récupéré";
+stop
+@enduml

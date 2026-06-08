@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { Box, Collapse, Divider, Tooltip, Typography } from '@mui/material';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../../../Redux/store';
-import { MdExpandLess, MdExpandMore, MdMiscellaneousServices, MdOutlinePhonelinkSetup } from 'react-icons/md';
+import { MdExpandLess, MdExpandMore, MdLocalLibrary, MdMiscellaneousServices, MdOutlinePhonelinkSetup } from 'react-icons/md';
 import { HiOutlineOfficeBuilding } from 'react-icons/hi';
 import { LiaCodeBranchSolid } from 'react-icons/lia';
 import { FcAndroidOs, FcApproval, FcConferenceCall, FcCurrencyExchange, FcDataConfiguration, FcHeadset, FcLineChart, FcList, FcMindMap, FcMultipleDevices, FcMultipleSmartphones, FcReadingEbook, FcSalesPerformance, FcSearch, FcTouchscreenSmartphone, FcTreeStructure, FcVoicePresentation } from 'react-icons/fc';
@@ -51,7 +51,7 @@ export default function MenuContent() {
   const handleNavigation = (page: string) => {
     navigate(`/dashboard/${page}`);
   };
-  
+
   const [filteredMenuItems, setFilteredMenuItems] = React.useState<MenuItem[]>([]);
   const [openMenus, setOpenMenus] = React.useState<Record<string, boolean>>({});
   const userr = useSelector((state: RootState) => state.auth.user);
@@ -60,104 +60,130 @@ export default function MenuContent() {
 
   const isChildActive = (children: { page: string }[]) =>
     children.some(c => isActive(c.page));
+{/*
+    MenuItem Menu Dashboard
+  
+  */}
+const menuItems: MenuItem[] = [
 
-  const menuItems: MenuItem[] = [
-    {
-      label: 'Administration',
-      icon: <MdMiscellaneousServices style={{ color: theme.palette.secondary.main }} />,
-      children: [
-        { label: 'Entreprise', page: 'Entreprise', icon: <HiOutlineOfficeBuilding style={{ color: theme.palette.primary.main }} /> },
-        { label: 'Agence', page: 'Agencies', icon: <LiaCodeBranchSolid style={{ color: theme.palette.secondary.main }} /> },
-        { label: 'Employees', page: 'Employees', icon: <FcConferenceCall /> },
-        { label: 'Marques', page: 'Marques', icon: <FcAndroidOs /> },
-        { label: 'Distributeurs', page: 'Distributeurs', icon: <FcTreeStructure /> },
-        { label: 'Raisonsexpertise', page: 'RaisonsExpertise', icon: <IoWaterOutline style={{ color: '#81D4FA' }} /> },
-        { label: 'ListProblem', page: 'ListProblemes', icon: <BiError style={{ color: 'red' }} /> },
-        { label: 'CustomerRequest', page: 'DemandeClient', icon: <FcReadingEbook /> },
-        { label: 'NoteClient', page: 'NoteToCustomers', icon: <RiUserVoiceLine style={{ color: theme.palette.secondary.main }} /> },
-        { label: 'ListAllPart', page: 'listePiécesTotal', icon: <FcList /> },
-        { label: 'LevelRepair', page: 'NiveauRéparation', icon: <BiTrendingUp style={{ color: 'gold' }} /> }, 
-        { label: 'Action de diagnostique', page: 'RepairActions', icon: <BiTrendingUp style={{ color: 'gold' }} /> },
-        { label: 'OthersCoast', page: 'AutresFrais', icon: <FcCurrencyExchange /> },
-        { label: 'Legislation', page: 'Legislation', icon: <GoLaw style={{ color: theme.palette.secondary.main }} /> },
-      ],
-    },
-    {
-      label: 'Statistiques', page: 'Statistique', icon: <FcLineChart/>
-    },
+  {
+    label: 'Administration',
+    icon: <MdMiscellaneousServices style={{ color: theme.palette.secondary.main }} />,
+    children: [
+      { label: 'Entreprise', page: 'Entreprise', icon: <HiOutlineOfficeBuilding style={{ color: theme.palette.primary.main }} /> },
+      { label: 'Agence', page: 'Agencies', icon: <LiaCodeBranchSolid style={{ color: theme.palette.secondary.main }} /> },
+      { label: 'Employees', page: 'Employees', icon: <FcConferenceCall /> },
+      { label: 'Marques', page: 'Marques', icon: <FcAndroidOs /> },
+      { label: 'Distributeurs', page: 'Distributeurs', icon: <FcTreeStructure /> },
+      { label: 'Legislation', page: 'Legislation', icon: <GoLaw style={{ color: theme.palette.secondary.main }} /> },
+      { label: 'Statistiques', page: 'Statistique', icon: <FcLineChart /> },
 
-    {
-      label: 'ModelsAccessory',
-      icon: <FcMultipleDevices />,
-      children: [
-        { label: 'Accessoires', page: 'Accessoires', icon: <FcHeadset /> },
-        { label: 'Modéles', page: 'Modéles', icon: <FcTouchscreenSmartphone /> },
-        { label: 'TypeModel', page: 'TypeModéle', icon: <FcMultipleSmartphones /> },
-      ]
-    },
 
-    {
-      label: 'Gestionstocks',
-      icon: <FcDataConfiguration style={{ color: theme.palette.secondary.main }} />,
-      children: [
-        { label: 'ApprovePart', page: 'AccordPiéces', icon: <FcApproval /> },
-        { label: 'Reférences', page: 'Reférences', icon: <GoNumber /> },
-        { label: 'case', page: 'case', icon: <CommitIcon /> },
-        { label: 'StateStock', page: 'EtatStock', icon: <SiDatabricks /> },
-        { label: 'RemplireStock', page: 'RemplissageStock', icon: <TbDatabasePlus /> },
-        { label: 'Transfertpiéces', page: 'TransfertPiéces', icon: <TbArrowsLeftRight /> },
-        { label: 'Reçoipiéces', page: 'ReçoiPiéces', icon: <TbTruckDelivery /> },
-        { label: 'AjusterPrix', page: 'AjusterPrixPiéces', icon: <FcCurrencyExchange /> },
-        { label: 'Démantèlement', page: 'Démantèlement', icon: <RiPageSeparator /> },
-      ]
-    },
-    {
-      label: 'Reception',
-      icon: <FcVoicePresentation />,
-      children: [
-        { label: 'Reçoiproduit', page: 'ReçoiProduit', icon: <TbTruckReturn /> },
-        { label: 'Etatproduit', page: 'ListRepair', icon: <TbClipboardCheck /> },
-        { label: 'Envoyeraffectation', page: 'EnvoyeAffectation', icon: <VscGitPullRequestGoToChanges /> },
-        { label: 'ReciveQC', page: 'RecevoireQC', icon: <GrValidate /> },
-        { label: 'Récupererproduit', page: 'RécupererProduit', icon: <BsPhone /> },
-        { label: 'Etatrécuperation', page: 'ListOutPut', icon: <BsClipboardData /> },
-        { label: 'Factures', page: 'Invoices', icon: <FcSalesPerformance /> },
-       
-      ]
-    },
+    ],
+  },
 
-    {
-      label: 'Réparation',
-      icon: <MdOutlinePhonelinkSetup style={{ color: theme.palette.primary.main }} />,
-      children: [
-        { label: 'ReçoitAffectation', page: 'ReçoiAffectation', icon: <TbAffiliate /> },
-        { label: 'listTotal', page: 'listTotal', icon: <BsTools /> },
-      ]
-    },
+  {
+    label: 'Référentiel technique',
+    icon: <MdLocalLibrary style={{ color: theme.palette.secondary.main }} />,
+    children: [
+      { label: 'LevelRepair', page: 'NiveauRéparation', icon: <BiTrendingUp style={{ color: 'gold' }} /> },
+      { label: 'Action de diagnostique', page: 'RepairActions', icon: <BiTrendingUp style={{ color: 'gold' }} /> },
+      { label: 'OthersCoast', page: 'AutresFrais', icon: <FcCurrencyExchange /> },
+      { label: 'Raisonsexpertise', page: 'RaisonsExpertise', icon: <IoWaterOutline style={{ color: '#81D4FA' }} /> },
+      { label: 'ListProblem', page: 'ListProblemes', icon: <BiError style={{ color: 'red' }} /> },
+      { label: 'CustomerRequest', page: 'DemandeClient', icon: <FcReadingEbook /> },
+      { label: 'NoteClient', page: 'NoteToCustomers', icon: <RiUserVoiceLine style={{ color: theme.palette.secondary.main }} /> },
+      { label: 'ListAllPart', page: 'listePiécesTotal', icon: <FcList /> },
+    ]
+  },
 
-    {
-      label: 'Coordination',
-      icon: <FcMindMap />,
-      children: [
-        { label: 'Reçoireception', page: 'ReçoiReception', icon: <BsBoxSeam /> },
-        { label: 'Affectation', page: 'Affectation', icon: <TbClipboardCheck /> },
-        { label: 'Réaffectation', page: 'Réaffectation', icon: <TbArrowsLeftRight /> },
-        { label: 'Accepter CQ', page: 'AccepteQC', icon: <GrValidate /> }, 
-        { label: 'Validation CQ', page: 'ValidationCQ', icon: <FcApproval /> },
-        { label: 'Transfertproduit', page: 'MenuTransfert', icon: <TbTruckDelivery /> }, 
-      ]
-    },
+  {
+    label: 'ModelsAccessory',
+    icon: <FcMultipleDevices />,
+    children: [
+      { label: 'Accessoires', page: 'Accessoires', icon: <FcHeadset /> },
+      { label: 'Modéles', page: 'Modéles', icon: <FcTouchscreenSmartphone /> },
+      { label: 'TypeModel', page: 'TypeModéle', icon: <FcMultipleSmartphones /> },
+    ]
+  },
 
-    {
-      label: 'Pièces: Disponibilité / Prix ', page: 'ViewParts', icon: <FcSearch />
-    },
+  {
+    label: 'Attribution',
+    icon: <FcMindMap />,
+    children: [
+      { label: 'Reçoireception', page: 'ReçoiReception', icon: <BsBoxSeam /> },
+      { label: 'Affectation', page: 'Affectation', icon: <TbClipboardCheck /> },
+      { label: 'Réaffectation', page: 'Réaffectation', icon: <TbArrowsLeftRight /> },
+    ]
+  },
 
-    {
-      label: 'Consulterappareille', page: 'ConsulterAppareille', icon: <FcSearch />
-    },
-          { label: 'Vente', page: 'Sales', icon: <BsShop /> },
+  {
+    label: 'Controle Qualité',
+    icon: <FcApproval />,
+    children: [
+      { label: 'Accepter CQ', page: 'AccepteQC', icon: <GrValidate /> },
+      { label: 'Validation CQ', page: 'ValidationCQ', icon: <FcApproval /> },
+      { label: 'Transfertproduit', page: 'MenuTransfert', icon: <TbTruckDelivery /> },
+    ]
+  },
 
-  ];
+  {
+    label: 'Gestionstocks',
+    icon: <FcDataConfiguration style={{ color: theme.palette.secondary.main }} />,
+    children: [
+      { label: 'ApprovePart', page: 'AccordPiéces', icon: <FcApproval /> },
+      { label: 'Reférences', page: 'Reférences', icon: <GoNumber /> },
+      { label: 'case', page: 'case', icon: <CommitIcon /> },
+      { label: 'StateStock', page: 'EtatStock', icon: <SiDatabricks /> },
+      { label: 'RemplireStock', page: 'RemplissageStock', icon: <TbDatabasePlus /> },
+      { label: 'Transfertpiéces', page: 'TransfertPiéces', icon: <TbArrowsLeftRight /> },
+      { label: 'Reçoipiéces', page: 'ReçoiPiéces', icon: <TbTruckDelivery /> },
+      { label: 'AjusterPrix', page: 'AjusterPrixPiéces', icon: <FcCurrencyExchange /> },
+      { label: 'Démantèlement', page: 'Démantèlement', icon: <RiPageSeparator /> },
+    ]
+  },
+
+  {
+    label: 'Réparation',
+    icon: <MdOutlinePhonelinkSetup style={{ color: theme.palette.primary.main }} />,
+    children: [
+      { label: 'ReçoitAffectation', page: 'ReçoiAffectation', icon: <TbAffiliate /> },
+      { label: 'listTotal', page: 'listTotal', icon: <BsTools /> },
+    ]
+  },
+
+  {
+    label: 'Accueil',
+    icon: <FcVoicePresentation />,
+    children: [
+      { label: 'Reçoiproduit', page: 'ReçoiProduit', icon: <TbTruckReturn /> },
+      { label: 'Etatproduit', page: 'ListRepair', icon: <TbClipboardCheck /> },
+      { label: 'Envoyeraffectation', page: 'EnvoyeAffectation', icon: <VscGitPullRequestGoToChanges /> },
+
+    ]
+  },
+
+
+  {
+    label: 'Récupération',
+    icon: <FcDataConfiguration />,
+    children: [
+      { label: 'ReciveQC', page: 'RecevoireQC', icon: <GrValidate /> },
+      { label: 'Récupererproduit', page: 'RécupererProduit', icon: <BsPhone /> },
+      { label: 'Etatrécuperation', page: 'ListOutPut', icon: <BsClipboardData /> },
+      { label: 'Factures', page: 'Invoices', icon: <FcSalesPerformance /> },
+    ]
+  },
+  { label: 'Vente', page: 'Sales', icon: <BsShop /> },
+  {
+    label: 'Consultation',
+    icon: <FcSearch />,
+    children: [
+      { label: 'Pièces: Disponibilité / Prix ', page: 'ViewParts', icon: <FcSearch /> },
+      { label: 'Consulterappareille', page: 'ConsulterAppareille', icon: <FcSearch /> },
+    ]
+  },
+];
 
   const handleToggle = (label: string) => {
     setOpenMenus((prev) => ({ ...prev, [label]: !prev[label] }));
@@ -169,16 +195,16 @@ export default function MenuContent() {
         let tempFiltered: MenuItem[] = [];
 
         if (userr?.role.includes('Reception')) {
-          tempFiltered = [menuItems[2], menuItems[4], menuItems[9]];
+          tempFiltered = [menuItems[2], menuItems[7], menuItems[8], menuItems[9]];
         }
 
-        if (userr?.role.includes('Technicien')) { tempFiltered = [...tempFiltered, menuItems[5]] }
+        if (userr?.role.includes('Technicien')) { tempFiltered = [...tempFiltered, menuItems[6]] }
 
-        if (userr?.role.includes('Gestionnaire_de_stocks')) { tempFiltered = [...tempFiltered, menuItems[3], menuItems[9]]; }
+        if (userr?.role.includes('Gestionnaire_de_stocks')) { tempFiltered = [...tempFiltered, menuItems[5], menuItems[9]]; }
 
-        if (userr?.role.includes('Coordinateur')) { tempFiltered = [...tempFiltered, menuItems[6]] }
+        if (userr?.role.includes('Coordinateur')) { tempFiltered = [...tempFiltered, menuItems[3], menuItems[4]]; }
 
-        tempFiltered = [...tempFiltered, menuItems[7], menuItems[8]];
+        tempFiltered = [...tempFiltered, menuItems[10]];
         if (userr?.role.includes('Administrateur')) { tempFiltered = menuItems; }
 
         setFilteredMenuItems(tempFiltered);
@@ -220,7 +246,7 @@ export default function MenuContent() {
 
     if (hasChildren) {
       return (
-        <Box key={item.label} sx={{ mb: 0.5 }}>
+        <Box key={'group-' + item.label} sx={{ mb: 0.5 }}>
           <ListItem disablePadding sx={{ display: 'block' }}>
             <ListItemButton
               onClick={() => handleToggle(item.label)}
@@ -261,7 +287,7 @@ export default function MenuContent() {
     if ('page' in item) {
       const isLeafActive = isActive(item.page);
       return (
-        <ListItem disablePadding key={item.label} sx={{ display: 'block' }}>
+        <ListItem disablePadding key={'leaf-' + item.page} sx={{ display: 'block' }}>
           <Tooltip title={t(item.label)} placement="right" arrow>
             <ListItemButton
               onClick={() => handleNavigation(item.page)}

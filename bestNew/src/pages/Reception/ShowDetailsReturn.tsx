@@ -64,7 +64,7 @@ setResults(mappedRepairs);
     const [results, setResults] = useState<RepairForm[]>([]);
 
   
-console.log('results', results)
+ 
     return (
         <div>
             <Modal

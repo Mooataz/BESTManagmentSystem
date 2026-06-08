@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../../services/api';
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -124,7 +125,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
         reset(); // Réinitialise le formulaire
         navigate('/dashboard');
       } else if (loginUser.rejected.match(resultAction)) {
-         notify(`${resultAction.error.message}`, "error");
+         notify(`${resultAction.payload}`, "error");
         setOpen(true);
       }
 
@@ -150,7 +151,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
               display: 'flex'
             }}>
             <Box component="img"
-              src={company?.logo ? `http://localhost:3000/upload/company/${company.logo}` : "https://via.placeholder.com/150"}
+              src={company?.logo ? `${API_BASE_URL}/upload/company/${company.logo}` : LogoBest}
               alt="Logo entreprise"
               sx={{
                 maxHeight: 70,

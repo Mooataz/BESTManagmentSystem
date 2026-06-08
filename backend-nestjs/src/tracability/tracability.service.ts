@@ -44,11 +44,7 @@ async create(createTracabilityDto: CreateTracabilityDto): Promise<Tracability> {
 
 
   async findAll():Promise<Tracability[]> {
-     const findAll= await this.tracabilityRepositry.find()
-          if ( !findAll || findAll.length === 0){
-            throw new NotFoundException("There is no data Available")
-          }
-          return findAll
+    return await this.tracabilityRepositry.find()
   }
 
   async findOne(id: number):Promise<Tracability> {

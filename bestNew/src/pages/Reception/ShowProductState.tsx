@@ -151,7 +151,9 @@ export default function ShowProductState() {
 
       if (textFilters.serialenumber) {
         const q = textFilters.serialenumber.toLowerCase();
-        if (!d.serialenumber?.toLowerCase().includes(q)) return false;
+        const deviceSnMatch = d.serialenumber?.toLowerCase().includes(q);
+        const repairSnMatch = (d.repair ?? []).some(r => r.newserialnumber?.toLowerCase().includes(q));
+        if (!deviceSnMatch && !repairSnMatch) return false;
       }
 
       if (textFilters.deviceId) {
@@ -210,7 +212,7 @@ export default function ShowProductState() {
 
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid size={2.4}>
-          <TextField fullWidth size="small" label="Numéro de série"
+          <TextField fullWidth size="small" label="SN appareil / nouvelle pièce"
             value={textFilters.serialenumber}
             onChange={e => setTextFilters({ ...textFilters, serialenumber: e.target.value })}
           />

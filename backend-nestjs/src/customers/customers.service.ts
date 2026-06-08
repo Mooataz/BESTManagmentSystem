@@ -22,11 +22,7 @@ export class CustomersService {
   }
 
   async findAll(): Promise<Customer[]> {
-    const allCustomers = await this.customerRepositry.find()
-    if (!allCustomers || allCustomers.length === 0) {
-      throw new NotFoundException("There is no Customers data Available")
-    }
-    return allCustomers
+    return await this.customerRepositry.find()
   }
 
   async findOne(id: number): Promise<Customer> {

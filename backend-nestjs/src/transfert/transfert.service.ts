@@ -70,11 +70,7 @@ export class TransfertService {
   }
 
   async findAll(): Promise<Transfert[]> {
-    const findAll = await this.transfertRepositry.find()
-    if (!findAll || findAll.length === 0) {
-      throw new NotFoundException("There is no Transfert available")
-    }
-    return findAll
+    return await this.transfertRepositry.find()
   }
 
   async findOne(id: number): Promise<Transfert> {

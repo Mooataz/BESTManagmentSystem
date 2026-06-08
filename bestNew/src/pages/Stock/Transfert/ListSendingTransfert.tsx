@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../../services/api';
 import React, { useEffect, useState } from 'react'
 import DynamicTable from '../../../Componants/Global/TableComponat'
 import { useAppDispatch } from '../../../Redux/hooks';
@@ -37,7 +38,7 @@ export default function ListSendingTransfert() {
     const handleClose = () => setOpen(false);
 
     const handleDownloadPdf = (transfertId: number) => {
-        const url = `http://localhost:3000/transfert/pdf/${transfertId}`;
+        const url = `${API_BASE_URL}/transfert/pdf/${transfertId}`;
         const a = document.createElement('a');
         a.href = url;
         a.download = `transfert_${transfertId}.pdf`;

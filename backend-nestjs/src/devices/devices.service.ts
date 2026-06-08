@@ -26,11 +26,7 @@ export class DevicesService {
   }
 
   async findAll(): Promise<Device[]> {
-    const findAll = await this.deviceRepositry.find()
-    if (!findAll || findAll.length === 0) {
-      throw new NotFoundException("There is no devices available")
-    }
-    return findAll
+    return await this.deviceRepositry.find()
   }
 
   async findOne(id: number): Promise<Device> {

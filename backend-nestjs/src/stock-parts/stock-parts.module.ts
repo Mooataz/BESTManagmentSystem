@@ -19,14 +19,13 @@ import { HistoryStockPart } from 'src/history-stock-part/entities/history-stock-
 import { PdfService } from 'src/pdf/pdf.service';
 import { Pdf } from 'src/pdf/entities/pdf.entity';
 import { Legislation } from 'src/legislation/entities/legislation.entity';
-import { StockGateway } from './Stock.Gateway';
 import { User } from 'src/users/entities/user.entity';
 import { RepairModule } from 'src/repair/repair.module';
 
 @Module({
-  imports: [ModelsModule, ReferencesModule, RepairModule, TypeOrmModule.forFeature([StockPart, StockGateway, Model,User, Reference, AllPart, Branch, Bin, Company, Tracability, HistoryStockPart, Pdf, Legislation])],
+  imports: [ModelsModule, ReferencesModule, RepairModule, TypeOrmModule.forFeature([StockPart, Model,User, Reference, AllPart, Branch, Bin, Company, Tracability, HistoryStockPart, Pdf, Legislation])],
   controllers: [StockPartsController],
-  providers: [StockPartsService, AppService, PdfService, StockGateway],
-  exports:[TypeOrmModule, StockPartsService, PdfService, StockGateway]
+  providers: [StockPartsService, AppService, PdfService],
+  exports:[TypeOrmModule, StockPartsService, PdfService]
 })
 export class StockPartsModule {}

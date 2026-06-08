@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../../../services/api';
 import * as React from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -134,7 +135,7 @@ React.useEffect(() => {
                               objectFit: 'cover', // ou 'contain' selon préférence
                               borderRadius: '8px'
                             }}
-                            src={`http://localhost:3000/upload/models/${selectedModel.picture}`}
+                            src={`${API_BASE_URL}/upload/models/${selectedModel.picture}`}
                             loading="lazy"
                             alt={selectedModel.name ?? 'Modèle'}
                           />

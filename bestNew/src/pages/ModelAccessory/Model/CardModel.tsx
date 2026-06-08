@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../../services/api';
 import { Box, Card, CardContent, CardMedia, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import type { Model } from '../../../Redux/Types/repairTypes'
@@ -62,7 +63,7 @@ export default function CardModel(item: Model) {
       <CardMedia
         component="img"
         sx={{ width: 200, height: 300 }}
-        image={`http://localhost:3000/upload/models/${item.picture}`}
+        image={`${API_BASE_URL}/upload/models/${item.picture}`}
         alt="Un marque"
       />
     </Card>

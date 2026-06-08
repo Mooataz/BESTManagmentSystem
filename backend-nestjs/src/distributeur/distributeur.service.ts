@@ -22,13 +22,9 @@ export class DistributeurService {
   }
 
   async  findAll():Promise<Distributeur[]> {
-    const allDistributeurs= await this.distributeurRepositry.find({order: {
+    return this.distributeurRepositry.find({order: {
       id: 'DESC' 
     }})
-      if ( !allDistributeurs || allDistributeurs.length === 0){
-        throw new NotFoundException("There is no distributeurs data Available")
-      }
-      return allDistributeurs
   }
 
   async  findOne(id: number):Promise<Distributeur> {

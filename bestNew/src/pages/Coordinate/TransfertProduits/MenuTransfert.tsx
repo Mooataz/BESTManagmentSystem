@@ -1,4 +1,4 @@
-﻿import { API } from '../../../services/api';
+﻿import { API, API_BASE_URL } from '../../../services/api';
 import React, { useEffect, useMemo, useState } from 'react'
 import { Box, Button, Card, CardContent, Chip, Dialog, DialogContent, DialogTitle, FormControl, Grid, IconButton, InputLabel, MenuItem, Select, Tab, Table, TableBody, TableCell, TableHead, TableRow, Tabs, Typography } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
@@ -148,7 +148,7 @@ export default function MenuTransfert() {
             <TableCell>{t.sendingDate ? new Date(t.sendingDate).toLocaleString('fr-FR') : '—'}</TableCell>
             <TableCell>{statusChip(t.state)}</TableCell>
             <TableCell>
-              <Button size="small" variant="outlined" sx={{ mr: 0.5 }} onClick={() => window.open(`http://localhost:3000/transfert/pdf/${t.id}`, '_blank')}>
+              <Button size="small" variant="outlined" sx={{ mr: 0.5 }} onClick={() => window.open(`${API_BASE_URL}/transfert/pdf/${t.id}`, '_blank')}>
                 PDF
               </Button>
               <Button size="small" variant="outlined" sx={{ mr: 0.5 }} onClick={() => setDetailTransfer(t)}>Détail</Button>

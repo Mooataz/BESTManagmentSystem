@@ -14,8 +14,6 @@ export const addOutPut = createAsyncThunk<
 
     try {
       const response = await API.post(`output-list`, body);
-  
-
       return response.data.data;
     } catch (error: any) {
       return rejectWithValue(

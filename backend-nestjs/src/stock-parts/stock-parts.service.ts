@@ -23,7 +23,6 @@ import { HistoryStockPart } from 'src/history-stock-part/entities/history-stock-
 import { Tracability } from 'src/tracability/entities/tracability.entity';
 import { PdfService } from 'src/pdf/pdf.service';
 import { Legislation } from 'src/legislation/entities/legislation.entity';
-import { StockGateway } from './Stock.Gateway';
 import { User } from 'src/users/entities/user.entity';
 
 
@@ -42,8 +41,7 @@ export class StockPartsService {
     private appService: AppService,
     private modelService: ModelsService,
     private referenceService: ReferencesService,
-    private PDFService: PdfService,
-    private StockGateway: StockGateway,) { }
+    private PDFService: PdfService,) { }
 
   async create(createStockPartDto: CreateStockPartDto, userId: number): Promise<StockPart> {
     if (createStockPartDto.serialNumber) {

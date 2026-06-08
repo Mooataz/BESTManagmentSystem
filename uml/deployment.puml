@@ -1,0 +1,62 @@
+@startuml
+skinparam component {
+  BackgroundColor #F3E5F5
+  BorderColor #7B1FA2
+}
+skinparam node {
+  BackgroundColor #E8EAF6
+  BorderColor #283593
+}
+skinparam database {
+  BackgroundColor #E0F2F1
+  BorderColor #00695C
+}
+
+node "Client Navigateur" {
+  rectangle "React App\n(Vite 6 + MUI 7)" as ReactApp
+  rectangle "Redux Toolkit\n(Persist: auth,\nuser, company)" as Redux
+  rectangle "Axios\n(withCredentials)" as Axios
+}
+
+node "Serveur Web\n(NestJS)" {
+  rectangle "Controllers\n(REST API)" as Controllers
+  rectangle "Services\n(Métier)" as Services
+  rectangle "TypeORM\n(Repository Pattern)" as ORM
+  rectangle "ValidationPipe\n(whitelist)" as Validation
+  rectangle "Guard JWT\n(Cookies HttpOnly)" as Auth
+  rectangle "Helmet +\nThrottler" as Security
+  rectangle "Swagger\n(API Docs)" as Swagger
+}
+
+database "PostgreSQL" as PG {
+  rectangle "Tables\n(35 entities)" as Tables
+}
+
+node "Système de Fichiers" {
+  rectangle "Uploads\n(photos, logos)" as Uploads
+  rectangle "PDF\n(Factures)" as PDFs
+}
+
+ReactApp --> Axios : HTTP (port 5173)
+Axios --> Controllers : HTTP (port 3000)\ncookies inclus
+Controllers --> Services : Injection
+Services --> ORM : Repository
+ORM --> PG : SQL
+Security --> Controllers : Middleware
+Auth --> Controllers : Guard
+Validation --> Controllers : Pipe
+Controllers --> Uploads : Static files
+Services --> PDFs : Génération\n(pdfkit)
+Swagger --> Controllers : Documentation
+
+note right of ReactApp
+  .env racine
+  envDir: '../'
+  VITE_API_URL
+end note
+
+note right of Controllers
+  @UseGuards(JwtAuthGuard)
+  @UsePipes(ValidationPipe)
+end note
+@enduml

@@ -24,11 +24,8 @@ export class BinService {
   }
 
   async findAll():Promise<Bin[]> {
-    const findAll = await this.binRepositry.find()
-    if (!findAll || findAll.length === 0){
-      throw new NotFoundException('No Bin model found')
-    }
-    return findAll;  }
+    return await this.binRepositry.find()
+  }
 
   async findOne(id: number):Promise<Bin> {
     const findOne = await this.binRepositry.findOne({ where : { id } })

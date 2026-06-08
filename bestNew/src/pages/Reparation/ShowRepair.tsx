@@ -1,4 +1,4 @@
-﻿import { API } from '../../services/api';
+﻿import { API, API_BASE_URL } from '../../services/api';
 import React, { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import { Box, Card, CardContent, Chip, Grid, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
@@ -367,7 +367,7 @@ export default function ShowRepair({ repairId: propRepairId }: ShowRepairProps =
                   }}
                 >
                   <img
-                    src={`http://localhost:3000/upload/repairs/${f}`}
+                    src={`${API_BASE_URL}/upload/repairs/${f}`}
                     alt=""
                     style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                   />

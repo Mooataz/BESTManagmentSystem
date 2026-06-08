@@ -5,13 +5,15 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import { HttpExceptionFilter } from './common/http-exception.filter';
 
-import 'tsconfig-paths/register';
 async function bootstrap() {
+  const isProduction = process.env.NODE_ENV === 'production';
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    logger: ['log', 'error', 'warn', 'debug', 'verbose'],
+    logger: isProduction ? ['log', 'error', 'warn'] : ['log', 'error', 'warn', 'debug', 'verbose'],
   });
+  app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
   app.useGlobalFilters(new HttpExceptionFilter());
   const config= new DocumentBuilder()
@@ -28,8 +30,10 @@ async function bootstrap() {
     },
     'access-token',  )
   .build()
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+const apiPort = process.env.API_PORT || '3000';
 app.enableCors({
-  origin: 'http://localhost:5173',
+  origin: frontendUrl,
   credentials: true,
 });
 app.use(cookieParser());
@@ -38,16 +42,15 @@ app.use(cookieParser());
   
     
 
-const uploadPath =
-  process.env.NODE_ENV === 'production'
-    ? join(__dirname, '..', 'upload') // dist en prod
-    : join(__dirname, '..', '..', 'upload'); // src en dev
+const uploadPath = isProduction
+    ? join(__dirname, '..', 'upload')
+    : join(__dirname, '..', '..', 'upload');
 
 app.useStaticAssets(uploadPath, {
   prefix: '/upload/',
 });
-  await app.listen( 3000);
-    Logger.log('Application is running on: http://localhost:3000', 'Bootstrap');
+  await app.listen( apiPort);
+    Logger.log(`Application is running on: http://localhost:${apiPort}`, 'Bootstrap');
 
 }
 bootstrap();

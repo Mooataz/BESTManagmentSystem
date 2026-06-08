@@ -1,0 +1,73 @@
+@startuml
+actor "Agent\nRéception" as Reception
+actor "Client" as Client
+actor "Technicien" as Tech
+actor "CQ" as CQ
+participant "Frontend\nReact" as Front
+participant "Backend\nNestJS" as API
+database "PostgreSQL" as DB
+
+== Étape 1 : Dépôt & Création fiche ==
+Reception -> Front : Nouvel appareil
+Front -> API : POST /customers\n(findOrCreate)
+API -> DB : SELECT/INSERT customer
+DB --> API : customer
+API --> Front : { id, name, phone }
+Front -> API : POST /device\n{ serial, model }
+API -> DB : INSERT device
+DB --> API : device
+API --> Front : { device }
+Front -> API : POST /repair\n{ device, customer, faults,\naccessories, requests }
+API -> DB : INSERT repair
+API -> DB : INSERT history_repair\n(step: "Déposé")
+DB --> API : ok
+API --> Front : { repairId }
+Front --> Reception : Fiche créée (N° {id})
+
+== Étape 2 : Diagnostic ==
+Tech -> Front : Liste appareils attribués
+Front -> API : GET /repair?step=Déposé
+API --> Front : [{ repair }]
+Tech -> Front : Saisie diagnostic + devis
+Front -> API : PATCH /repair/{id}\n{ faults, actions, levelRepair, price }
+API --> Front : ok
+Front -> API : POST /history-repair\n{ step: "Diagnostic posé" }
+API --> Front : ok
+
+== Étape 3 : Validation client ==
+Client -> Front : Consulte devis
+Client -> Front : Valide devis
+Front -> API : PATCH /repair/{id}\n{ approveRepair: true }
+Front -> API : POST /history-repair\n{ step: "Devis validé" }
+
+== Étape 4 : Attribution ==
+Reception -> Front : Attribue à un technicien
+Front -> API : PATCH /repair/{id}\n{ user: techId }
+Front -> API : POST /history-repair\n{ step: "Attribué" }
+
+== Étape 5 : Réparation ==
+Tech -> Front : Pièces nécessaires
+Front -> API : POST /approve-stock\n{ repair, parts }
+API -> DB : UPDATE stock_part\n(quantities)
+API --> Front : ok
+Tech -> Front : Réparation terminée
+Front -> API : POST /history-repair\n{ step: "Réparé" }
+Front -> API : PATCH /repair/{id}\n{ newserialnumber? }
+
+== Étape 6 : Contrôle Qualité ==
+CQ -> Front : Appareils à contrôler
+CQ -> Front : Valide CQ
+Front -> API : POST /history-repair\n{ step: "Validé CQ" }
+Front -> API : PATCH /repair/{id}\n{ actuellybranch }
+
+== Étape 7 : Récupération ==
+Reception -> Front : Appareils prêts
+Client -> Reception : Récupère
+Reception -> Front : Générer facture
+Front -> API : POST /invoice\n{ repair, costs }
+API --> Front : { invoiceId, PDF }
+Front -> API : POST /output-list\n{ customer, repairIds }
+Front -> API : POST /history-repair\n{ step: "Récupéré" }
+Front --> Reception : Facture imprimée
+Reception -> Client : Appareil + Facture
+@enduml

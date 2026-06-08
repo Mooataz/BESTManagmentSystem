@@ -14,6 +14,7 @@ import { Tracability } from 'src/tracability/entities/tracability.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Reference } from 'src/references/entities/reference.entity';
 import { Company } from 'src/company/entities/company.entity';
+import { Repair } from 'src/repair/entities/repair.entity';
 
 @Injectable()
 export class ApproveStockService {
@@ -24,6 +25,7 @@ export class ApproveStockService {
               @InjectRepository(HistoryStockPart) private readonly historyStockPartRepositry: Repository<HistoryStockPart>,
               @InjectRepository(Tracability) private readonly tracabilityRepositry: Repository<Tracability>,
               @InjectRepository(Company) private readonly companyRepositry: Repository<Company>,
+              @InjectRepository(Repair) private readonly repairRepositry: Repository<Repair>,
 
 
               
@@ -109,10 +111,7 @@ async findByState(state: string): Promise<ApproveStock[]> {
 }
 
   async findAll(): Promise<ApproveStock[]> {
-    const findAll = await this.approveStockRepositry.find()
-    if (!findAll || findAll.length === 0) {
-      throw new NotFoundException("There is no data Available") }
-    return findAll
+    return await this.approveStockRepositry.find()
   }
 
   async findOne(id: number): Promise<ApproveStock> {
@@ -182,13 +181,13 @@ async findByState(state: string): Promise<ApproveStock[]> {
   async confirmPart(approveStockId: number, stockPartId: number, binDefectId: number, userId: number): Promise<ApproveStock> {
     const approveStock = await this.approveStockRepositry.findOne({
       where: { id: approveStockId },
-      relations: ['stockPart'],
+      relations: ['stockPart', 'repair'],
     });
     if (!approveStock) throw new NotFoundException('ApproveStock not found');
 
     const stockPart = await this.stockPartRepositry.findOne({
       where: { id: stockPartId },
-      relations: ['bin', 'bin.branch'],
+      relations: ['bin', 'bin.branch', 'reference', 'reference.allpart'],
     });
     if (!stockPart) throw new NotFoundException('StockPart not found');
     if (stockPart.bin?.type !== 'Bon') throw new BadRequestException('Part is not available (not in Bon bin)');
@@ -221,6 +220,14 @@ async findByState(state: string): Promise<ApproveStock[]> {
       stockPart: { id: stockPartId },
       state: 'Confirmer',
     });
+
+    // Si c'est une carte mère, mettre à jour le numéro de série de la réparation
+    const partName = stockPart.reference?.allpart?.description?.toLowerCase() || '';
+    if (partName.includes('carte mère') && approveStock.repair && stockPart.serialNumber) {
+      await this.repairRepositry.update(approveStock.repair.id, {
+        newserialnumber: stockPart.serialNumber,
+      });
+    }
 
     const updated = await this.approveStockRepositry.findOne({
       where: { id: approveStockId },

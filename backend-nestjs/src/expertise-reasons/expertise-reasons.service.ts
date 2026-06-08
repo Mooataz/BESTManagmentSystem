@@ -18,12 +18,8 @@ export class ExpertiseReasonsService {
   }
 
   async findAll():Promise<ExpertiseReason[]> {
-    const allfind = await this.expertiseReasonRepositry.find()
-
-    if (!allfind || allfind.length === 0) {
-      throw new NotFoundException ("There is no data available")
-    }
-    return allfind  }   
+    return await this.expertiseReasonRepositry.find()
+  }
 
   async findOne(id: number):Promise<ExpertiseReason> {
     const Onefind= await this.expertiseReasonRepositry.findOne({ where: { id } })

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../services/api';
 import React from 'react'
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
@@ -26,6 +27,7 @@ import SelectAgencie from '../../Componants/getAgence';
 import { getCurrentUser, handleLogout } from '../../Redux/Actions/authAction';
 import { useAppDispatch } from '../../Redux/hooks';
 import type { User } from '../../Redux/Types/authenTypes';
+import logoFallback from '../../assets/BestV2.png';
 
 interface Company {
   id: number;
@@ -142,7 +144,7 @@ const [currentUser, setCurrentUser] = React.useState<Partial<User>>();
           color="info"
           sx={{ display: { xs: 'none', sm: 'inline-flex' }, borderRadius: '30%' }}
         >
-          <img src={company?.logo ? `http://localhost:3000/upload/company/${company.logo}` : "https://via.placeholder.com/150"} style={{ width: '110px', borderRadius: '30px' }} />
+          <img src={company?.logo ? `${API_BASE_URL}/upload/company/${company.logo}` : logoFallback} style={{ width: '110px', borderRadius: '30px' }} />
         </IconButton>
         <Button
 

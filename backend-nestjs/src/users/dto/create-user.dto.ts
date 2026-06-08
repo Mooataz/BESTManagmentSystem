@@ -1,8 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsDate, IsEmail, IsEmpty, IsInt, IsNotEmpty, IsNumber, IsString } from "class-validator";
-import { Branch } from "src/branches/entities/branch.entity";
-import { Repair } from "src/repair/entities/repair.entity";
-import { ManyToMany } from "typeorm";
+import { IsArray, IsDateString, IsNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class CreateUserDto {
 
@@ -43,9 +40,9 @@ export class CreateUserDto {
         type:Date,
         description: "Required"
     })
-    @IsDate()
+    @IsDateString()
     @IsNotEmpty()
-    createdDate! : Date;
+    createdDate! : string;
 
     @ApiProperty({
         type:String,
@@ -61,7 +58,7 @@ export class CreateUserDto {
     })
     @IsArray()
     @IsString({ each: true })
-    role! : string;
+    role! : string[];
 
  
 
@@ -70,6 +67,5 @@ export class CreateUserDto {
         description: "Required"
     })
     @IsNumber()
-    @IsNotEmpty()
     branch?: number; 
 }

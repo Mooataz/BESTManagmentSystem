@@ -1,4 +1,4 @@
-﻿import { API } from '../../services/api';
+﻿import { API, API_BASE_URL } from '../../services/api';
 import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, IconButton } from '@mui/material'
 import React, { useState } from 'react'
 import theme from '../../Theme/theme'
@@ -89,7 +89,7 @@ export default function Validation() {
       }))
       notify('Envoyè à rècuperation', 'success')
       const a = document.createElement('a');
-      a.href = `http://localhost:3000/repair/pdf/${row.id}`;
+      a.href = `${API_BASE_URL}/repair/pdf/${row.id}`;
       a.download = `reparation_${row.id}.pdf`;
       document.body.appendChild(a);
       a.click();

@@ -1,4 +1,4 @@
-﻿import { API } from '../../services/api';
+﻿import { API, API_BASE_URL } from '../../services/api';
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   Box, Button, Card, CardContent, Chip, CircularProgress, Dialog, DialogActions,
@@ -307,7 +307,7 @@ export default function Invoices() {
                   <TableCell><Chip label={inv.state} size="small" color={inv.state === 'Payé' || inv.state === 'Validé' ? 'success' : 'warning'} /></TableCell>
                   <TableCell align="right">{inv.totalPrice?.toFixed(3) ?? '-'}</TableCell>
                   <TableCell align="center">
-                    <Button size="small" variant="outlined" onClick={() => window.open(`http://localhost:3000/invoice/pdf/${inv.id}`)}>
+                    <Button size="small" variant="outlined" onClick={() => window.open(`${API_BASE_URL}/invoice/pdf/${inv.id}`)}>
                       PDF
                     </Button>
                   </TableCell>

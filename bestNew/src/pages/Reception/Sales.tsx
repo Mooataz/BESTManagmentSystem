@@ -1,4 +1,4 @@
-﻿import { API } from '../../services/api';
+﻿import { API, API_BASE_URL } from '../../services/api';
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   Box, Button, Chip, CircularProgress, Dialog, DialogActions,
@@ -361,7 +361,7 @@ export default function Sales() {
                         </Button>
                       )}
                       {(s.state === 'Confirmé' || s.state === 'Validé') && (
-                        <Button size="small" variant="outlined" onClick={() => window.open(`http://localhost:3000/sales/pdf/${s.id}`, '_blank')}>
+                        <Button size="small" variant="outlined" onClick={() => window.open(`${API_BASE_URL}/sales/pdf/${s.id}`, '_blank')}>
                           PDF
                         </Button>
                       )}

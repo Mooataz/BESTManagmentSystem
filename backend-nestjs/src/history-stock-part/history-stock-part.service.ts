@@ -41,10 +41,8 @@ export class HistoryStockPartService {
   }
 
   async findAll():Promise<HistoryStockPart[]> {
-    const allfind = await this.historyStockPartRepositry.find()
-
-    if (!allfind || allfind.length === 0) { throw new NotFoundException ("There is no data available") }
-    return allfind  }
+    return this.historyStockPartRepositry.find()
+  }
 
   async findOne(id: number):Promise<HistoryStockPart> {
     const Onefind= await this.historyStockPartRepositry.findOne({ where: { id } })

@@ -46,7 +46,6 @@ const DynamicTable: React.FC<TableProps> = ({
 useEffect(() => {
   if (!rows.length) {
     setSelectedIds([]);
-    onChecked?.([]);
   }
 }, [rows.length]);
   /* useEffect(() => {
@@ -69,17 +68,15 @@ useEffect(() => {
   const handleCheckboxChange = (id: number) => {
     setSelectedIds((prevSelected) => {
       const isSelected = prevSelected.includes(id);
-      const updated = isSelected
+      return isSelected
         ? prevSelected.filter((selectedId) => selectedId !== id)
         : [...prevSelected, id];
-
-      if (onChecked) {
-        onChecked(updated);
-      }
-
-      return updated;
     });
   };
+
+  React.useEffect(() => {
+    onChecked?.(selectedIds);
+  }, [selectedIds, onChecked]);
 
   const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);

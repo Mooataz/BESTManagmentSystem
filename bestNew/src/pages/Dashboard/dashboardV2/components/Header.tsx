@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../../../services/api';
 import * as React from 'react';
 import Stack from '@mui/material/Stack';
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
@@ -271,7 +272,7 @@ function NotificationBell({
                   '&:hover': { bgcolor: 'action.selected' },
                 }}
                 onClick={() => window.open(
-                  `http://localhost:3000/apiApp/stock-alert/${alert.id}/pdf/${alert.branchId}`,
+                  `${API_BASE_URL}/apiApp/stock-alert/${alert.id}/pdf/${alert.branchId}`,
                   '_blank',
                 )}
               >

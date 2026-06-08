@@ -36,7 +36,7 @@ type Users = {
     status: string;
     login: string;
     role: string[];
-    branch: number
+    branch: number | null
 };
 const Transition = React.forwardRef(function Transition(
     props: TransitionProps & {
@@ -62,11 +62,11 @@ export default function AddEmploye() {
         password: '',
         login: '',
         createdDate: new Date(),
-        status: '',
+        status: 'Autoriser',
         role: [] as string[],
-        branch: 0
+        branch: null as unknown as number
     })
- const [valueStatus, setValueStatus] = React.useState('');
+ const [valueStatus, setValueStatus] = React.useState('Autoriser');
 
 const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   const newStatus = event.target.value;

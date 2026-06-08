@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../../../services/api';
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Avatar from '@mui/material/Avatar';
@@ -12,6 +13,7 @@ import CardAlert from './CardAlert';
 import OptionsMenu from './OptionsMenu';
 import { IconButton } from '@mui/material';
 import { getCompany } from '../../../../Redux/Actions/Administration/Company';
+import logoFallback from '../../../../assets/BestV2.png';
 import type { Company } from '../../../../Redux/Types/administrationTypes';
 import { useDispatch } from 'react-redux';
 import type { RootState } from '../../../../Redux/store';
@@ -65,7 +67,7 @@ export default function SideMenu() {
                 borderRadius: '30%',
                 marginLeft:'70px' }}
         >
-          <img  src={company?.logo ? `http://localhost:3000/upload/company/${company.logo}` : "https://via.placeholder.com/150"} 
+          <img  src={company?.logo ? `${API_BASE_URL}/upload/company/${company.logo}` : logoFallback} 
                 style={{  width: '145px', 
                           borderRadius: '30px' }} />
         </IconButton>
