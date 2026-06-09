@@ -1,6 +1,6 @@
 import { API_BASE_URL } from '../../services/api';
 import React, { useMemo, useState } from 'react'
-import { getByBranchStep } from '../../Redux/Actions/Reception/repairAction';
+import { getByBranchStep, UpdateOneRepair } from '../../Redux/Actions/Reception/repairAction';
 import { useAppDispatch } from '../../Redux/hooks';
 import { useNotification } from '../../Componants/NotificationContext';
 import type { RootState } from '../../Redux/store';
@@ -9,6 +9,7 @@ import type { Customer, OutputListForm, RepairForm } from '../../Redux/Types/rep
 import { Box, Button, Checkbox, Dialog, DialogContent, DialogTitle, FormControl, FormLabel, Grid, IconButton, Input, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { PiEye, PiFilePdf } from 'react-icons/pi';
+import { TbClipboardCheck } from 'react-icons/tb';
 import ShowRepair from '../Reparation/ShowRepair';
 import theme from '../../Theme/theme';
 import DynamicTable from '../../Componants/Global/TableComponat';
@@ -137,8 +138,25 @@ export default function Recuperation() {
         }
     };
 
+    const handleConfirmRepair = async (repair: any) => {
+        const result = await dispatch(UpdateOneRepair({ id: repair.id, approveRepair: true }));
+        if (UpdateOneRepair.fulfilled.match(result)) {
+            dispatch(addHistoryRepair({
+                date: new Date(),
+                step: 'Envoyé à affecter',
+                user: { id: userr?.id || 0 },
+                repair: repair.id
+            }));
+            notify('Réparation confirmée', 'success');
+            dispatch(getByBranchStep({ branch: branchId!, step: 'Prêt à récupérer' }))
+                .then((res) => { if (getByBranchStep.fulfilled.match(res)) setResults(res.payload); });
+        } else {
+            notify('Erreur lors de la confirmation', 'error');
+        }
+    };
 
-        const [selectedRepairId, setSelectedRepairId] = useState<number | null>(null);
+    const [confirmRepair, setConfirmRepair] = useState<any | null>(null);
+    const [selectedRepairId, setSelectedRepairId] = useState<number | null>(null);
 
         const [filters, setFilters] = useState({
 
@@ -184,7 +202,6 @@ const getUniqueOptions = (key: keyof FiltersType): string[] => {
       case 'deviceid':
         return row.device?.id ? [String(row.device.id)] : [];
       case 'deviceserialenumber':
-        // ⚠️ ton DynamicTable montre "device.serialenumber" (avec un "e" minuscule)
         return row.device?.serialenumber ? [row.device.serialenumber] : [];
       case 'devicemodelname':
         return row.device?.model?.name ? [row.device.model.name] : [];
@@ -377,11 +394,29 @@ const getUniqueOptions = (key: keyof FiltersType): string[] => {
                 enableChecked={true}
                 onChecked={setSelected}
 
-                actions={(row) => [
-                    { icon: <PiEye size={18} />, onClick: () => setSelectedRepairId(row.id) },
-                    { icon: <PiFilePdf size={18} style={{ color: theme.palette.primary.main }} />, onClick: () => { const a = document.createElement('a'); a.href = `${API_BASE_URL}/repair/pdf/${row.id}`; a.download = `reparation_${row.id}.pdf`; document.body.appendChild(a); a.click(); document.body.removeChild(a); } }
-                ]}
+                actions={(row) => {
+                    const actions: any[] = [
+                        { icon: <PiEye size={18} />, onClick: () => setSelectedRepairId(row.id) },
+                        { icon: <PiFilePdf size={18} style={{ color: theme.palette.primary.main }} />, onClick: () => { const a = document.createElement('a'); a.href = `${API_BASE_URL}/repair/pdf/${row.id}`; a.download = `reparation_${row.id}.pdf`; document.body.appendChild(a); a.click(); document.body.removeChild(a); } }
+                    ];
+                    const hasDevis = Array.isArray(row.repairAction) && row.repairAction.some((a: any) => a.name === 'Devis');
+                    if (!row.warrenty && hasDevis) {
+                        actions.push({ icon: <TbClipboardCheck size={18} style={{ color: 'green' }} />, onClick: () => setConfirmRepair(row) });
+                    }
+                    return actions;
+                }}
             />
+            <Dialog open={!!confirmRepair} onClose={() => setConfirmRepair(null)}>
+                <DialogTitle>Confirmer la réparation</DialogTitle>
+                <DialogContent>
+                    <Typography>Réparation N°{confirmRepair?.id} — Confirmer la prise en charge et envoyer à l'affectation ?</Typography>
+                </DialogContent>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, p: 2 }}>
+                    <Button onClick={() => setConfirmRepair(null)} variant="outlined">Annuler</Button>
+                    <Button onClick={() => { const r = confirmRepair; setConfirmRepair(null); handleConfirmRepair(r); }} variant="contained" color="primary">Confirmer</Button>
+                </Box>
+            </Dialog>
+
             <Dialog open={!!selectedRepairId} onClose={() => setSelectedRepairId(null)} maxWidth="md" fullWidth>
                 <DialogTitle>
                     Détail de la réparation

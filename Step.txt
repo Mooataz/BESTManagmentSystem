@@ -1,9 +1,0 @@
-
-
-
-
-
-à remplire automatiquement :
- ListAllPart: Chargeur, Ecouteur, 'Câble USB'., Appareille complet, Carte mère
- Action-Repair: Réparation, Devis, Nouvelle appareille
- ajouter Admin : Ad-Bilel pass: BenHammouda-Bilel
