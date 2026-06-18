@@ -74,9 +74,11 @@ useEffect(() => {
     });
   };
 
+  const onCheckedRef = React.useRef(onChecked);
+  onCheckedRef.current = onChecked;
   React.useEffect(() => {
-    onChecked?.(selectedIds);
-  }, [selectedIds, onChecked]);
+    onCheckedRef.current?.(selectedIds);
+  }, [selectedIds]);
 
   const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);

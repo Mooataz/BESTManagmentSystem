@@ -137,7 +137,7 @@ const menuItems: MenuItem[] = [
       { label: 'StateStock', page: 'EtatStock', icon: <SiDatabricks /> },
       { label: 'RemplireStock', page: 'RemplissageStock', icon: <TbDatabasePlus /> },
       { label: 'Transfertpiéces', page: 'TransfertPiéces', icon: <TbArrowsLeftRight /> },
-      { label: 'Reçoipiéces', page: 'ReçoiPiéces', icon: <TbTruckDelivery /> },
+      //{ label: 'Reçoipiéces', page: 'ReçoiPiéces', icon: <TbTruckDelivery /> },
       { label: 'AjusterPrix', page: 'AjusterPrixPiéces', icon: <FcCurrencyExchange /> },
       { label: 'Démantèlement', page: 'Démantèlement', icon: <RiPageSeparator /> },
     ]

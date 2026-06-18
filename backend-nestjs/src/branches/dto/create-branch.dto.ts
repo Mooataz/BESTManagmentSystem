@@ -1,40 +1,29 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsNumber, IsString } from "class-validator";
+import { IsEmail, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateBranchDto {
-    @ApiProperty({
-        type: String,
-        description: "Required"
-    })
+    @ApiProperty({ type: String })
     @IsString()
     name!: string;
 
-    @ApiProperty({
-        type: String,
-        description: "Required"
-    })
+    @ApiProperty({ type: String, required: false })
+    @IsOptional()
     @IsString()
     location?: string;
 
-    @ApiProperty({
-        type: Number,
-        description: "Required"
-    })
+    @ApiProperty({ type: Number, required: false })
+    @IsOptional()
     @IsNumber()
     phone?: number;
 
-    @ApiProperty({
-        type: String,
-        description: "Required"
-    })
+    @ApiProperty({ type: String, required: false })
+    @IsOptional()
     @IsEmail()
     email?: string;
     
-    @ApiProperty({
-        type: String,
-        description: "Required"
-    })
-    @IsEmail()
+    @ApiProperty({ type: Number, required: false })
+    @IsOptional()
+    @IsNumber()
     company?: number;
 
 }

@@ -5,6 +5,8 @@ import type { TransitionProps } from '@mui/material/transitions';
 import { useAppDispatch } from '../../../Redux/hooks';
 import { useNotification } from '../../../Componants/NotificationContext';
 import { getReferences, UpdateOneReference } from '../../../Redux/Actions/stock/References';
+import { getAllModel } from '../../../Redux/Actions/ModelAndAccessory/Models';
+import { getAllPart } from '../../../Redux/Actions/Administration/ListAllPart';
 import { CustomAutocomplete } from '../../../Componants/Global/CustomAutocomplete';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../../Redux/store';
@@ -44,6 +46,11 @@ export default function EditReference({
         allpart: reference.allpart,
     }) */
        const [description, setDescription] = useState<References | null>(null);
+
+  useEffect(() => {
+        dispatch(getAllModel());
+        dispatch(getAllPart());
+    }, [dispatch]);
 
   useEffect(() => {
         if (reference) {

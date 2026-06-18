@@ -27,8 +27,8 @@ export default function EnAttente() {
     typeof branch === 'number' ? branch : branch?.id;
 
   const branchId = getBranchId(user?.branch);
-        const type = 'Pieces';
-    const state = 'Encours';
+        const type = 'Pièces';
+    const state = 'En cours';
     const [transferts, setTransferts] = useState<TransfertPR[]>([]);
      const loadTransferts = async () => {
         try {
@@ -54,8 +54,8 @@ export default function EnAttente() {
         if (branchId) {
             dispatch(GetReceiveTransfert({
                 branchId,
-                type: 'Pieces',
-                state: 'Encours'
+                type: 'Pièces',
+                state: 'En cours'
             }));
         }
     }, [branchId]);

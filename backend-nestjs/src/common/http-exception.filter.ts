@@ -7,6 +7,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
+    console.error('[ExceptionFilter]', exception);
+
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Erreur interne du serveur';
 

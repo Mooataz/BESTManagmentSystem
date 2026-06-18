@@ -11,7 +11,7 @@ interface Agency {
 }
 
 export interface UserState {
-  id: number | null;
+  id?: number;
   login: string;
   name: string;
   status: string;

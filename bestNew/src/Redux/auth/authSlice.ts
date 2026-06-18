@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { handleLogout, loginUser } from '../Actions/authAction';
+import { handleLogout, loginUser, getCurrentUser } from '../Actions/authAction';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { User } from '../Types/authenTypes';
 import type { Agency } from '../Types/Stock';
@@ -46,6 +46,16 @@ const authSlice = createSlice({
         state.loading = false;
         state.success = false;
         state.error = action.payload || 'Unknown error';
+      })
+      .addCase(getCurrentUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getCurrentUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(getCurrentUser.rejected, (state) => {
+        state.loading = false;
       })
       .addCase(handleLogout.pending, (state) => {
         state.loading = true;

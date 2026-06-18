@@ -12,7 +12,8 @@ import { IconButton } from '@mui/material';
 import { getAgencies } from '../../api/administration/Agencies';
 import { getCompany } from '../../api/administration/Company';
 import theme from '../../Theme/theme';
-import { setBranch } from '../../Redux/auth/authSlice';
+import { setBranch as setAuthBranch } from '../../Redux/auth/authSlice';
+import { setUser, setBranch as setUserBranch } from '../../Redux/auth/userSlice';
 import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -73,6 +74,7 @@ const [currentUser, setCurrentUser] = React.useState<Partial<User>>();
       const result = await dispatch(getCurrentUser())
       if (getCurrentUser.fulfilled.match(result)) {
         setCurrentUser(result.payload);
+        dispatch(setUser(result.payload));
       } else {
         console.error('Erreur lors du chargement de l’utilisateur');
       }
@@ -172,7 +174,8 @@ const [currentUser, setCurrentUser] = React.useState<Partial<User>>();
             agencies={agencies}
             onSelect={(agency: any) => {
               if (agency) {
-                dispatch(setBranch(agency)); // Met à jour Redux avec la nouvelle agence
+                dispatch(setAuthBranch(agency));
+                dispatch(setUserBranch(agency));
               }
             }}
           />

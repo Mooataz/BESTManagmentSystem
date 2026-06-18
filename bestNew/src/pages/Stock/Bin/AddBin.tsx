@@ -75,33 +75,35 @@ export function AddBin() {
     const handleClose = () => setOpen(false);
     const { notify } = useNotification();
     const dispatch = useAppDispatch();
-    const user = useSelector((state: RootState) => state.auth.user);
     const userr = useSelector((state: RootState) => state.user);
+    const branchId = userr.branch?.id;
     const [formData, setFormData] = useState({
         name: '',
         type: '',
-        branch: userr.branch?.id || 0
     })
     const handleSubmit = async () => {
         setIsLoading(true);
         try {
-                 if (userr.branch?.id  ) {
-            const result = await dispatch(addBin({ name: formData.name, type: formData.type, branch: userr.branch?.id   }));
+            if (!formData.name || !formData.type) {
+                notify('Veuillez remplir tous les champs', 'error');
+                return;
+            }
+            if (!branchId) {
+                notify('Aucune agence associée', 'error');
+                return;
+            }
+            const result = await dispatch(addBin({ name: formData.name, type: formData.type, branch: branchId }));
 
             if (addBin.fulfilled.match(result)) {
-                dispatch(getBin(userr.branch?.id  ))
+                dispatch(getBin(branchId))
                 notify('Bin ajouté avec succès', 'success');
                 setOpen(false);
             } else {
                 notify(result.payload as string || 'Erreur lors de l’ajout', 'error');
             }
-
-            }
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : "Erreur inconnue";
             notify(errorMessage, "error");
-
-
         } finally {
             setIsLoading(false);
         }
@@ -130,11 +132,10 @@ export function AddBin() {
                         <Typography id="spring-modal-title" variant="h6" component="h2">
                             Ajouter une case
                         </Typography>
-                        <Typography id="spring-modal-description"  >
-
+                        <Box sx={{ mt: 2 }}>
                             <form onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
                                 event.preventDefault();
-                                setOpen(false);
+                                handleSubmit();
                             }}>
                                 <Stack spacing={3}>
                                     <FormControl>
@@ -162,10 +163,10 @@ export function AddBin() {
                                 </Stack>
                                 <DialogActions>
                                     <Button onClick={() => setOpen(false)}>Annuler</Button>
-                                    <Button onClick={handleSubmit} loading={isLoading}>Enregistrer</Button>
+                                    <Button type="submit" loading={isLoading}>Enregistrer</Button>
                                 </DialogActions>
                             </form>
-                        </Typography>
+                        </Box>
                     </Box>
                 </Fade>
             </Modal>

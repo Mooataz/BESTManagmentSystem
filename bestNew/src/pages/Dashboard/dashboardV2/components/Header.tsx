@@ -17,9 +17,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../../../Redux/hooks';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../../../Redux/store';
-import { setBranch } from '../../../../Redux/auth/authSlice';
+import { setBranch as setAuthBranch } from '../../../../Redux/auth/authSlice';
+import { setUser, setBranch as setUserBranch } from '../../../../Redux/auth/userSlice';
 import type { Agency } from '../../../../Redux/Types/Stock';
-import { handleLogout } from '../../../../Redux/Actions/authAction';
+import { handleLogout, getCurrentUser } from '../../../../Redux/Actions/authAction';
 import SelectAgencie from '../../../../Componants/getAgence';
  import theme from '../../../../Theme/theme'
 import { getAgencies } from '../../../../Redux/Actions/Administration/AgenciesActions';
@@ -38,7 +39,14 @@ const dispatch = useAppDispatch();
   const branchId = user?.branch && typeof user.branch === 'object' && 'id' in user.branch ? (user.branch as any).id : undefined;
 
   React.useEffect(() => {
-    dispatch(getAgencies())
+    dispatch(getAgencies());
+    const restoreUser = async () => {
+      const result = await dispatch(getCurrentUser());
+      if (getCurrentUser.fulfilled.match(result)) {
+        dispatch(setUser(result.payload));
+      }
+    };
+    restoreUser();
   }, [dispatch]);
 
   React.useEffect(() => {
@@ -106,7 +114,8 @@ const dispatch = useAppDispatch();
             agencies={agencies}
             onSelect={(agency: any) => {
               if (agency) {
-                dispatch(setBranch(agency)); // Met à jour Redux avec la nouvelle agence
+                dispatch(setAuthBranch(agency));
+                dispatch(setUserBranch(agency));
               }
             }}
           />  

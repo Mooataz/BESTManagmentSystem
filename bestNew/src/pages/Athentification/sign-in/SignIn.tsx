@@ -118,6 +118,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
           role: Array.isArray(resultAction.payload.role)
             ? resultAction.payload.role
             : [resultAction.payload.role],
+          branch: resultAction.payload.branch,
         };
 
         dispatch(setUser(adaptedUser));

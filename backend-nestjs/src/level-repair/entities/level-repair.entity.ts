@@ -15,9 +15,8 @@ export class LevelRepair {
     price!: number;
 
     @ManyToMany( () => Brand, (brand) => brand.levelRepair)
-    
     brand!: Brand[];
 
     @OneToMany( () => PartsPrice, (partsPrice) => partsPrice.levelRepair)
-    partsPrice!: PartsPrice;
+    partsPrice!: PartsPrice[];
 }

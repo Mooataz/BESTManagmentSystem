@@ -17,9 +17,9 @@ export default function ListAccepter() {
   useEffect(() => {
           if (branchId) {
               dispatch(GetReceiveTransfert({
-                  branchId,
-                  type: 'Pieces',
-                  state: 'Accepter'
+                branchId,
+                    type: 'Pièces',
+                    state: 'Accepter'
               }));
           }
       }, [branchId]);

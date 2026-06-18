@@ -48,10 +48,16 @@ export   function AddAgence() {
   const handleSubmit = async () => {
       setIsLoading(true);
       setError(null);
-          
+
+      const cleaned = { ...formData };
+      for (const k of Object.keys(cleaned) as (keyof typeof cleaned)[]) {
+        const v = cleaned[k];
+        if (v === '' || v === 0 || v === '0') delete cleaned[k];
+      }
+      if (Comapny?.id) cleaned.company = Comapny.id;
 
       try {
-        dispatch(addAgencies(formData))
+        dispatch(addAgencies(cleaned))
        .then( () => notify("Agence Ajouter avec succès !", "success"));
 
         setOpen(false);

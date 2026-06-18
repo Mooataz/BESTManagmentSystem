@@ -22,7 +22,7 @@ export default function ListSendingTransfert() {
     useEffect(() => {
     
     if (branchId != null && branchId > 0) {
-        dispatch(GetSendTransfert({ branchId, type: 'Pieces' }));
+        dispatch(GetSendTransfert({ branchId, type: 'Pièces' }));
     }
 }, [dispatch, branchId]);
 

@@ -1,44 +1,29 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsEmpty, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class CreateDistributeurDto {
-    @ApiProperty({
-            type:String,
-            description: "Required"
-        })
+    @ApiProperty({ type: String })
     @IsString()
     @IsNotEmpty()
     name!: string;
 
-    @ApiProperty({
-        type:Number,
-        description: "Required"
-    })
+    @ApiProperty({ type: Number, required: false })
+    @IsOptional()
     @IsNumber()
-    @IsEmpty()
-    phone ?: number;
+    phone?: number;
 
-    @ApiProperty({
-        type:String,
-        description: "Required"
-    })
+    @ApiProperty({ type: String, required: false })
+    @IsOptional()
     @IsEmail()
-    @IsEmpty()
     email?: string;
 
-    @ApiProperty({
-        type:String,
-        description: "Required"
-    })
+    @ApiProperty({ type: String, required: false })
+    @IsOptional()
     @IsString()
-    @IsEmpty()
     location?: string;
 
-    @ApiProperty({
-        type:String,
-        description: "Required"
-    })
+    @ApiProperty({ type: String, required: false })
+    @IsOptional()
     @IsString()
-    @IsEmpty()
     taxRegisterNumber?: string;
 }

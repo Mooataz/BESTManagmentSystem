@@ -10,6 +10,8 @@ import { Box, Button, Card, Divider, IconButton, Input, MenuItem, Paper, Select,
 import ShowHeadRepair from './ShowHeadRepair';
 import { CustomAutocomplete } from '../../Componants/Global/CustomAutocomplete';
 import { getAllExpertiseRaisons } from '../../Redux/Actions/Administration/RaisonsExpertiseActions';
+import { getNotesCustomer } from '../../Redux/Actions/Administration/NotesCustomer';
+import { getRepairAction } from '../../Redux/Actions/Administration/ActionRepairActions';
 import type { RepairForm, TypeModel } from '../../Redux/Types/repairTypes';
 import { CustomCheckboxSelector } from '../../Componants/Global/CustomCheckboxSelector';
 import { useNotification } from '../../Componants/NotificationContext';
@@ -56,7 +58,9 @@ export default function RepairedRepair() {
     }
   }, [oneRepair]);
   useEffect(() => {
-    dispatch(getAllExpertiseRaisons())
+    dispatch(getAllExpertiseRaisons());
+    dispatch(getNotesCustomer());
+    dispatch(getRepairAction());
   }, [dispatch])
 
   useEffect(() => {
@@ -390,11 +394,9 @@ const [saving, setSaving] = useState(false);
               </TableCell>
               {formRepair?.warrenty === true ? <TableCell>Sous garantie</TableCell> : <TableCell>Hors garantie</TableCell>}
             </TableRow>
-
-            <Divider sx={{ width: '300%' }} />
-
+            <TableRow><TableCell colSpan={3} sx={{ borderBottom: '1px solid rgba(224,224,224,1)', p: 0 }} /></TableRow>
             <TableRow>
-              <TableCell>La garantie ne couvre pas les cas suivant</TableCell>
+              <TableCell sx={{ width: '25%' }}>La garantie ne couvre pas les cas suivant</TableCell>
               <TableCell>
                 <CustomAutocomplete
                   data={expertiseRaison.ExpertiseRaisons}
@@ -419,9 +421,7 @@ const [saving, setSaving] = useState(false);
                 )}
               </TableCell>
             </TableRow>
-
-            <Divider sx={{ width: '300%' }} />
-
+            <TableRow><TableCell colSpan={3} sx={{ borderBottom: '1px solid rgba(224,224,224,1)', p: 0 }} /></TableRow>
             <TableRow>
               <TableCell>Notes pour client</TableCell>
               <TableCell>
@@ -448,9 +448,7 @@ const [saving, setSaving] = useState(false);
                 )}
               </TableCell>
             </TableRow>
-
-            <Divider sx={{ width: '300%' }} />
-
+            <TableRow><TableCell colSpan={3} sx={{ borderBottom: '1px solid rgba(224,224,224,1)', p: 0 }} /></TableRow>
             <TableRow>
               <TableCell>Remarque</TableCell>
               <TableCell>
@@ -458,9 +456,7 @@ const [saving, setSaving] = useState(false);
               </TableCell>
               <TableCell>{formRepair?.remark}</TableCell>
             </TableRow>
-
-            <Divider sx={{ width: '300%' }} />
-
+            <TableRow><TableCell colSpan={3} sx={{ borderBottom: '1px solid rgba(224,224,224,1)', p: 0 }} /></TableRow>
             <TableRow>
               <TableCell>Action sur l'appareille</TableCell>
               <TableCell>
@@ -487,9 +483,7 @@ const [saving, setSaving] = useState(false);
                 )}
               </TableCell>
             </TableRow>
-
-            <Divider sx={{ width: '300%' }} />
-
+            <TableRow><TableCell colSpan={3} sx={{ borderBottom: '1px solid rgba(224,224,224,1)', p: 0 }} /></TableRow>
             <TableRow>
               <TableCell sx={{ width: '25%' }}>Besoin des pièces</TableCell>
               <TableCell sx={{ width: '40%' }}>
@@ -607,14 +601,11 @@ const [saving, setSaving] = useState(false);
               </TableCell>
             </TableRow>
 
-            <Divider sx={{ width: '300%' }} />
-
-            <br /><br />
-            <Box display="flex" gap={2} justifyContent="center">
-              <Button disabled={saving} onClick={handleSave} sx={{ background: '#ECEFF1', minWidth: 200 }}>Enregistrer</Button>
-              <Button disabled={saving} onClick={handleCloseRepair} sx={{ backgroundColor: theme.palette.primary.main, color: 'white', minWidth: 200, ':hover': { backgroundColor: theme.palette.secondary.main } }}>Clôturer la réparation</Button>
-            </Box>
           </Table>
+        </Box>
+        <Box display="flex" gap={2} justifyContent="center" sx={{ mt: 2 }}>
+          <Button disabled={saving} onClick={handleSave} sx={{ background: '#ECEFF1', minWidth: 200 }}>Enregistrer</Button>
+          <Button disabled={saving} onClick={handleCloseRepair} sx={{ backgroundColor: theme.palette.primary.main, color: 'white', minWidth: 200, ':hover': { backgroundColor: theme.palette.secondary.main } }}>Clôturer la réparation</Button>
         </Box>
       </Card>
     </Box>

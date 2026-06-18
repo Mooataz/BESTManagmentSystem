@@ -20,11 +20,11 @@ export default function AddTransfertpart() {
     typeof branch === 'number' ? branch : branch?.id;
 
   const currentbranch = getBranchId(user?.branch);
-  const branches = useSelector((state: RootState) => {
-    const allbranch = state.agencies.Agency
-
-    return allbranch.filter(branch => branch.id !== currentbranch)
-  })
+  const allAgencies = useSelector((state: RootState) => state.agencies.Agency)
+  const branches = React.useMemo(
+    () => allAgencies.filter(branch => branch.id !== currentbranch),
+    [allAgencies, currentbranch]
+  )
 
 
   const handleSelectionBranch = async (ids: number) => {
@@ -36,6 +36,10 @@ export default function AddTransfertpart() {
   useEffect(() => {
     dispatch(getAgencies())
   }, [dispatch, user?.id, currentbranch])
+
+  const handleChecked = React.useCallback((ids: number[]) => {
+    setFormtransfert(prev => ({ ...prev, stockPartIds: ids }));
+  }, []);
 
   const [formtransfert, setFormtransfert] = useState<TransfertPR>({
     delivredBy: '',
@@ -290,13 +294,22 @@ export default function AddTransfertpart() {
             'remark'
           ]}
           enableChecked={true} // ✅ Active la sélection
-          onChecked={(ids: number[]) => setFormtransfert({ ...formtransfert, stockPartIds: ids })}
+          onChecked={handleChecked}
         />
 
       </Box>
 
 
-      <Button onClick={handleSubmit}>Confirmer</Button>
+      <Button onClick={handleSubmit}
+      sx={{
+        width: '100%',
+        backgroundColor: 'primary.main',
+        color: 'white',
+        '&:hover': {
+          backgroundColor: 'primary.dark',
+        },
+      }}
+      >Confirmer</Button>
     </Box>
   )
 }

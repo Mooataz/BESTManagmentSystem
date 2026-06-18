@@ -21,5 +21,5 @@ export class Brand {
 
     @ManyToMany( () => LevelRepair, (levelRepair) => levelRepair.brand)
     @JoinTable()
-    levelRepair?: LevelRepair;
+    levelRepair?: LevelRepair[];
 }

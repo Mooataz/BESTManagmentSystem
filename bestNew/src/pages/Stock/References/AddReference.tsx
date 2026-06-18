@@ -1,14 +1,13 @@
 import { useSpring, animated } from '@react-spring/web';
 import { useSelector } from 'react-redux';
-import { Backdrop, Box, Button, DialogActions, FormControl, FormHelperText, FormLabel, Input, MenuItem, Modal, Select, Stack, Typography } from '@mui/material';
+import { Backdrop, Box, Button, DialogActions, FormControl, FormHelperText, FormLabel, Input, Modal, Stack, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNotification } from '../../../Componants/NotificationContext';
 import { useAppDispatch } from '../../../Redux/hooks';
-import type { AppDispatch, RootState } from '../../../Redux/store';
+import type { RootState } from '../../../Redux/store';
 import { AddOneReference, getReferences } from '../../../Redux/Actions/stock/References';
 import { CustomAutocomplete } from '../../../Componants/Global/CustomAutocomplete';
 import { getModelsAuthorised } from '../../../Redux/Actions/ModelAndAccessory/Models';
-import { useDispatch } from 'react-redux';
 import { getAllPart } from '../../../Redux/Actions/Administration/ListAllPart';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Controller, useForm } from 'react-hook-form';
@@ -91,7 +90,7 @@ export default function AddReference() {
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     const { notify } = useNotification();
-    const dispatch = useDispatch<AppDispatch>();
+    const dispatch = useAppDispatch();
     const userr = useSelector((state: RootState) => state.user);
     const models = useSelector((state: RootState) => state.models.models);
     const allParts = useSelector((state: RootState) => state.allParts.allParts);
@@ -107,14 +106,17 @@ export default function AddReference() {
     });
 
 
+    useEffect(() => {
+        dispatch(getModelsAuthorised());
+        dispatch(getAllPart());
+    }, [dispatch]);
+
     const [formData, setFormData] = useState<FormData>({
         materialCode: '',
         modelIds: [],
         allpart: 0
     })
 
-  
-                     
     const onSubmit = async (formData: FormData) => {
         setOpen(false);
         setIsLoading(true);

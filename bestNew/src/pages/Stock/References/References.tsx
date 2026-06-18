@@ -1,8 +1,10 @@
 import { Box, Typography } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import DynamicTable from '../../../Componants/Global/TableComponat'
 import type { RootState } from '../../../Redux/store';
 import { useSelector } from 'react-redux';
+import { useAppDispatch } from '../../../Redux/hooks';
+import { getReferences } from '../../../Redux/Actions/stock/References';
 import AddReference from './AddReference';
 import theme from '../../../Theme/theme';
 import EditReference from './EditReference';
@@ -12,15 +14,17 @@ import EditIcon from '@mui/icons-material/Edit';
 import type { References } from '../../../Redux/Types/Stock';
 
 export default function References() {
+  const dispatch = useAppDispatch();
   const userr = useSelector((state: RootState) => state.user);
   const references = useSelector((state: RootState) => state.references.references)
- 
+
+  useEffect(() => { dispatch(getReferences()); }, [dispatch]);
+  
    const { notify } = useNotification();
    const [row, setRow] = useState<References>();
    const handleClose = () => setOpen(false);
    const [isLoading, setIsLoading] = useState(false);
- 
- 
+  
    const [open, setOpen] = React.useState(false);
    const handelOpenEdit = (ref : References ) => {
      setRow(ref);

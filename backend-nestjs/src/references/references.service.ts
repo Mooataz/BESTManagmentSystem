@@ -67,28 +67,28 @@ async create(createReferenceDto: CreateReferenceDto): Promise<Reference> {
   }
 
   async update(id: number, updateReferenceDto: UpdateReferenceDto): Promise<Reference> {
-    const { allpart, modelIds, ...rest} = updateReferenceDto;
+    const existing = await this.referenceRepositry.findOne({
+      where: { id },
+      relations: ['allpart', 'model'],
+    });
+    if (!existing) throw new NotFoundException('Reference not found');
 
-    let updateData: Partial<Reference> = { ...rest };
+    const { allpart, modelIds, ...rest } = updateReferenceDto;
 
-    // Vérifier si allpart est fourni et récupérer l'entité correspondante
-    if (updateReferenceDto.allpart !== undefined) {
-        const allpart = await this.allPartRepositry.findOne({ where: { id: updateReferenceDto.allpart } });
-        if (!allpart) {
-            throw new NotFoundException('No part found');
-        }
-        updateData.allpart = allpart; // Conversion de number -> AllPart
+    if (allpart !== undefined) {
+      const part = await this.allPartRepositry.findOne({ where: { id: allpart } });
+      if (!part) throw new NotFoundException('No part found');
+      existing.allpart = part;
     }
 
-    await this.referenceRepositry.update(id, updateData);
-
-    const updatedReference = await this.referenceRepositry.findOne({ where: { id }, relations: ['allpart'] });
-
-    if (!updatedReference) {
-        throw new NotFoundException('Reference not found to update');
+    if (modelIds !== undefined) {
+      const models = await this.modelRepositry.find({ where: { id: In(modelIds) } });
+      if (!models.length) throw new NotFoundException('No models found');
+      existing.model = models;
     }
 
-    return updatedReference;
+    Object.assign(existing, rest);
+    return this.referenceRepositry.save(existing);
 }
 
 async remove(id: number):Promise<Reference> {

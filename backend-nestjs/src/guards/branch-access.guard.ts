@@ -22,6 +22,10 @@ export class BranchAccessGuard implements CanActivate {
       where: { id: jwtPayload.sub },
       relations: ['branch'],
     });
+    if (!user) throw new ForbiddenException('Utilisateur introuvable');
+
+    if (user.role?.some(r => r === 'Administrateur')) return true;
+
     if (!user?.branch?.id) throw new ForbiddenException('Utilisateur sans agence');
 
     const userBranchId = user.branch.id;

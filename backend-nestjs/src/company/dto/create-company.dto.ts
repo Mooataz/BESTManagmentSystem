@@ -1,70 +1,47 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmpty, IsNumber, IsPositive, IsString } from "class-validator";
+import { IsNumber, IsOptional, IsPositive, IsString } from "class-validator";
 
 export class CreateCompanyDto {
-    @ApiProperty({
-            type:String,
-            description: "Required"
-        })
+    @ApiProperty({ type: String })
+    @IsOptional()
     @IsString()
-    @IsEmpty()
-    name!: string;
+    name?: string;
 
-    @ApiProperty({
-        type:String,
-        description: "Required"
-    })
+    @ApiProperty({ type: String, required: false })
+    @IsOptional()
     @IsString()
-    @IsEmpty()
     headquarterslocation?: string;
 
-    @ApiProperty({
-        type:String,
-        description: "Required"
-    })
+    @ApiProperty({ type: String, required: false })
+    @IsOptional()
     @IsString()
-    @IsEmpty()
     taxRegisterNumber?: string;
 
-    @ApiProperty({
-        type:Number,
-        description: "Required"
-    })
+    @ApiProperty({ type: Number, required: false })
+    @IsOptional()
     @IsNumber()
-    @IsEmpty()
     rib?: number;
 
-    @ApiProperty({
-        type:String,
-        description: "Required"
-    })
-    @IsEmpty()
+    @ApiProperty({ type: String, required: false })
+    @IsOptional()
     logo?: string;
 
-    @ApiProperty({
-        type:String,
-        description: "Required"
-    })
-    @IsEmpty()
-    bank? : string;
+    @ApiProperty({ type: String, required: false })
+    @IsOptional()
+    bank?: string;
     
-    @ApiProperty({
-        type:Number,
-        description: "Required"
-    })
+    @ApiProperty({ type: Number, required: false })
+    @IsOptional()
+    @IsNumber()
     quantityAlertStock?: number;
 
-    @ApiProperty({
-        type:Number,
-        description: "TVA en pourcentage"
-    })
+    @ApiProperty({ type: Number, required: false })
+    @IsOptional()
     @IsPositive()
     tva?: number;
 
-    @ApiProperty({
-        type:Number,
-        description: "Timbre fiscale"
-    })
+    @ApiProperty({ type: Number, required: false })
+    @IsOptional()
     @IsPositive()
     timbreFiscale?: number;
 }
