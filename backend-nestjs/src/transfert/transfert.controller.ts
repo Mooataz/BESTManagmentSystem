@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Res, HttpStatus, Htt
 import { TransfertService } from './transfert.service';
 import { CreateTransfertDto } from './dto/create-transfert.dto';
 import { UpdateTransfertDto } from './dto/update-transfert.dto';
+import { AcceptTransfertDto } from './dto/accept-transfert.dto';
 
 @Controller('transfert')
 export class TransfertController {
@@ -224,6 +225,30 @@ export class TransfertController {
         data: updatedata
       })
     }   catch (error) {
+    if (error instanceof HttpException) {
+      return res.status(error.getStatus()).json({
+        message: error.message,
+        status: error.getStatus(),
+        data: null,
+      })
+    }
+  
+    throw error
+  }
+  }
+
+  @Patch('/accept/:id')
+  async accept(@Param('id') id: number,
+    @Body() acceptTransfertDto: AcceptTransfertDto,
+    @Res() res: any) {
+    try {
+      const updatedata = await this.transfertService.acceptTransfert(+id, acceptTransfertDto)
+      return res.status(HttpStatus.OK).json({
+        message: "Transfert accepté avec succès !",
+        status: HttpStatus.OK,
+        data: updatedata
+      })
+    } catch (error) {
     if (error instanceof HttpException) {
       return res.status(error.getStatus()).json({
         message: error.message,

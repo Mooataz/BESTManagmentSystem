@@ -32,7 +32,7 @@ export class HistoryStockPartService {
    const saveHist = await this.historyStockPartRepositry.save(newCreate);
     const tracData ={
       user: user,
-      stockPart:saveHist
+      historyStockPart: saveHist
     }
     const newTrac =  await this.tracabilityRepositry.create(tracData)
     await this.tracabilityRepositry.save(newTrac);

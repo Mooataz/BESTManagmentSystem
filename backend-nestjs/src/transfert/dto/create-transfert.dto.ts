@@ -29,4 +29,6 @@ export class CreateTransfertDto {
     @ApiProperty({ type: Number, description: "Required" }) tobranch?: number;
 
     @ApiProperty({ type: String, description: "Required" }) @Optional() typePart?: string;
+
+    @ApiProperty({ type: Number, description: "Required" }) @Optional() bin?: number;
 }

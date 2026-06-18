@@ -39,8 +39,11 @@ const update = {
   state: body.state,
   receivedDate: body.receivedDate,
   receiveUser: body.receiveUser,
+  ...(body.stockPartIds && { stockPartIds: body.stockPartIds }),
+  ...(body.bin != null && { bin: body.bin }),
 };
     try {
+      console.log("Action bin", body.bin);
       const response = await API.patch(`transfert/${id}`, update);
   
  
@@ -49,6 +52,32 @@ const update = {
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Échec de l\'envoie'
+      );
+    }
+  }
+);
+
+export const AcceptTransfert = createAsyncThunk<
+  TransfertPR,
+  any,
+  AsyncThunkConfig
+>(
+  'Transfert/Accept',
+  async (body, { rejectWithValue }) => {
+    const { id } = body;
+    const payload = {
+      state: body.state,
+      receivedDate: body.receivedDate,
+      receiveUser: body.receiveUser,
+      stockPartIds: body.stockPartIds ?? [],
+      bin: body.bin,
+    };
+    try {
+      const response = await API.patch(`transfert/accept/${id}`, payload);
+      return response.data.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Échec de l'acceptation"
       );
     }
   }

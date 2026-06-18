@@ -39,7 +39,7 @@ export default function TransfertPart() {
         </Box>
         <TabPanel value="1"  ><ListSendingTransfert /></TabPanel>
         <TabPanel value="2"  ><AcceptePart /></TabPanel>
-        <TabPanel value="3" ><AddTransfertpart /></TabPanel>
+        <TabPanel value="3" ><AddTransfertpart onCreated={() => setValue('1')} /></TabPanel>
          
       </TabContext>
     </Box>

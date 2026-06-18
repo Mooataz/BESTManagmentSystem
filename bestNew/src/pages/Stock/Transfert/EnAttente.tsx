@@ -13,7 +13,6 @@ import { BiShowAlt } from 'react-icons/bi';
 import type { TableAction } from '../../../Redux/Types/repairTypes';
 import { Button } from '@mui/material';
 import AcceptePart from './AcceptePart';
-import { AddhistoryOnePart } from '../../../Redux/Actions/stock/EtatStockActions';
 
 export default function EnAttente() {
     const user = useSelector((state: RootState) => state.auth.user);
@@ -77,21 +76,6 @@ export default function EnAttente() {
             notify('Transfert accepté', 'success');
 
             loadTransferts()
-            const partIds = row.stockPartIds ?? [];
-            const toBranch = row.tobranch ?? row.toBranchName ?? '';
-            if (partIds.length > 0) {
-                await Promise.all(
-                    partIds.map((idPart: number) =>
-                        dispatch(
-                            AddhistoryOnePart({
-                                id: idPart,
-                                userId: user?.id || 0,
-                                step: `Transfert accepter agence ${toBranch}`,
-                            })
-                        )
-                    )
-                );
-            }
         } catch (error) {
             notify('Erreur lors de l’acceptation', 'error');
         }

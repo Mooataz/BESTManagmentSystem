@@ -11,5 +11,6 @@ import { Tracability } from 'src/tracability/entities/tracability.entity';
   imports: [TypeOrmModule.forFeature([HistoryStockPart,StockPart,User,Tracability])],
   controllers: [HistoryStockPartController],
   providers: [HistoryStockPartService],
+  exports: [HistoryStockPartService],
 })
 export class HistoryStockPartModule {}

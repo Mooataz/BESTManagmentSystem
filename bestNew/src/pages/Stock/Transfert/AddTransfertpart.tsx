@@ -7,11 +7,15 @@ import type { RootState } from '../../../Redux/store';
 import type { TransfertPR, TypeBranchTransfert } from '../../../Redux/Types/Stock';
 import { getAgencies } from '../../../Redux/Actions/Administration/AgenciesActions';
 import { CustomAutocomplete } from '../../../Componants/Global/CustomAutocomplete';
-import { AddhistoryOnePart, getTotransfert } from '../../../Redux/Actions/stock/EtatStockActions';
+import { getTotransfert } from '../../../Redux/Actions/stock/EtatStockActions';
 import { AddOneTransfert, GetSendTransfert } from '../../../Redux/Actions/stock/TransfertAction';
 import DynamicTable from '../../../Componants/Global/TableComponat';
 
-export default function AddTransfertpart() {
+interface Props {
+  onCreated?: () => void;
+}
+
+export default function AddTransfertpart({ onCreated }: Props) {
   const dispatch = useAppDispatch();
   const { notify } = useNotification();
   const user = useSelector((state: RootState) => state.auth.user);
@@ -27,10 +31,10 @@ export default function AddTransfertpart() {
   )
 
 
-  const handleSelectionBranch = async (ids: number) => {
+  const selectedIdsRef = React.useRef<number[]>([]);
 
-    setFormtransfert({ ...formtransfert, tobranch: ids });
-
+  const handleSelectionBranch = (ids: number) => {
+    setFormtransfert(prev => ({ ...prev, tobranch: ids }));
   };
 
   useEffect(() => {
@@ -38,6 +42,7 @@ export default function AddTransfertpart() {
   }, [dispatch, user?.id, currentbranch])
 
   const handleChecked = React.useCallback((ids: number[]) => {
+    selectedIdsRef.current = ids;
     setFormtransfert(prev => ({ ...prev, stockPartIds: ids }));
   }, []);
 
@@ -50,13 +55,13 @@ export default function AddTransfertpart() {
     stockPartIds: [],
     type: 'Pièces',
     state: 'En cours',
-    typePart: '',
+    typePart: 'Bon',
     remark: ''
 
   })
 
   const [dataTransfert, setDataTansfert] = useState<TypeBranchTransfert>({
-    typePart: formtransfert.typePart || '',
+    typePart:  'Bon',
     branchId: currentbranch || 0,
   })
 
@@ -70,7 +75,7 @@ export default function AddTransfertpart() {
 
   const handleSubmit = async () => {
     try {
-      const hasStockParts = (formtransfert.stockPartIds ?? []).length > 0;
+      const hasStockParts = selectedIdsRef.current.length > 0;
 
       if (!hasStockParts) {
         notify("Veuillez sélectionner au moins une pièce", "error");
@@ -81,14 +86,11 @@ export default function AddTransfertpart() {
         ...formtransfert,
         sendingDate: new Date(),
         typePart: formtransfert.typePart || '',
-        stockPartIds: formtransfert.stockPartIds,
-
-        // ✅ Champs requis ou attendus par l'entité
-        remark: formtransfert.remark,                    // défaut obligatoire
-        receivedDate: null,           // champ nullable mais doit exister
-        receiveUser: null,            // champ nullable mais doit exister
+        stockPartIds: selectedIdsRef.current,
+        remark: formtransfert.remark,
+        receivedDate: null,
+        receiveUser: null,
       };
-
 
       delete payload.stockPart;
       delete payload.repair;
@@ -97,24 +99,11 @@ export default function AddTransfertpart() {
 
       if (AddOneTransfert.fulfilled.match(result)) {
         if (currentbranch) {
-          dispatch(GetSendTransfert(currentbranch));
+          dispatch(GetSendTransfert({ branchId: currentbranch, type: 'Pièces' }));
         }
         dispatch(getTotransfert(dataTransfert))
         notify('Transfert ajouté avec succès', 'success');
-
-        await Promise.all(
-          (formtransfert.stockPartIds ?? []).map((idPart: number) =>
-            dispatch(
-              AddhistoryOnePart({
-                id: idPart,
-                userId: user?.id || 0,
-                step: `Transfert de agence ${formtransfert.frombranch}`,
-              })
-            )
-          )
-        );
-
-
+        onCreated?.();
         
       } else {
         notify(result.payload as string || 'Erreur lors de l’ajout', 'error');
@@ -231,23 +220,7 @@ export default function AddTransfertpart() {
           onChange={handleSelectionBranch}
 
         />
-        <Box>
-          <FormLabel>  Type de pièces </FormLabel><br />
-          <Select
-            sx={{ width: '300px' }}
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={formtransfert.typePart}
-            onChange={(e) => {
-              setFormtransfert({ ...formtransfert, typePart: e.target.value, stockPartIds: [] });
-              setDataTansfert({ ...dataTransfert, typePart: e.target.value })
-            }}
-          >
-            <MenuItem value={'Bon'}>Bon</MenuItem>
-            <MenuItem value={'Défectueux'}>Défectueux</MenuItem>
-
-          </Select>
-        </Box>
+     
 
 
         <Box>

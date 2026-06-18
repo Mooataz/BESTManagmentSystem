@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTransfertDto } from './dto/create-transfert.dto';
 import { UpdateTransfertDto } from './dto/update-transfert.dto';
+import { AcceptTransfertDto } from './dto/accept-transfert.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Transfert } from './entities/transfert.entity';
 import { In, Repository } from 'typeorm';
@@ -10,6 +11,8 @@ import { User } from 'src/users/entities/user.entity';
 import { Branch } from 'src/branches/entities/branch.entity';
 import { HistoryRepair } from 'src/history-repair/entities/history-repair.entity';
 import { Tracability } from 'src/tracability/entities/tracability.entity';
+import { StockPartsService } from 'src/stock-parts/stock-parts.service';
+import { HistoryStockPartService } from 'src/history-stock-part/history-stock-part.service';
 
 @Injectable()
 export class TransfertService {
@@ -17,10 +20,12 @@ export class TransfertService {
     @InjectRepository(Transfert) private readonly transfertRepositry: Repository<Transfert>,
     @InjectRepository(StockPart) private readonly stockPartRepositry: Repository<StockPart>,
     @InjectRepository(Repair) private readonly repairRepositry: Repository<Repair>,
+    private readonly stockPartsService: StockPartsService,
     @InjectRepository(User) private readonly userRepositry: Repository<User>,
     @InjectRepository(Branch) private readonly branchRepositry: Repository<Branch>,
     @InjectRepository(HistoryRepair) private readonly historyRepairRepositry: Repository<HistoryRepair>,
     @InjectRepository(Tracability) private readonly tracabilityRepositry: Repository<Tracability>,
+    private readonly historyStockPartService: HistoryStockPartService,
   ) { }
 
   async create(createTransfertDto: CreateTransfertDto): Promise<Transfert> {
@@ -66,7 +71,22 @@ export class TransfertService {
         .execute();
     }
 
-    return await this.transfertRepositry.save(newCreate);
+    const saved = await this.transfertRepositry.save(newCreate);
+
+    if (stockPart.length) {
+      const fromBranch = await this.branchRepositry.findOne({ where: { id: createTransfertDto.frombranch } });
+      const branchName = fromBranch?.name ?? String(createTransfertDto.frombranch);
+      for (const sp of stockPart) {
+        await this.historyStockPartService.create({
+          stockPart: sp.id,
+          user: { id: createTransfertDto.sendUser },
+          step: `Transfert de agence ${branchName}`,
+          date: new Date(),
+        });
+      }
+    }
+
+    return saved;
   }
 
   async findAll(): Promise<Transfert[]> {
@@ -126,8 +146,13 @@ async update(id: number, data: any): Promise<Transfert> {
     where: { id: In(data.repairIds ?? []) },
   });
 
-  if ((!stockPart.length) && (!repair.length)) {
-    throw new NotFoundException('No data for transfert');
+  // Récupérer le transfert à modifier
+  const transfert = await this.transfertRepositry.findOne({
+    where: { id },
+  });
+
+  if (!transfert) {
+    throw new NotFoundException('Transfert Not found for update = failed');
   }
 
   // Mise à jour des entités associées selon le type de transfert
@@ -141,33 +166,66 @@ async update(id: number, data: any): Promise<Transfert> {
   }
 
   if (stockPart.length) {
+    const stockPartIds = stockPart.map(p => p.id);
     await this.stockPartRepositry
       .createQueryBuilder()
       .update(StockPart)
-      .set({ bin: () => data.bin }) // attention ici : `bin` doit être une expression SQL ou une string
-      .where('id IN (:...ids)', { ids: stockPart.map(p => p.id) })
+      .set({ bin: data.bin })
+      .where('id IN (:...ids)', { ids: stockPartIds })
       .execute();
-  }
-
-  // Récupérer le transfert à modifier
-  const transfert = await this.transfertRepositry.findOne({
-    where: { id },
-    relations: ['repair', 'stockPart'],
-  });
-
-  if (!transfert) {
-    throw new NotFoundException('Transfert Not found for update = failed');
+    const toBranch = await this.branchRepositry.findOne({ where: { id: transfert.tobranch } });
+    const branchName = toBranch?.name ?? String(transfert.tobranch);
+    for (const sp of stockPart) {
+      await this.historyStockPartService.create({
+        stockPart: sp.id,
+        user: { id: data.receiveUser ?? 0 },
+        step: `Transfert accepté agence ${branchName}`,
+        date: new Date(),
+      });
+    }
   }
 
   // Mettre à jour les données simples
   Object.assign(transfert, data);
 
-  // Mettre à jour les relations
-  transfert.repair = repair;
-  transfert.stockPart = stockPart;
-
   // Sauvegarder le tout
   return await this.transfertRepositry.save(transfert);
+}
+
+async acceptTransfert(id: number, data: any): Promise<Transfert> {
+  const transfert = await this.transfertRepositry.findOne({ where: { id } });
+  if (!transfert) {
+    throw new NotFoundException('Transfert non trouvé');
+  }
+
+  transfert.state = data.state ?? transfert.state;
+  transfert.receivedDate = data.receivedDate ?? transfert.receivedDate;
+  transfert.receiveUser = data.receiveUser ?? transfert.receiveUser;
+
+  const saved = await this.transfertRepositry.save(transfert);
+
+  const stockPartIds = data.stockPartIds ?? [];
+  
+  if (stockPartIds.length > 0 && data.bin != null) {
+    for (const spId of stockPartIds) {
+      await this.stockPartsService.update(spId, { bin: data.bin } as any);
+    }
+  }
+
+  if (stockPartIds.length > 0) {
+    const toBranch = await this.branchRepositry.findOne({ where: { id: transfert.tobranch } });
+    const branchName = toBranch?.name ?? String(transfert.tobranch);
+    for (const spId of stockPartIds) {
+      await this.historyStockPartService.create({
+        stockPart: spId,
+        user: { id: data.receiveUser ?? 0 },
+        step: `Transfert accepté agence ${branchName}`,
+        date: new Date(),
+      });
+    }
+  }
+
+  return saved;
 }
 
   async remove(id: number): Promise<Transfert> {
@@ -277,9 +335,7 @@ async update(id: number, data: any): Promise<Transfert> {
       .createQueryBuilder('transfert')
       .where('state = :state', { state })
       .getMany();
-    if (!findAll || findAll.length === 0) {
-      throw new NotFoundException("There is no data Available")
-    }
+
     return findAll
   }
 
@@ -293,10 +349,8 @@ async update(id: number, data: any): Promise<Transfert> {
       .leftJoinAndSelect('stockPart.bin', 'bin')
       .where('transfert.frombranch = :branchId', { branchId })
       .andWhere('transfert.type = :type', { type })
+      .orderBy('transfert.id', 'DESC')
       .getMany();
-    if (!transferts || transferts.length === 0) {
-      throw new NotFoundException('There is no data available');
-    }
     const result: any[] = [];
     for (const t of transferts) {
       const [sendUser, receiveUser, fromBranch, toBranch] = await Promise.all([
@@ -327,6 +381,7 @@ async update(id: number, data: any): Promise<Transfert> {
         receiveUserName: receiveUser?.name || null,
         fromBranchName: fromBranch?.name || null,
         toBranchName: toBranch?.name || null,
+        stockPartIds: t.stockPart?.map(sp => sp.id) ?? [],
         stockPart: stockPartsDetail
       });
     }
@@ -336,7 +391,7 @@ async update(id: number, data: any): Promise<Transfert> {
 
   async getToBranch(branchId: number, type: string, state: string): Promise<any[]> {
 
-    const transferts = await this.transfertRepositry
+    const query = this.transfertRepositry
       .createQueryBuilder('transfert')
       .leftJoinAndSelect('transfert.stockPart', 'stockPart')
       .leftJoinAndSelect('stockPart.reference', 'reference')
@@ -344,13 +399,15 @@ async update(id: number, data: any): Promise<Transfert> {
       .leftJoinAndSelect('reference.model', 'model')
       .leftJoinAndSelect('stockPart.bin', 'bin')
       .where('transfert.tobranch = :branchId', { branchId })
-      .andWhere('transfert.type = :type', { type })
-      .andWhere('transfert.state = :state', { state })
-      .getMany();
+      .andWhere('transfert.type = :type', { type });
 
-    if (!transferts || transferts.length === 0) {
-      throw new NotFoundException('There is no data available');
+    if (state !== 'all') {
+      query.andWhere('transfert.state = :state', { state });
     }
+
+    query.orderBy('transfert.id', 'DESC');
+
+    const transferts = await query.getMany();
     const result: any[] = [];
     for (const t of transferts) {
       const [sendUser, receiveUser, fromBranch, toBranch] = await Promise.all([
@@ -381,6 +438,7 @@ async update(id: number, data: any): Promise<Transfert> {
         receiveUserName: receiveUser?.name || null,
         fromBranchName: fromBranch?.name || null,
         toBranchName: toBranch?.name || null,
+        stockPartIds: t.stockPart?.map(sp => sp.id) ?? [],
         stockPart: stockPartsDetail
       });
     }

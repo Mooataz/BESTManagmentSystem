@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { TransfertPR } from "../Types/Stock";
-import { AddOneTransfert, GetReceiveTransfert, GetSendTransfert, UpdateOneTransfert, FetchRepairTransfers, AcceptRepairTransfer, RefuseRepairTransfer, CancelRepairTransfer } from "../Actions/stock/TransfertAction";
+import { AcceptTransfert, AddOneTransfert, GetReceiveTransfert, GetSendTransfert, UpdateOneTransfert, FetchRepairTransfers, AcceptRepairTransfer, RefuseRepairTransfer, CancelRepairTransfer } from "../Actions/stock/TransfertAction";
 import { getTotransfert } from "../Actions/stock/EtatStockActions";
 
 interface TransfertState {
@@ -85,6 +85,7 @@ const TransfertSlice = createSlice({
             .addCase(GetSendTransfert.rejected, (state, action) => {
                 state.loading = false;
                 state.success = false;
+                state.Transfert = [];
                 state.error =
                     typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
             })
@@ -102,6 +103,7 @@ const TransfertSlice = createSlice({
             .addCase(GetReceiveTransfert.rejected, (state, action) => {
                 state.loading = false;
                 state.success = false;
+                state.Transfert = [];
                 state.error =
                     typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
             })
@@ -117,6 +119,25 @@ const TransfertSlice = createSlice({
                 state.Transfert = action.payload;
             })
             .addCase(FetchRepairTransfers.rejected, (state, action) => {
+                state.loading = false;
+                state.success = false;
+                state.Transfert = [];
+                state.error =
+                    typeof action.payload === 'string' ? action.payload : 'Erreur inconnue';
+            })
+
+            .addCase(AcceptTransfert.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+                state.success = false;
+            })
+            .addCase(AcceptTransfert.fulfilled, (state, action: PayloadAction<TransfertPR>) => {
+                state.loading = false;
+                state.success = true;
+                const index = state.Transfert.findIndex(t => t.id === action.payload.id);
+                if (index !== -1) state.Transfert[index] = action.payload;
+            })
+            .addCase(AcceptTransfert.rejected, (state, action) => {
                 state.loading = false;
                 state.success = false;
                 state.error =

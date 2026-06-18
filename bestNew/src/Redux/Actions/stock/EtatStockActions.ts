@@ -77,7 +77,7 @@ export const AddhistoryOnePart = createAsyncThunk<
   'stockPart/AddhistoryOnePart',
   async ({ id, userId, step }, { rejectWithValue }) => {
     try {
-      const response = await API.post(`AddHistorytockPart/${id}/${userId}/${step}`);
+      const response = await API.post(`stock-parts/AddHistorytockPart/${id}/${userId}/${step}`);
 
       return response.data.data;
     } catch (error: any) {
